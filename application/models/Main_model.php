@@ -2560,11 +2560,16 @@ class Main_model extends CI_Model {
         }
     }
 
-    public function showoffdeTecutedPanel_expenselist($date){
+  
+
+    public function showoffdeTecutedPanel_expenselist($date,$outletid){
+        
         $this->db->select('expenses_list.expenses_list_id,expenses_list.expense_note,expenses_list.expense_date,expenses_list.expense_amount,expense_type.expense_name');
         $this->db->from('expenses_list'); 
+        //$this->db->where('expenses_list.expense_date',$date);
+        $this->db->where('expenses_list.outlet_id_fk',$outletid); 
         $this->db->join('expense_type','expense_type.expense_typeid=expenses_list.expense_type','left');
-        $this->db->where('expenses_list.expense_date',$date);
+       
         $result = $this->db->get(); 
         if($result->num_rows() > 0){
             return $result->result(); 
@@ -2736,6 +2741,8 @@ class Main_model extends CI_Model {
     }
 
     
+
+    
     public function refillwarehousection($fillablevalue,$id){
         return $this->db->query('update products_section set quantity=(quantity + '.$fillablevalue.') where products_id='.$id.''); 
     }
@@ -2774,6 +2781,40 @@ class Main_model extends CI_Model {
         }
 
     }
+
+    public function saveexpensedetailsforregister($value, $date, $outletid){
+        $this->db->select('register_details_id'); 
+        $this->db->from('register_details_section'); 
+        $this->db->where('date',$date);
+        $this->db->where('outlet_id', $outletid); 
+        $result = $this->db->get(); 
+        if($result->num_rows() > 0){
+           return  $this->db->query('update register_details_section set expenses_amount_reg=(expenses_amount_reg + '.$value.') where date="'.$date.'" and outlet_id='.$outletid.'');
+        }
+        else {
+            return $this->db->insert('register_details_section',array('expenses_amount_reg' => $value,'date' => $date, 'outlet_id' => $outletid)); 
+        }
+
+
+        
+    }
+
+    public function subtractexpenseamount($value,$date, $outletid){
+        $this->db->select('register_details_id'); 
+        $this->db->from('register_details_section'); 
+        $this->db->where('date',$date);
+        $this->db->where('outlet_id', $outletid); 
+        $result = $this->db->get(); 
+        if($result->num_rows() > 0){
+           return  $this->db->query('update register_details_section set expenses_amount_reg=(expenses_amount_reg - '.$value.') where date="'.$date.'" and outlet_id='.$outletid.'');
+        }
+        else {
+            return $this->db->insert('register_details_section',array('expenses_amount_reg' => $value,'date' => $date, 'outlet_id' => $outletid)); 
+        }
+        
+    }
+
+    
 
     //copyback
     public function showoffsalesunitsection($date,$outletid){

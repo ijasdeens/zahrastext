@@ -2563,6 +2563,7 @@ class Controllerunit extends CI_Controller {
                 $data['cheque_payment'] = $res->cheque_payment; 
                 $data['refunded_amount'] = $res->refunded_amount; 
                 $data['date'] = $res->date; 
+                $data['expenses_amount_reg'] = $res->expenses_amount_reg;
                  
             }
         }
@@ -3713,11 +3714,23 @@ public function select_postponed(){
 
     #showback
 
+
+    public function saveexpensedetailsforregister(){
+        $amount = $this->security->xss_clean($_POST['amount']); 
+        $date = $this->security->xss_clean($_POST['date']); 
+
+      $result = $this->main_model->saveexpensedetailsforregister($amount, $date, $this->session->outlet_id); 
+      echo $result; 
+    }
+
     public function save_frm_expense_list_section(){
         $expense_type = $this->security->xss_clean($_POST['expense_type']);
         $expense_date = $this->security->xss_clean($_POST['expense_date']);
         $expense_amount = $this->security->xss_clean($_POST['expense_amount']);
         $note_for_expense_section = $this->security->xss_clean($_POST['note_for_expense_section']);
+        
+        
+
 
         $data = array(
         'expense_type' => $expense_type,
@@ -4173,15 +4186,25 @@ public function select_postponed(){
 
     }
 
+    public function subtractexpenseamount(){
+        $expenseamount = $this->security->xss_clean($_POST['expenseamount']); 
+        $getfulldate = $this->security->xss_clean($_POST['getfulldate']); 
+
+        $result = $this->main_model->subtractexpenseamount($expenseamount,$getfulldate,$this->session->outlet_id); 
+        echo $result; 
+    }
+
     public function showoffdeTecutedPanel_expenselist(){
         $mydate = $this->security->xss_clean($_POST['mydate']); 
-        $result = $this->main_model->showoffdeTecutedPanel_expenselist($mydate); 
+        $mydate  = trim($mydate);
+        $result = $this->main_model->showoffdeTecutedPanel_expenselist($mydate, $this->session->outlet_id); 
         echo json_encode($result); 
     }
 
     public function delete_expense_list_from_cashier(){
         $value = (int)$this->security->xss_clean($_POST['value']); 
         $result = $this->main_model->delete_expense_list_from_cashier($value);
+        echo $result; 
 
     }
 

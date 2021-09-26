@@ -184,6 +184,10 @@
                          <div class="p-2">
                          Returned amount :    Rs. <?php echo number_format($refunded_amount,2)?>
                          </div>
+                         <div class='details'>
+                         <div class="p-2">
+                         Expenses amount :    Rs. <?php echo number_format($expenses_amount_reg,2)?>
+                         </div>
                          <span>----------------------------------------------</span>
 
                          <div class="details">

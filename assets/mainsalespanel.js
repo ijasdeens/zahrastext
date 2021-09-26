@@ -615,7 +615,7 @@ $(document).ready(function () {
 				}, 
 				method: "POST",
 				success: function (mydata) {
-					console.clear(); 
+				 
 					console.log(mydata); 
 				},
 				error: function (err) {
@@ -1927,6 +1927,26 @@ ${
 		});
 	});
 
+	function saveexpensedetailsforregister(amount,date){
+		$.ajax({
+			url: base_url + "Controllerunit/saveexpensedetailsforregister",
+			method: "POST",
+			data: {
+				amount:amount, 
+				date:date
+			},
+			success: function (data) {
+				 if(data!=1){
+					 alert(data); 
+				 }
+			},
+			error: function (err) {
+				console.error("Error found", err);
+			},
+		});
+
+	}
+
 	$("#save_frm_expense_list_section").submit(function (e) {
 		e.preventDefault();
 
@@ -1957,6 +1977,7 @@ ${
 			alert("Note section is required");
 			return false;
 		}
+		saveexpensedetailsforregister(expense_amount, getfulldate());
 
 		$.ajax({
 			url: base_url + "Controllerunit/save_frm_expense_list_section",
@@ -2050,15 +2071,15 @@ ${
 			},
 			success: function (data) {
 				let getData = JSON.parse(data);
+				console.log('expense list ',getData); 
 				if (getData == 0) {
 					$("#cashier_expense_list_section_outcome").html(
 						'<span class="text text-danger font-weight-bold">NO EXPENSES FOUND</span>'
 					);
 
-					return false;
+				 
 				} else {
-					console.log(getData);
-
+					 
 					getData.map((d) => {
 						totalamountsection += parseFloat(d.expense_amount);
 						html = `<tr class="text text-center">
@@ -2068,7 +2089,7 @@ ${
                         <td>Rs.${parseFloat(d.expense_amount).toFixed(2)}</td>
                         <td>${d.expense_note}</td>
                         <td>
-                        <button class="btn btn-danger btn-sm delete_expense_list" expense_id="${
+                        <button class="btn btn-danger btn-sm delete_expense_list" expense_amount="${d.expense_amount}" expense_id="${
 													d.expenses_list_id
 												}">
                         <i class="fa fa-trash" aria-hidden='true'></i>
@@ -2091,19 +2112,50 @@ ${
 
 	showoffdeTecutedPanel();
 
+	function subtractexpenseamount(expenseamount, getfulldate){
+		$.ajax({
+			url: base_url + "Controllerunit/subtractexpenseamount",
+			method: "POST",
+			data: {
+				expenseamount: expenseamount,
+				getfulldate:getfulldate
+				
+			},
+			success: function (data) {
+				console.log('Subtravted amount expense',data); 
+				registerDetailsection(); 
+			},
+			error: function (err) {
+				console.error("Error found", err);
+			},
+		});
+
+	}
+
+
+	//bullback
+
 	$("body").delegate(".delete_expense_list", "click", function () {
 		let value = parseInt($(this).attr("expense_id"));
+		let expense_amount = parseFloat($(this).attr('expense_amount')); 
+	 
 
 		if (confirm("Are you sure you want to delete it?")) {
+			subtractexpenseamount(expense_amount,getfulldate()); 
+
+			 
+
 			$.ajax({
 				url: base_url + "Controllerunit/delete_expense_list_from_cashier",
 				method: "POST",
 				data: {
 					value: value,
+					
 				},
 				success: function (data) {
 					toastr.error("Deleted successfully");
 					showoffdeTecutedPanel();
+					registerDetailsection(); 
 				},
 				error: function (err) {
 					console.error("Error found", err);
@@ -2158,7 +2210,7 @@ ${
                         <td>Rs.${parseFloat(d.expense_amount).toFixed(2)}</td>
                         <td>${d.expense_note}</td>
                         <td>
-                        <button class="btn btn-danger btn-sm delete_expense_list" expense_id="${
+                        <button class="btn btn-danger btn-sm delete_expense_list" expense_amount='${d.expense_amount}' expense_id="${
 													d.expenses_list_id
 												}">
                         <i class="fa fa-trash" aria-hidden='true'></i>
@@ -2729,6 +2781,8 @@ ${
 						$("#Total_refunds").html(
 							"Rs." + parseFloat(d.refunded_amount).toFixed()
 						);
+						$('#expenses_amount').html("Rs."+ parseFloat(d.expenses_amount_reg).toFixed(2)); 
+
 						total_payments += parseFloat(d.cash_in_hand);
 						total_payments += parseFloat(d.cash_payment);
 						total_payments += parseFloat(d.cheque_payment);
@@ -3441,7 +3495,7 @@ const detectexpirechecksbyadmindetails = () => {
 			checkstatus:checkstatus
 		}, 
 		success: function (data) {
-			console.clear(); 
+			 
 			let getData = JSON.parse(data); 
 			if(getData==0){
 				 $('#checks_by_admin_section_print').html('<tr><span class="text text-danger font-weight-bold">No data found</span></tr>'); 
