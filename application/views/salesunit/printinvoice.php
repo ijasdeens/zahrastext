@@ -143,7 +143,7 @@
             <p>Invoice ID : <?php echo $invoice_id?></p>
       </div>
     </div><!--End Invoice Mid-->
-
+    <span>------------------------------------------</span>
     <div id="bot">
 
                     <div id="table">
@@ -202,13 +202,20 @@
                               <td colspan="2"><h2 id="discount_percentage"><?php echo $discount_percentage?></h2></td>
                                 <td class="payment"><h2><?php echo  $discount_amount?></h2></td>
                             </tr>
+                            <tr class="tabletitle tablebottomsection">
+                                <td style="font-size:12px;">Dis amount from total</td>
+
+                              <td colspan="2"><h2 id="discount_from_total"></h2></td>
+                                <td class="payment"><h2>Rs. <?php echo number_format($this->session->subtractedamountfromtotal,2)?></td>
+                            </tr>
+
                                 <tr class="tabletitle tablebottomsection">
                                 <td style="font-size:12px;">Sub total</td>
                                 <td></td>
                                 <td></td>
                                 <td class="payment"><h2 id="given_cash_amounts"><?php echo substr($paying_amount,4)?></h2></td>
                             </tr>
-                            <hr>
+                            
                            </tr>
                                 <tr class="tabletitle tablebottomsection">
                                 <td style="font-size:12px;">No of Pcs <?php echo $numberofpcs?></td>
@@ -220,14 +227,16 @@
 
                         </table>
                     </div><!--End Table-->
+                    <span>------------------------------------------</span>
 
 
                     </div>
-                    <br>
+                    
                     <div class="my-4">
                       Thank you for purcahsing. 
                     </div>
-                    <hr/>
+                    <span>------------------------------------------</span>
+                    
                   <span style="font-size:12px; font-weight: bold;">  POS System delivered by CodeAccelerator - 0758953142</span>
                 </div><!--End InvoiceBot-->
   </div>

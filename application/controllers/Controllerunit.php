@@ -532,56 +532,7 @@ class Controllerunit extends CI_Controller {
 
 
 
-    public function savecashamount(){
-
-        $paying_amount_given  = $this->security->xss_clean($_POST['paying_amount_given']);
-        $recieved_amount = $this->security->xss_clean($_POST['recieved_amount']);
-        $fulltimewithdate = $this->security->xss_clean($_POST['fulltimewithdate']);
-        $outletid = (int)$this->session->userdata('outlet_id');
-
-        $discountpercentage = $this->security->xss_clean($_POST['discountpercentage']);
-        $dicountvalue = $this->security->xss_clean($_POST['dicountvalue']);
-
-        $balance_amount = $this->security->xss_clean($_POST['balance_amount']);
-
-        $sales_invoice_id = $this->security->xss_clean($_POST['sales_invoice_id']);
-
-        $additional_information = $this->security->xss_clean($_POST['additional_information']); 
-
-        $chequestatus = 'Pending';
-
-
-        $orderedstatus = 1;
-        $orderdetailsarray = array(
-            'ordered_date' => $fulltimewithdate,
-            'ordered_status' => 'Completed',
-            'discount' => $discountpercentage,
-            'discounted_amount' => $dicountvalue,
-            'total_amount' => $paying_amount_given,
-            'ordered_status' => $orderedstatus,
-            'customer_id' => (int)$this->session->userdata('customer_id'),
-            'payment_method' => 'Cash',
-            'outlet_id' => $outletid,
-            'status' => 'Sold',
-            'invoice_no' => $sales_invoice_id,
-            'additional_text' => $additional_information
-        );
-
-        $last_insert_id = $this->main_model->savecashamount($orderdetailsarray);
-        $this->session->set_userdata('last_insert_id',$last_insert_id);
-
-        if($balance_amount!=0){
-            $credit_data = array(
-                'sales_credit_amount' => $balance_amount,
-                'summery_id_fk' => $last_insert_id, 
-                'outlet_id' => $this->session->outlet_id
-            );
-            $this->main_model->savecreditamountnow($credit_data);
-        }
-
-
-
-    }
+    
 
     
     public function creditdetailsforsaving(){
@@ -591,6 +542,8 @@ class Controllerunit extends CI_Controller {
         $sales_invoice_id = $this->security->xss_clean($_POST['sales_invoice_id']);
  $outletid = (int)$this->session->userdata('outlet_id');
   $paying_amount_given = $this->security->xss_clean($_POST['value']);
+        $additional_information = $this->security->xss_clean($_POST['additional_information']); 
+
 
         $orderedstatus = 1;
         $orderdetailsarray = array(
@@ -613,73 +566,15 @@ class Controllerunit extends CI_Controller {
         $creditamountdata = array(
             'sales_credit_amount' => $paying_amount_given, 
             'summery_id_fk ' => $last_insert_id,
-            'outlet_id' => $this->session->outlet_id
+            'outlet_id' => $this->session->outlet_id,
+            'additional_information' => $additional_information
         );
 
           $this->main_model->savecreditdetailssection($creditamountdata); 
 
     }
 
-    public function savechequepayment(){
-        $bank_name = $this->security->xss_clean($_POST['bank_name']);
-        $bank_branch = $this->security->xss_clean($_POST['bank_branch']);
-        $account_no = $this->security->xss_clean($_POST['account_no']);
-        $paying_amount_given  = $this->security->xss_clean($_POST['paying_amount_given']);
-        $cheque_date = $this->security->xss_clean($_POST['cheque_date']);
-
-        $recieved_amount = $this->security->xss_clean($_POST['recieved_amount']);
-        $cheque_amount_balance = $this->security->xss_clean($_POST['cheque_amount_balance']);
-        $fulltimewithdate = $this->security->xss_clean($_POST['fulltimewithdate']);
-        $outletid = (int)$this->session->userdata('outlet_id');
-
-        $discountpercentage = $this->security->xss_clean($_POST['discountpercentage']);
-        $dicountvalue = $this->security->xss_clean($_POST['dicountvalue']);
-        $sales_invoice_id = $this->security->xss_clean($_POST['sales_invoice_id']);
-
-        $paywithcheck_additoinalinformation = $this->security->xss_clean($_POST['paywithcheck_additoinalinformation']); 
-
-        $chequestatus = 'Pending';
-
-        $orderedstatus = 1;
-        $orderdetailsarray = array(
-            'ordered_date' => $fulltimewithdate,
-            'ordered_status' => 'Completed',
-            'discount' => $discountpercentage,
-            'discounted_amount' => $dicountvalue,
-            'total_amount' => $paying_amount_given,
-            'ordered_status' => $orderedstatus,
-            'customer_id' => (int)$this->session->userdata('customer_id'),
-            'payment_method' => 'Cheque',
-            'outlet_id' => $outletid,
-            'status' => 'Sold',
-            'invoice_no' => $sales_invoice_id, 
-            'additional_text' => $paywithcheck_additoinalinformation
-        );
-
-          $last_insert_id = $this->main_model->saveamountforall($orderdetailsarray);
-          $this->session->set_userdata('last_insert_id',$last_insert_id);
-
-          if($cheque_amount_balance!=0){
-              $credit_data = array(
-                  'sales_credit_amount' => $cheque_amount_balance,
-                  'summery_id_fk' => $last_insert_id
-              );
-              $this->main_model->savecreditamountnow($credit_data);
-          }
-
-          $checkdata = array(
-            'bank_name' => $bank_name,
-            'branch_name' => $bank_branch,
-            'account_no' => $account_no,
-            'cheque_date' => $cheque_date,
-            'cheque_status' => $chequestatus,
-            'summery_id' => $last_insert_id
-
-        );
-        $makepaymentwithcheque = $this->main_model->paying_method_cheque($checkdata);
-
-        echo $makepaymentwithcheque;
-    }
+    
 
 
     public function showoffallchequedetailsbyadmin(){
@@ -2323,8 +2218,7 @@ class Controllerunit extends CI_Controller {
 
     }
 
-
-
+  
     public function mainlogout(){
         echo $this->session->sess_destroy();
     }
@@ -4726,6 +4620,132 @@ public function select_postponed(){
         echo $result; 
 
     }
+
+    public function savecashamount(){
+
+        $paying_amount_given  = $this->security->xss_clean($_POST['paying_amount_given']);
+        $recieved_amount = $this->security->xss_clean($_POST['recieved_amount']);
+        $fulltimewithdate = $this->security->xss_clean($_POST['fulltimewithdate']);
+        $outletid = (int)$this->session->userdata('outlet_id');
+
+        $discountpercentage = $this->security->xss_clean($_POST['discountpercentage']);
+        $dicountvalue = $this->security->xss_clean($_POST['dicountvalue']);
+
+        $balance_amount = $this->security->xss_clean($_POST['balance_amount']);
+
+        $sales_invoice_id = $this->security->xss_clean($_POST['sales_invoice_id']);
+
+        $additional_information = $this->security->xss_clean($_POST['additional_information']); 
+
+        $chequestatus = 'Pending';
+
+        echo $this->session->subtractedamountfromtotal;
+
+        $orderedstatus = 1;
+        $orderdetailsarray = array(
+            'ordered_date' => $fulltimewithdate,
+            'ordered_status' => 'Completed',
+            'discount' => $discountpercentage,
+            'discounted_amount' => $dicountvalue,
+            'total_amount' => $paying_amount_given,
+            'ordered_status' => $orderedstatus,
+            'customer_id' => (int)$this->session->userdata('customer_id'),
+            'payment_method' => 'Cash',
+            'outlet_id' => $outletid,
+            'status' => 'Sold',
+            'invoice_no' => $sales_invoice_id,
+            'additional_text' => $additional_information, 
+            'discount_from_total_amount' => ($this->session->subtractedamountfromtotal=='NaN' || $this->session->subtractedamountfromtotal==null ) ? 0 : $this->session->subtractedamountfromtotal 
+       
+        );
+
+        $last_insert_id = $this->main_model->savecashamount($orderdetailsarray);
+        $this->session->set_userdata('last_insert_id',$last_insert_id);
+
+        if($balance_amount!=0){
+            $credit_data = array(
+                'sales_credit_amount' => $balance_amount,
+                'summery_id_fk' => $last_insert_id, 
+                'outlet_id' => $this->session->outlet_id
+            );
+            $this->main_model->savecreditamountnow($credit_data);
+        }
+
+
+
+    }
+
+    public function savechequepayment(){
+        $bank_name = $this->security->xss_clean($_POST['bank_name']);
+        $bank_branch = $this->security->xss_clean($_POST['bank_branch']);
+        $account_no = $this->security->xss_clean($_POST['account_no']);
+        $paying_amount_given  = $this->security->xss_clean($_POST['paying_amount_given']);
+        $cheque_date = $this->security->xss_clean($_POST['cheque_date']);
+
+        $recieved_amount = $this->security->xss_clean($_POST['recieved_amount']);
+        $cheque_amount_balance = $this->security->xss_clean($_POST['cheque_amount_balance']);
+        $fulltimewithdate = $this->security->xss_clean($_POST['fulltimewithdate']);
+        $outletid = (int)$this->session->userdata('outlet_id');
+
+        $discountpercentage = $this->security->xss_clean($_POST['discountpercentage']);
+        $dicountvalue = $this->security->xss_clean($_POST['dicountvalue']);
+        $sales_invoice_id = $this->security->xss_clean($_POST['sales_invoice_id']);
+
+        $paywithcheck_additoinalinformation = $this->security->xss_clean($_POST['paywithcheck_additoinalinformation']); 
+
+        $chequestatus = 'Pending';
+
+        $orderedstatus = 1;
+        $orderdetailsarray = array(
+            'ordered_date' => $fulltimewithdate,
+            'ordered_status' => 'Completed',
+            'discount' => $discountpercentage,
+            'discounted_amount' => $dicountvalue,
+            'total_amount' => $paying_amount_given,
+            'ordered_status' => $orderedstatus,
+            'customer_id' => (int)$this->session->userdata('customer_id'),
+            'payment_method' => 'Cheque',
+            'outlet_id' => $outletid,
+            'status' => 'Sold',
+            'invoice_no' => $sales_invoice_id, 
+            'additional_text' => $paywithcheck_additoinalinformation,
+            'discount_from_total_amount' => ($this->session->subtractedamountfromtotal=='NaN' || $this->session->subtractedamountfromtotal==null ) ? 0 : $this->session->subtractedamountfromtotal 
+
+        );
+
+          $last_insert_id = $this->main_model->saveamountforall($orderdetailsarray);
+          $this->session->set_userdata('last_insert_id',$last_insert_id);
+
+          if($cheque_amount_balance!=0){
+              $credit_data = array(
+                  'sales_credit_amount' => $cheque_amount_balance,
+                  'summery_id_fk' => $last_insert_id
+              );
+              $this->main_model->savecreditamountnow($credit_data);
+          }
+
+          $checkdata = array(
+            'bank_name' => $bank_name,
+            'branch_name' => $bank_branch,
+            'account_no' => $account_no,
+            'cheque_date' => $cheque_date,
+            'cheque_status' => $chequestatus,
+            'summery_id' => $last_insert_id
+
+        );
+        $makepaymentwithcheque = $this->main_model->paying_method_cheque($checkdata);
+
+        echo $makepaymentwithcheque;
+    }
+    
+
+
+    public function savesubtractedamounttocache(){
+        $answer = $this->security->xss_clean($_POST['answer']); 
+        echo $this->session->set_userdata('subtractedamountfromtotal',$answer); 
+    }
+
+
 
 
 

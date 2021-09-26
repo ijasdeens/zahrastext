@@ -193,6 +193,7 @@ $(document).ready(function () {
 				myvalue: value,
 			},
 			success: function (data) {
+			 
 				let getData = JSON.parse(data);
 				console.log(getData);
 			},
@@ -570,15 +571,14 @@ $(document).ready(function () {
 				$("#amounttoshowoffpaying_second").html("<br/>Rs." + item.total);
 
 				$("#totalamounttocalculate").val(item.valuetototal);
-				 
  
-
 				$("#total_amount_cash").val(item.valuetototal);
 
 				$("#paying_amount_given").val(item.valuetototal);
 
 				$("#discountpercentage").html(0 + "%");
 				$("#percentage_for_print_inv").html(0 + "%");
+				$('#subtractamounttotally').html(0); 
 
 				$("#dicountvalue").html("Rs.0");
 			},
@@ -593,10 +593,11 @@ $(document).ready(function () {
 		let totalamounttocalculate = $("#totalamounttocalculate").val();
 		totalamounttocalculate = parseFloat(totalamounttocalculate);
 		amount = parseFloat(amount);
-
+		$('#subtractamounttotally').html(parseFloat(amount).toFixed(2)); 
 		let answer = 0;
 		if (amount != null) {
 			answer = totalamounttocalculate - amount;
+					
 
 			$("#totalamounttocalculate").val(answer);
 			$("#paying_amount_given").val(answer);
@@ -606,6 +607,23 @@ $(document).ready(function () {
 			$("#totalamount").html("Rs." + totalamounttocalculate.toFixed(2));
 			$("#amounttoshowoffpaying").html("<br/>Rs." + answer.toFixed(2));
 			$("#after_subtracted").html("<br/> <b>Rs." + answer.toFixed(2) + "</b>");
+
+			$.ajax({
+				url: base_url + "Controllerunit/savesubtractedamounttocache",
+				data:{
+					answer:amount
+				}, 
+				method: "POST",
+				success: function (mydata) {
+					console.clear(); 
+					console.log(mydata); 
+				},
+				error: function (err) {
+					console.error("Error found", err);
+				},
+			});
+
+
 		}
 	});
 
@@ -1417,6 +1435,7 @@ $(document).ready(function () {
 				additional_information:additional_information
 			},
 			success: function (data) {
+				alert(data);
 				console.log(data);
 				reduceProductQuantity();
 			},
@@ -1469,9 +1488,18 @@ $(document).ready(function () {
 			},
 		});
 	});
+	$('#credit_details_for_saveing').click(function(){
+		$('#paywithcreditamountdetailsmodal').modal('show'); 
+		$('#amount_for_credit_details').val(parseFloat($('#totalamounttocalculate').val()).toFixed(2)); 
+	}); 
 
-	$("#credit_details_for_saveing").click(function () {
+	$('#frm_paycreditsection').submit(function(e){
+		e.preventDefault(); 
+
+
+
 		let value = $("#totalamounttocalculate").val();
+		let additional_information = $('#additional_information').val(); 
 
 		let discountpercentage = $("#discountpercentage").html();
 		let dicountvalue = $("#dicountvalue").html();
@@ -1499,6 +1527,7 @@ $(document).ready(function () {
 					fulltimewithdate: fulltimewithdate(),
 					sales_invoice_id: sales_invoice_id,
 					value: value,
+					additional_information:additional_information
 				},
 				success: function (data) {
 					reduceProductQuantity();
@@ -1508,6 +1537,10 @@ $(document).ready(function () {
 				},
 			});
 		}
+	})
+
+	$("#scredit_details_for_saveing").click(function () {
+	
 	});
 
 	$("#frm_paywithcheque").submit(function (e) {
@@ -1823,10 +1856,7 @@ ${
 		let product_id = parseInt($(this).attr("product_id"));
 
 		let html = null;
-
-		alert("Return quantity " + return_quantity_val);
-		alert("Chosen quantity" + choosen_quantity_html);
-
+ 
 		if (return_quantity_val > choosen_quantity_html) {
 			alert("Returning quantity can not go over purcahsed quantity");
 			$(this)
@@ -2189,6 +2219,9 @@ ${
                         <td>
                         ${d.discounted_amount}
                         </td>
+						<td>
+						${parseFloat(d.discount_from_total_amount).toFixed(2)}
+						</td>
                             <td>
                             ${d.ordered_date}
                             </td>
@@ -2568,6 +2601,7 @@ ${
                         <td>
                         ${d.discounted_amount}
                         </td>
+						<td>${parseFloat(d.discount_from_total_amount).toFixed(2)}</td>
                             <td>
                             ${d.ordered_date}
                             </td>

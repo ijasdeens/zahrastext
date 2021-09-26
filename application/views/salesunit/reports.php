@@ -123,7 +123,8 @@
 
     <center id="top">
       <div style="">
-      <b></b>
+      <img src="<?php echo base_url()?>assets/logoimage/<?php echo $this->session->logo?>" alt="LOGO" class="img-fluid" style="min-width:100%;max-height:100%;"> <br>
+      <b><?php echo $this->session->outlets_name?></b>
       </div>
       <div class="info">
 
@@ -134,21 +135,30 @@
     <div id="mid">
       <div class="info">
         <h2>Sales summery</h2>
-        <p>
+        <p style="font-weight:bold">
             Address :    <?= $this->session->address?><br/>
               Phone   : <?php echo $this->session->outlet_mobile?> <br/>
                Cashier : <?php echo $this->session->staffname;?> <br>
                Outlet name : <?php echo $this->session->outlets_name?> <br/>
-               <br>
+             
 
         </p>
 
-           <p id="date_time"></p><br>
+           <p id="date_time" style="font-weight:bold"></p><br>
            
       </div>
     </div><!--End Invoice Mid-->
+    <?php
+    $totalamount = 0; 
+    $totalamount = ($cash_in_hand + $cash_payment); 
 
-    <div id="bot">
+    $amountstoberecieved = 0; 
+
+    $amountstoberecieved = ($credit_payment + $cheque_payment ); 
+
+    ?>
+
+    <div id="bot" style="font-weight:bold">
 
                     <div id="table">
                        <div class='details'>
@@ -172,9 +182,21 @@
 
                          <div class='details'>
                          <div class="p-2">
-                         Refunded amount :    Rs. <?php echo number_format($refunded_amount,2)?>
+                         Returned amount :    Rs. <?php echo number_format($refunded_amount,2)?>
                          </div>
-                      
+                         <span>----------------------------------------------</span>
+
+                         <div class="details">
+                           <div class="p-2">
+                            Amount in cash drawer :Rs. <?php echo number_format($totalamount,2)?>
+                           </div>
+                         </div>
+                         
+                         <div class="details">
+                           <div class="p-2">
+                            Amounts to be recieved :Rs. <?php echo number_format($amountstoberecieved,2)?>
+                           </div>
+                         </div>
                       
                       
 
@@ -186,7 +208,7 @@
                     </div>
                     <br>
                     <div class="my-4">
-                     <center>Sales summery</center>
+                     <center></center>
                     </div>
                     <hr/>
                   <span style="font-size:12px; font-weight: bold;">  POS System delivered by CodeAccelerator - 0758953142</span>

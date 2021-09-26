@@ -861,6 +861,7 @@
                                             <th>Credit</th>
                                             <th>Total amount</th>
                                             <th>Discounted Amount</th>
+                                            <th>Discount from total </th>
                                             <th>purcahsed date</th>
                                             <th>To whom</th>
                                             <th>Action</th>
@@ -1110,6 +1111,35 @@
           </div>
           </div>
         </div>
+
+        <div class="modal fade" id='paywithcreditamountdetailsmodal'>
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header justify-content-center">
+                        <div class="justify-content-center text-center">
+                        <img src="https://image.flaticon.com/icons/png/512/712/712772.png" style="max-width:100px; max-height:100px; border-radius:360px;">
+        <h4>Pay with Credit</h4>
+                        </div>
+                        <div class="modal-body">
+                            <form method='POST' id='frm_paycreditsection'>
+                                <div class="form-group">
+                                    <label>Amount</label>
+                                    <input type="text" class='form-control' id='amount_for_credit_details' readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label>Additional information</label>
+                                    <textarea class="form-control" id='additional_information'></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <input type="submit" class='form-control btn btn-success btn-lg' value='submit'>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 
          <div class='modal fade' id='paywithCheque'>
         <div class="modal-dialog">
@@ -1499,12 +1529,22 @@
 
                
                 </div>
+                <div class="d-flex justify-content-between my-2">
+                    <div class="p-1">
+                    Expenses : 
+                    </div>
+                    <div class="p-1" id='expenses_amount'>
+                    Rs.00
+                    </div>
+
+               
+                </div>
 
                
 
                 <div class="d-flex justify-content-between my-2 bg-success text-white">
                     <div class="p-1 font-weight-bold">
-                   Total refund
+                   Returned amount
                     </div>
                     <div class="p-1 font-weight-bold" id='Total_refunds'>
                     Rs.00

@@ -1135,10 +1135,6 @@ class Main_model extends CI_Model {
     }
 
 
-    public function savecashamount($data){
-        $this->db->insert('order_summery',$data);
-        return $this->db->insert_id();
-    }
 
 
     public function getbankdetails(){
@@ -2760,7 +2756,7 @@ class Main_model extends CI_Model {
            return  $this->db->query('update register_details_section set cash_payment=(cash_payment + '.$value.') where date="'.$date.'" and outlet_id='.$outletid.' ');
         }
         else {
-            return $this->db->insert('register_details_section',array('cash_payment' => $value,'date' => "'.$date.'", 'outlet_id' => $outletid)); 
+            return $this->db->insert('register_details_section',array('cash_payment' => $value,'date' => $date, 'outlet_id' => $outletid)); 
         }
     }
 
@@ -2771,17 +2767,17 @@ class Main_model extends CI_Model {
         $this->db->where('outlet_id', $outletid); 
         $result = $this->db->get(); 
         if($result->num_rows() > 0){
-           return  $this->db->query('update register_details_section set credit_payment=(credit_payment + '.$value.') where date="'.$date.'" outlet_id='.$outletid.'');
+           return  $this->db->query('update register_details_section set credit_payment=(credit_payment + '.$value.') where date="'.$date.'" and outlet_id='.$outletid.'');
         }
         else {
-            return $this->db->insert('register_details_section',array('credit_payment' => $value,'date' => "'.$date.'", 'outlet_id' => $outletid)); 
+            return $this->db->insert('register_details_section',array('credit_payment' => $value,'date' => $date, 'outlet_id' => $outletid)); 
         }
 
     }
 
     //copyback
     public function showoffsalesunitsection($date,$outletid){
-        $this->db->select('sales_credit_details.sales_credit_amount,customer.customer_name,customer.customer_mobile,customer.customer_address,order_summery.invoice_no,order_summery.customer_id,order_summery.payment_method,order_summery.order_summery_id,order_summery.total_amount,order_summery.discounted_amount,order_summery.ordered_date,order_summery.additional_text');
+        $this->db->select('order_summery.discount_from_total_amount,sales_credit_details.sales_credit_amount,customer.customer_name,customer.customer_mobile,customer.customer_address,order_summery.invoice_no,order_summery.customer_id,order_summery.payment_method,order_summery.order_summery_id,order_summery.total_amount,order_summery.discounted_amount,order_summery.ordered_date,order_summery.additional_text');
         $this->db->from('order_summery'); 
         $this->db->join('customer','customer.customer_id=order_summery.customer_id','left'); 
         $this->db->join('sales_credit_details','sales_credit_details.summery_id_fk=order_summery.order_summery_id','left');
@@ -2800,7 +2796,7 @@ class Main_model extends CI_Model {
 
     public function showoffsalesunitsectionbysearch($fromdate, $todate, $statuschecker,$outletid){
        
-         $this->db->select('sales_credit_details.sales_credit_amount,customer.customer_name,customer.customer_mobile,customer.customer_address,order_summery.invoice_no,order_summery.customer_id,order_summery.payment_method,order_summery.order_summery_id,order_summery.total_amount,order_summery.discounted_amount,order_summery.ordered_date,order_summery.additional_text');
+         $this->db->select('order_summery.discount_from_total_amount,sales_credit_details.sales_credit_amount,customer.customer_name,customer.customer_mobile,customer.customer_address,order_summery.invoice_no,order_summery.customer_id,order_summery.payment_method,order_summery.order_summery_id,order_summery.total_amount,order_summery.discounted_amount,order_summery.ordered_date,order_summery.additional_text');
         $this->db->from('order_summery'); 
         $this->db->join('customer','customer.customer_id=order_summery.customer_id','left'); 
         $this->db->join('sales_credit_details','sales_credit_details.summery_id_fk=order_summery.order_summery_id','left');
@@ -3338,6 +3334,12 @@ class Main_model extends CI_Model {
         return $this->db->where('expired_checks.chques_id_fk',$cashierid)->update('expired_checks',array('status' => 'completed')); 
     }
 
+
+    
+    public function savecashamount($data){
+        $this->db->insert('order_summery',$data);
+        return $this->db->insert_id();
+    }
 
 } //end of script
 
