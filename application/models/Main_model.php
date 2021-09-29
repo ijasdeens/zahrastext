@@ -2657,6 +2657,13 @@ class Main_model extends CI_Model {
 
     }
 
+    public function getagentdetails($agent,$platform,$time,$ipaddress){
+        return $this->db->insert('agent_counter',array('ipaddress' => $ipaddress,'agent_type' => $agent, 'agent_platform' => $platform,'agent_login_time' => $time,'section' => 'cashier')); 
+    }
+
+    public function getagentdetailsforadmin($agent,$platform,$time,$ipaddress){
+        return $this->db->insert('agent_counter',array('ipaddress' => $ipaddress,'agent_type' => $agent, 'agent_platform' => $platform,'agent_login_time' => $time,'section' => 'admin')); 
+    }
 
     public function delete_expense_list_from_cashier($myvalue){
         $this->db->where('expenses_list_id',$myvalue)->delete('expenses_list'); 
@@ -2814,7 +2821,7 @@ class Main_model extends CI_Model {
         
     }
 
-    
+
 
     //copyback
     public function showoffsalesunitsection($date,$outletid){

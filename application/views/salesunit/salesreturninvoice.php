@@ -107,9 +107,7 @@
     }
 
 </style>
-
-
-
+ 
 </head>
 <body onload="window.print()">
 

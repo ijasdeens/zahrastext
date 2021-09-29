@@ -1628,15 +1628,22 @@ $(document).ready(function () {
 			 
 			$(this).val("");
 			$(this).focus();
+			let result = false; 
 
 			$(".btnaddshoppingcart").each(function () {
 				if ($(this).attr("product_code") == value) {
 					$(this).click();
+					result = false; 
 					return false;
 				} else {
-					console.log("Shopping product hsa been counted");
+					result = true; 
+					 
 				}
 			});
+
+			if(result==true){
+				alert('No product found with barcode'); 
+			}
 		}
 	});
 
@@ -2026,6 +2033,8 @@ ${
 					valuetochange: valuetochange,
 				},
 				success: function (data) {
+					console.clear(); 
+					console.log('Edit price update',data); 
 					toastr.info("Updated successfully");
 					fetchAllshoppingcartdata();
 					savetemporarydateforsale();
@@ -2141,9 +2150,7 @@ ${
 	 
 
 		if (confirm("Are you sure you want to delete it?")) {
-			subtractexpenseamount(expense_amount,getfulldate()); 
-
-			 
+			subtractexpenseamount(expense_amount,getfulldate());
 
 			$.ajax({
 				url: base_url + "Controllerunit/delete_expense_list_from_cashier",

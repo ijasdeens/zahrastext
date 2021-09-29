@@ -294,7 +294,7 @@ $(document).ready(function () {
     });
 
     $('body').delegate('.assign_outlets', 'click', function () {
-        let current_quantity = parseInt($(this).attr('current_quantity'));
+        let current_quantity = parseFloat($(this).attr('current_quantity'));
         $('#hidden_product_id').val($(this).attr('products_id'));
         $("#current_quantity_for_outlet").val(current_quantity);
     });
@@ -302,19 +302,19 @@ $(document).ready(function () {
 
     $('#out_let_qty').keyup(function (event) {
         let value = event.target.value;
-        let currentQty = parseInt($('#current_quantity_for_outlet').val());
+        let currentQty = $('#current_quantity_for_outlet').val();
 
-        if (isNaN(value)) {
-            alert('Only numbers are allowed');
-            $('#out_let_qty').val('');
-            return false;
-        }
+        // if (isNaN(value)) {
+        //     alert('Only numbers are allowed');
+        //     $('#out_let_qty').val('');
+        //     return false;
+        // }
 
-        if (value > currentQty) {
-            alert('It can not exceed over available quantity');
-            $('#out_let_qty').val(currentQty);
+        // if (value > currentQty) {
+        //     alert('It can not exceed over available quantity');
+        //     $('#out_let_qty').val(currentQty);
 
-        }
+        // }
 
 
     });
@@ -322,12 +322,23 @@ $(document).ready(function () {
 
     $("#transfer_to_outlet").click(function () {
 
-        let out_let_qty = parseInt($('#out_let_qty').val());
-        let current_quantity_for_outlet = parseInt($('#current_quantity_for_outlet').val());
+        let out_let_qty = $('#out_let_qty').val();
+        let current_quantity_for_outlet = $('#current_quantity_for_outlet').val();
+        
+        let balance = 0.00; 
 
-        let balance = current_quantity_for_outlet - out_let_qty;
+        let answer =  current_quantity_for_outlet - out_let_qty; 
+        
         let outlet_name = parseInt($('#outlet_name').val());
         let hidden_product_id = parseInt($('#hidden_product_id').val());
+ 
+        var firstValue=current_quantity_for_outlet;
+var secondValue=out_let_qty;
+var result = parseFloat(firstValue).toFixed(1) -
+parseFloat(secondValue).toFixed(1);
+console.log("Result is="+result);
+        balance = result; 
+
 
         $.ajax({
             url: base_url + 'Controllerunit/outletassigned',
@@ -336,7 +347,8 @@ $(document).ready(function () {
                 out_let_qty: out_let_qty,
                 balance: balance,
                 outlet_name: outlet_name,
-                hidden_product_id: hidden_product_id
+                hidden_product_id: hidden_product_id,
+                current_quantity_for_outlet:current_quantity_for_outlet
             },
             success: function (data) {
                 if(data==1){

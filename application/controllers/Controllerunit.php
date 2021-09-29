@@ -660,18 +660,51 @@ class Controllerunit extends CI_Controller {
 
 
 
-
+//spoof 
 
      public function loginforcashier(){
+
+        $agent = '';
+
+
+        $this->load->library('user_agent');
+
+if ($this->agent->is_browser())
+{
+        $agent = $this->agent->browser().' '.$this->agent->version();
+}
+elseif ($this->agent->is_robot())
+{
+        $agent = $this->agent->robot();
+}
+elseif ($this->agent->is_mobile())
+{
+        $agent = $this->agent->mobile();
+}
+else
+{
+        $agent = 'Unidentified User Agent';
+}
+
+    $time = $this->security->xss_clean($_POST['timeline']); 
+
+    $ipaddress = md5(
+        $_SERVER['REMOTE_ADDR'] .
+        $_SERVER['HTTP_USER_AGENT']
+    );
+
         $mobNumber = $this->security->xss_clean($_POST['mobNumber']);
         $mobPassword = $this->security->xss_clean($_POST['mobPassword']);
 
         $result = $this->main_model->loginforcashier($mobNumber,$mobPassword);
 
+        
+
             if($result==0){
               echo 0;
             }
         else {
+           // $this->main_model->getagentdetails($agent,$this->agent->platform(),$time,$ipaddress);
         foreach($result as $row){
             $this->session->set_userdata('cashier_id', $row->staff_id);
             $this->session->set_userdata('outlet_id', $row->working_outlet);
@@ -2006,10 +2039,13 @@ class Controllerunit extends CI_Controller {
      }
 
     public function outletassigned(){
-        $out_let_qty =(int)$this->security->xss_clean($_POST['out_let_qty']);
+        $out_let_qty =$this->security->xss_clean($_POST['out_let_qty']);
         $balance = $this->security->xss_clean($_POST['balance']);
         $outlet_name = $this->security->xss_clean($_POST['outlet_name']);
         $hidden_product_id = (int)$this->security->xss_clean($_POST['hidden_product_id']);
+        $current_quantity_for_outlet = $this->security->xss_clean($_POST['current_quantity_for_outlet']); 
+
+       
 
         $outlet_data = array(
         'outlet_id' => $outlet_name,
@@ -2198,6 +2234,36 @@ class Controllerunit extends CI_Controller {
      $mobileNumber = $this->security->xss_clean($_POST['mobNumber']);
      $mobPassword = $this->security->xss_clean($_POST['mobPassword']);
 
+        $time = $this->security->xss_clean($_POST['time']); 
+
+        
+        $agent = '';
+
+
+        $this->load->library('user_agent');
+
+        if ($this->agent->is_browser())
+        {
+                $agent = $this->agent->browser().' '.$this->agent->version();
+        }
+        elseif ($this->agent->is_robot())
+        {
+                $agent = $this->agent->robot();
+        }
+        elseif ($this->agent->is_mobile())
+        {
+                $agent = $this->agent->mobile();
+        }
+        else
+        {
+                $agent = 'Unidentified User Agent';
+        }
+
+        $ipaddress = md5(
+            $_SERVER['REMOTE_ADDR'] .
+            $_SERVER['HTTP_USER_AGENT']
+        );
+
        $result = $this->main_model->mainloginareaforadmin($mobileNumber,$mobPassword);
 
 
@@ -2205,8 +2271,11 @@ class Controllerunit extends CI_Controller {
             echo 0;
          }
         else {
+            $this->main_model->getagentdetailsforadmin($agent,$this->agent->platform(),$time,$ipaddress);
+
 
         foreach($result as $row){
+            
             $this->session->set_userdata('admin_id', $row->admin_id);
 
         }
@@ -2252,21 +2321,27 @@ class Controllerunit extends CI_Controller {
             foreach($this->cart->contents() as $items){
                 if($items['type']!=$type){
                     $this->cart->destroy();
+                if($items['id']==$_POST['product_id']){
+                if($items['actual_price']==$_POST['product_price']){
+                    $data = array(
+                        'id'      => $_POST['product_id'],
+                        'qty'     => 1,
+                        'price'   => $items['actual_price'],
+                        'name'    => $_POST['product_name'],
+                        'availablequantity' => $_POST['availablequantity'],
+                        'product_pic' => $_POST['product_pic'],
+                        'product_unit' => $_POST['product_unit'],
+                        'product_code' => $_POST['product_code'],
+                        'type' => $type,
+                        'actual_price' => $_POST['product_price']
+                
+                        );
+                    
+                }
+               
+                 }
 
-                           $data = array(
-        'id'      => $_POST['product_id'],
-        'qty'     => 1,
-        'price'   => $items['price']==$_POST['product_price'] ? $_POST['product_price'] : $items['price'],
-        'name'    => $_POST['product_name'],
-        'availablequantity' => $_POST['availablequantity'],
-        'product_pic' => $_POST['product_pic'],
-        'product_unit' => $_POST['product_unit'],
-        'product_code' => $_POST['product_code'],
-        'type' => $type,
-        'actual_price' => $_POST['product_price']
-
-        );
-
+     
            echo $this->cart->insert($data);
  
                 }

@@ -128,7 +128,7 @@
       				</div>
       				<div class="form-group">
       					<label>Quantity</label>
-      					<input type="tel" class="form-control" id="out_let_qty">
+      					<input type="text" class="form-control" id="out_let_qty">
       				</div> 
       				<div class="form-group">
       				 <button class="btn btn-outline-primary form-control" id="transfer_to_outlet">Transfer</button>
