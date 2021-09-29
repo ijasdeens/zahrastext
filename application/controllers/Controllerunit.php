@@ -2303,7 +2303,7 @@ else
              $data = array(
         'id'      => $_POST['product_id'],
         'qty'     => 1,
-        'price'   => $_POST['product_price'],
+        'price'   =>  $_POST['product_price'],
         'name'    => $_POST['product_name'],
         'availablequantity' => $_POST['availablequantity'],
         'product_pic' => $_POST['product_pic'],
@@ -2321,55 +2321,95 @@ else
             foreach($this->cart->contents() as $items){
                 if($items['type']!=$type){
                     $this->cart->destroy();
-                if($items['id']==$_POST['product_id']){
-                if($items['actual_price']==$_POST['product_price']){
-                    $data = array(
-                        'id'      => $_POST['product_id'],
-                        'qty'     => 1,
-                        'price'   => $items['actual_price'],
-                        'name'    => $_POST['product_name'],
-                        'availablequantity' => $_POST['availablequantity'],
-                        'product_pic' => $_POST['product_pic'],
-                        'product_unit' => $_POST['product_unit'],
-                        'product_code' => $_POST['product_code'],
-                        'type' => $type,
-                        'actual_price' => $_POST['product_price']
-                
-                        );
+                    if($items['id']==$_POST['product_id'] && $items['price']!=$_POST['product_price']){
+                        $data = array(
+                            'id'      => $_POST['product_id'],
+                            'qty'     => 1,
+                            'price'   => $items['price'],
+                            'name'    => $_POST['product_name'],
+                            'availablequantity' => $_POST['availablequantity'],
+                            'product_pic' => $_POST['product_pic'],
+                            'product_unit' => $_POST['product_unit'],
+                            'product_code' => $_POST['product_code'],
+                            'type' => $type,
+                            'actual_price' => $_POST['product_price']
                     
-                }
-               
-                 }
+                            );
+                                 echo $this->cart->insert($data);
+                            exit(); 
+                    }
+                    else {
+                        $data = array(
+                            'id'      => $_POST['product_id'],
+                            'qty'     => 1,
+                            'price'   => $_POST['product_price'],
+                            'name'    => $_POST['product_name'],
+                            'availablequantity' => $_POST['availablequantity'],
+                            'product_pic' => $_POST['product_pic'],
+                            'product_unit' => $_POST['product_unit'],
+                            'product_code' => $_POST['product_code'],
+                            'type' => $type,
+                            'actual_price' => $_POST['product_price']
+                    
+                            );
+                            echo $this->cart->insert($data);
+                            exit(); 
+
+                    }
+                 
 
      
-           echo $this->cart->insert($data);
+          // echo $this->cart->insert($data);
  
                 }
                 else {
+                    if($items['id']==$_POST['product_id'] && $items['price']!=$_POST['product_price']){
+                        $data = array(
+                            'id'      => $_POST['product_id'],
+                            'qty'     => 1,
+                            'price'   => $items['price'],
+                            'name'    => $_POST['product_name'],
+                            'availablequantity' => $_POST['availablequantity'],
+                            'product_pic' => $_POST['product_pic'],
+                            'product_unit' => $_POST['product_unit'],
+                            'product_code' => $_POST['product_code'],
+                            'type' => $type,
+                            'actual_price' => $_POST['product_price']
+                    
+                            );
+                            echo $this->cart->insert($data);
+                            exit(); 
 
-                $data = array(
-        'id'      => $_POST['product_id'],
-        'qty'     => 1,
-        'price'   => $items['price']==$_POST['product_price'] ? $_POST['product_price'] : $items['price'],
-        'name'    => $_POST['product_name'],
-        'availablequantity' => $_POST['availablequantity'],
-        'product_pic' => $_POST['product_pic'],
-        'product_unit' => $_POST['product_unit'],
-        'product_code' => $_POST['product_code'],
-        'type' => $type,
-        'actual_price' => $_POST['product_price']
+                    }
+                    else {
+                        $data = array(
+                            'id'      => $_POST['product_id'],
+                            'qty'     => 1,
+                            'price'   => $_POST['product_price'],
+                            'name'    => $_POST['product_name'],
+                            'availablequantity' => $_POST['availablequantity'],
+                            'product_pic' => $_POST['product_pic'],
+                            'product_unit' => $_POST['product_unit'],
+                            'product_code' => $_POST['product_code'],
+                            'type' => $type,
+                            'actual_price' => $_POST['product_price']
+                    
+                            );
+                            echo $this->cart->insert($data);
+                            exit(); 
+                    }
 
-        );
+       
 
 
  
 
                 }
 
-            }
+            } //end of loop
 
 
- echo  $this->cart->insert($data);
+ //echo  $this->cart->insert($data);
         }
 
 
