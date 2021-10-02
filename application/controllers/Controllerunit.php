@@ -4495,15 +4495,29 @@ public function select_postponed(){
          echo json_encode($result); 
      }
 
+     
+     public function loanpayingreports(){
+ 
+        $balance_amount = $this->security->xss_clean($_POST['balance_amount']); 
+        $payment_to_bepadi = $this->security->xss_clean($_POST['payment_to_bepadi']); 
+        $recieving_amount = $this->security->xss_clean($_POST['recieving_amount']); 
+
+        
+        $this->load->view('salesunit/loanpayingreports');
+
+
+     }
 
      public function detectcreditdetailsbycash(){
          $recieving_amount = $this->security->xss_clean($_POST['recieving_amount']); 
          $ordered_date_sec = $this->security->xss_clean($_POST['ordered_date_sec']); 
          $summery_id = $this->security->xss_clean($_POST['summery_id']); 
          $balance_amount = $this->security->xss_clean($_POST['balance_amount']); 
+        $payment_to_bepadi = $this->security->xss_clean($_POST['payment_to_bepadi']); 
 
          $result = $this->main_model->detectcreditdetailsbycash($recieving_amount, $ordered_date_sec, $summery_id,$balance_amount);
-         echo $result;  
+        
+        
 
      }
 
@@ -4514,7 +4528,6 @@ public function select_postponed(){
          $cheque_date_for_loan_name = $this->security->xss_clean($_POST['cheque_date_for_loan_name']); 
         $bank_name_for_loan_cheque = $this->security->xss_clean($_POST['bank_name_for_loan_cheque']); 
         $summery_id_fk = $this->security->xss_clean($_POST['summery_id_fk']); 
-        $recieveddate = $this->security->xss_clean($_POST['recieveddate']); 
         $recieveddate = $this->security->xss_clean($_POST['recieveddate']); 
         $status = $this->security->xss_clean($_POST['status']); 
         $ordered_date_sec = $this->security->xss_clean($_POST['ordered_date_sec']); 
@@ -4532,10 +4545,12 @@ public function select_postponed(){
             'summery_id' => $summery_id_fk, 
             'cheque_status' => $status, 
           
-        ); 
-        echo  $this->main_model->savepaymentdetailsforreigsterdetails($ordered_date_sec,$this->session->outlet_id,$cheque_loan_amount); 
+        );
+        $this->main_model->detectpaymentforcheck($summery_id_fk,$cheque_loan_amount);  
+      echo  $this->main_model->submit_loan_chequessection($data);
 
-       $this->main_model->submit_loan_chequessection($data);
+       // echo  $this->main_model->savepaymentdetailsforreigsterdetails($ordered_date_sec,$this->session->outlet_id,$cheque_loan_amount); 
+
 
      }
 

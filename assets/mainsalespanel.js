@@ -1807,9 +1807,10 @@ ${d.ordered_date}
 				} else {
 					$("#product_name_section_display").html("");
 
+
 					getData.map((d) => {
 						let subtotal = parseFloat(d.sub_total * d.choosen_quantity);
-						html = `<tr>
+						html += `<tr>
 <td>${d.product_name}</td>
 <td class='choosen_quantity_column'>${d.choosen_quantity}</td>
 <td>${parseFloat(d.sub_total).toFixed(2)}</td>
@@ -1827,8 +1828,9 @@ ${
 </td>
 </tr>`;
 
-						$("#product_name_section_display").append(html);
 					});
+					$("#product_name_section_display").append(html);
+
 				}
 			},
 			error: function (err) {
@@ -2339,7 +2341,8 @@ ${
 													}">${d.payment_method}</span>
                         </td>
                         <td>
-                         ${d.sales_credit_amount==null ? 0 : d.sales_credit_amount}
+						Rs.
+                         ${d.sales_credit_amount==null ? 0 : parseFloat(d.sales_credit_amount).toFixed(2)}
                         </td>
                         <td>
                            Rs. ${parseFloat(d.total_amount).toFixed(2)}
@@ -2521,6 +2524,9 @@ ${
 			return false;
 		}
 
+	 
+
+
 		$.ajax({
 			url: base_url + "Controllerunit/submit_loan_chequessection",
 			method: "POST",
@@ -2537,8 +2543,10 @@ ${
 			},
 			success: function (data) {
 				if (data == 1) {
-					alert("Chque has been saved successfully");
-					window.location.reload();
+					chequeSaveDetailsforregister(parseFloat(cheque_loan_amount).toFixed(2)); 
+					alert('Payment has been detected successfully by check payment'); 
+					window.location.reload(); 
+					
 				} else {
 					alert(data);
 				 
@@ -2602,6 +2610,30 @@ ${
 		}
 	});
 
+	 
+	function openloanrecieptamount(balance_amount,payment_to_bepadi,recieving_amount){
+	 
+		$.ajax({
+			url: base_url + "Controllerunit/loanpayingreports",
+			method: "POST",
+			data:{
+				balance_amount:balance_amount,
+				payment_to_bepadi:payment_to_bepadi,
+				recieving_amount:recieving_amount
+			}, 
+	 		success: function (data) {
+				 
+				window.open(
+					`${base_url}/Controllerunit/loanpayingreports`,
+					"_blank"
+				);
+			},
+			error: function (err) {
+				console.error("Error found", err);
+			},
+		});
+	}
+
 	$("#payloanbycashbtn").click(function (event) {
 		event.stopImmediatePropagation();
 
@@ -2639,7 +2671,8 @@ ${
 			$("#recieving_amount").css("border", "2px solid red");
 			return false;
 		}
-
+ 
+	
 		$.ajax({
 			url: base_url + "Controllerunit/detectcreditdetailsbycash",
 			method: "POST",
@@ -2648,14 +2681,14 @@ ${
 				ordered_date_sec: ordered_date_sec,
 				summery_id: invoice_id,
 				balance_amount: balance_amount,
+				payment_to_bepadi:payment_to_bepadi,
+
 			},
 			success: function (data) {
-				if (data == 1) {
-					alert("Payment has been detected successfully");
-					window.location.reload();
-				} else {
-					alert(data);
-				}
+				alert('Product has been detected'); 
+				saveCashpaymentforregisterdetails(recieving_amount);
+		openloanrecieptamount(balance_amount,payment_to_bepadi,recieving_amount); 
+
 			},
 			error: function (err) {
 				console.error("Error found", err);
@@ -2721,7 +2754,8 @@ ${
 													}">${d.payment_method}</span>
                         </td>
                         <td>
-                         ${d.sales_credit_amount==null ? 0 : d.sales_credit_amount}
+						Rs.
+                         ${d.sales_credit_amount==null ? 0 : parseFloat(d.sales_credit_amount).toFixed(2)}
                         </td>
                         <td>
                            Rs. ${parseFloat(d.total_amount).toFixed(2)}

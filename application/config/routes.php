@@ -67,7 +67,7 @@ $route['cashflowledger'] = 'Controllerunit/cashflowledger';
 $route['printotalsummerydetails'] = 'Controllerunit/printotalsummerydetails';
 
 $route['productsinoutlets'] = 'Controllerunit/productsinoutlets'; 
-
+$route['loanpayingreports'] = 'Controllerunit/loanpayingreports'; 
 
 
 $route['404_override'] = '';

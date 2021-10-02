@@ -148,79 +148,28 @@
            
       </div>
     </div><!--End Invoice Mid-->
-    <?php
-    $totalamount = 0; 
-    $totalamount = ($cash_in_hand + $cash_payment); 
-
-    $amountstoberecieved = 0; 
-
-    $amountstoberecieved = ($credit_payment + $cheque_payment ); 
-
-    ?>
+   
 
     <div id="bot" style="font-weight:bold">
 
                     <div id="table">
-                       <div class='details'>
+                           <div class='details'>
                          <div class="p-2">
-                           Cash IN hand :     Rs.<?php echo number_format($cash_in_hand,2)?>
-                         </div>
-                          
-                        
-                         <div class='details'>
-                         <div class="p-2">
-                           Cash payment :    Rs. <?php echo number_format($cash_payment,2)?>
+                         Previous amount :  
                          </div>
                          <div class='details'>
                          <div class="p-2">
-                         Credit payment :    Rs. <?php echo number_format($credit_payment,2)?>
+                         Recieving amount :     
                          </div>
                          <div class='details'>
                          <div class="p-2">
-                         Cheque payment :    Rs. <?php echo number_format($cheque_payment,2)?>
-                         </div>
-
-                         <div class='details'>
-                         <div class="p-2">
-                         Returned amount :    Rs. <?php echo number_format($refunded_amount,2)?>
-                         </div>
-                         <div class='details'>
-                         <div class="p-2">
-                         Expenses amount :    Rs. <?php echo number_format($expenses_amount_reg,2)?>
+                         Amount to be paid :      <br>
+                         <span><small>(Previous amount - recieving amount)</small></span>
                          </div>
                          <span style="font-weight:bold">----------------------------------------------</span>
-
-                         <div class="details">
-                           <div class="p-2">
-                          <small style="font-weight:bold"> (Cash in hand + Cash payment )</small> :Rs. <?php echo number_format($totalamount,2)?>
-                            
-                           </div>
-                         </div>
-                         <?php
-                         $getamountincashdrawer = floatval(($totalamount - ($refunded_amount + $expenses_amount_reg))); 
-                         $gettotalexpensesamount = floatval($refunded_amount + $expenses_amount_reg); 
-                         ?>
+                       </div>
                         
-                        <div class="details">
-                           <div class="p-2">
-                            (Expenses + returned) : Rs. -<?php echo number_format($gettotalexpensesamount,2)?>
-                           </div>
-                         </div>
-                         <div class="details">
-                           <div class="p-2">
-                            Amount in cash drawer :Rs. <?php echo number_format($getamountincashdrawer,2)?>
-                           </div>
-                         </div>
-                         
-                         <div class="details">
-                           <div class="p-2">
-                            Amounts to be recieved :Rs. <?php echo number_format($amountstoberecieved,2)?>
-                           </div>
-                         </div>
-                      
-                      
-
-
+                     
                        </div>
                     </div><!--End Table-->
 

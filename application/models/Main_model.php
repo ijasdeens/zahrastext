@@ -1149,6 +1149,12 @@ class Main_model extends CI_Model {
         }
     }
 
+    public function detectpaymentforcheck($summery_id_fk,$cheque_loan_amount){
+        $mycheckloan = floatval($cheque_loan_amount); 
+        return $this->db->query("update sales_credit_details set sales_credit_amount=(sales_credit_amount - ".$mycheckloan.") where summery_id_fk=".$summery_id_fk."");
+    }
+
+
     public function savepaymentdetailsforreigsterdetails($mydate, $outletid,$loanamount) {
          return $this->db->query('update register_details_section set cheque_payment=(cheque_payment + '.$loanamount.') where date="'.$mydate.'" and outlet_id='.$outletid.' '); 
     }
@@ -2740,10 +2746,10 @@ class Main_model extends CI_Model {
         $this->db->where('date',$date);
         $result = $this->db->get(); 
         if($result->num_rows() > 0){
-           return  $this->db->query('update register_details_section set cheque_payment=(cheque_payment + '.$value.') where date="'.$date.'"  outlet_id='.$outletid.'');
+           return  $this->db->query('update register_details_section set cheque_payment=(cheque_payment + '.$value.') where date="'.$date.'"  and  outlet_id='.$outletid.'');
         }
         else {
-            return $this->db->insert('register_details_section',array('cheque_payment' => $value,'date' => "'.$date.'", 'outlet_id' => $outletid)); 
+            return $this->db->insert('register_details_section',array('cheque_payment' => $value,'date' => $date, 'outlet_id' => $outletid)); 
         }
     }
 
