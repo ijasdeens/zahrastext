@@ -658,6 +658,14 @@
                         <dd class="text-right" id="dicountvalue">Rs.0</dd>
                     </dl>
                     <dl class="dlist-align">
+                        <dt>Individual dis-amount</dt>
+                        <dd class="text-right pt-3" id="individualdiscountamount">Rs.0</dd>
+                    </dl>
+                   <br>
+                   <hr>
+                    <br>
+                
+                    <dl class="dlist-align">
                         <dt>Total: </dt>
                         <dd class="text-right h4 b" id="totalamount"></dd>
                     </dl>
@@ -1092,6 +1100,13 @@
                  <div class="form-group">
                 <label for="payingamount">Recieving amount</label>
                 <input type="tel" class='form-control' id='paying_amount' autofocus>
+                </div>
+                <div class="form-group">
+                    <label for="status">
+                        Status : 
+                    </label>
+                    <span class='badge badge-success' id='balanbce_status_for_sales'>Balance</span>
+
                 </div>
 
                 <div class="form-group">

@@ -2292,6 +2292,20 @@ else
         echo $this->session->sess_destroy();
     }
 
+    public function fetchallindividualdiscount(){
+        if(count($this->cart->contents())!=0){
+            $actualprice = 0.00; 
+            $discountedamount = 0.00; 
+            $answer = 0; 
+            foreach($this->cart->contents() as $items){
+                $actualprice+=floatval($items['actual_price']) * $items['qty']; 
+                $discountedamount+=floatval($items['price']) * $items['qty']; 
+            }
+            $answer = ($actualprice - $discountedamount); 
+            echo number_format($answer,2); 
+        }
+    }
+
 
     public function addtocartshoppingcart(){
         $this->load->library('cart');
@@ -2605,7 +2619,9 @@ else
     }
 
     public function deletesessionforcarts(){
+       
        $this->cart->destroy();
+       $this->session->set_userdata('mainbalance',0);
     }
 
     public function getordersummeryid(){
@@ -3290,8 +3306,9 @@ $this->cart->update($data);
         $amounttoshowoffpaying = $this->security->xss_clean($_POST['amounttoshowoffpaying']);
 
         $dicountvalue = $this->security->xss_clean($_POST['dicountvalue']);
+        $individualdiscountamount = $this->security->xss_clean($_POST['individualdiscountamount']); 
 
-                $outletid = (int)$this->session->userdata('outlet_id');
+                $outletid = (int)$this->session->outlet_id;
 
         $data = array(
         'discount' => $discountpercentage,
@@ -3299,7 +3316,8 @@ $this->cart->update($data);
             'discount_amount' => $dicountvalue,
             'total' =>  $totalamount,
             'paying_amount' => $amounttoshowoffpaying,
-            'outlet_id' => $outletid
+            'outlet_id' => $outletid,
+            'individual_total_discountamount' => $individualdiscountamount
         );
 
         $result = $this->main_model->savetemporarydateforsale($data,$outletid);
@@ -4074,6 +4092,7 @@ public function select_postponed(){
 
     }
 
+  
 
     public function alert_quantity_for_outlets_text(){
         $alert_quantity_for_outlets_text = (int)$this->security->xss_clean($_POST['value']);
@@ -4465,6 +4484,7 @@ public function select_postponed(){
 
 
 
+
      //meow
 
      public function savecreditdetailsbyregisterfromcash(){
@@ -4811,6 +4831,11 @@ public function select_postponed(){
 
 
 
+    }
+
+    public function saveassessiontogetback(){
+        $balance_amount = $this->security->xss_clean($_POST['balance_amount']); 
+        echo $this->session->set_userdata('mainbalance',$balance_amount); 
     }
 
     public function savechequepayment(){

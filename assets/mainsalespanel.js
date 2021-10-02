@@ -395,6 +395,8 @@ $(document).ready(function () {
 
 		let dicountvalue = $("#dicountvalue").html();
 
+		let individualdiscountamount = $('#individualdiscountamount').html(); 
+
 
 
 		$.ajax({
@@ -406,6 +408,7 @@ $(document).ready(function () {
 				totalamount: totalamount,
 				amounttoshowoffpaying: amounttoshowoffpaying,
 				dicountvalue: dicountvalue,
+				individualdiscountamount:individualdiscountamount
 			},
 			method: "POST",
 			success: function (data) {
@@ -680,11 +683,28 @@ $(document).ready(function () {
 		$(this).css("border", "1px solid black");
 
 		if (paying_amount > total_amount_cash) {
-			$(this).val(total_amount_cash);
-			toastr.warning("Recieving amount can not be more than total amount");
-			$("#balance_amountbycash").val(0);
-			return false;
+			$('#balanbce_status_for_sales').html('Balance');
+			$('#balanbce_status_for_sales').removeClass('badge badge-danger');  
+ 			$('#balanbce_status_for_sales').addClass('badge badge-success badge-info'); 
+	
 		}
+		else if(paying_amount==total_amount_cash){
+
+			$('#balanbce_status_for_sales').html('Cash');
+			$('#balanbce_status_for_sales').removeClass('badge badge-danger'); 
+			$('#balanbce_status_for_sales').removeClass('badge badge-success'); 
+			$('#balanbce_status_for_sales').addClass('badge badge-info');  
+
+		}
+		
+		else {
+			$('#balanbce_status_for_sales').html('Credit');
+			$('#balanbce_status_for_sales').removeClass('badge badge-success badge-info'); 
+			$('#balanbce_status_for_sales').addClass('badge badge-danger');  
+
+
+		}
+		
 
 		paying_amount = parseFloat(paying_amount);
 		answer = total_amount_cash - paying_amount;
@@ -1002,6 +1022,7 @@ $(document).ready(function () {
 			success: function (data) {
 				toastr.info("Increased...");
 				fetchAllshoppingcartdata();
+				fetchallindividualdiscount(); 
 			},
 			error: function (err) {
 				console.error("Error found", err);
@@ -1023,6 +1044,7 @@ $(document).ready(function () {
 			success: function (data) {
 				toastr.warning("Decreased...");
 				fetchAllshoppingcartdata();
+				fetchallindividualdiscount();
 			},
 			error: function (err) {
 				console.error("Error found", err);
@@ -1336,6 +1358,8 @@ $(document).ready(function () {
 
 		let amounttoshowoffpaying = $("#amounttoshowoffpaying").html();
 
+
+
 		$.ajax({
 			url: base_url + "Controllerunit/passalldetailstoformsection",
 			method: "POST",
@@ -1377,9 +1401,9 @@ $(document).ready(function () {
 
 	$("#paybycashfrm").submit(function (e) {
 		e.preventDefault();
-		let total_amount_cash = $("#total_amount_cash").val();
-		let balance_amount = $("#balance_amountbycash").val();
-		let paying_amount = $("#paying_amount").val();
+		let total_amount_cash = parseFloat($("#total_amount_cash").val());
+		let balance_amount = Math.abs($("#balance_amountbycash").val());
+		let paying_amount = parseFloat($("#paying_amount").val());
 
 		let discountpercentage = $("#discountpercentage").html();
 		let dicountvalue = $("#dicountvalue").html();
@@ -1391,7 +1415,26 @@ $(document).ready(function () {
 		if (sales_invoice_id == null) {
 		}
 
-		if (total_amount_cash !== paying_amount) {
+		if ((total_amount_cash < paying_amount) || (total_amount_cash==paying_amount)) {
+			$.ajax({
+				url: base_url + "Controllerunit/saveassessiontogetback",
+				method: "POST",
+				data: {
+					balance_amount : balance_amount 
+				},
+				success: function (data) {
+					 
+				},
+				error: function (err) {
+					console.error("Error found", err);
+				},
+			});
+			 
+		
+		}
+
+		else {
+		 
 			if ($("#messagesectionoffound").html() != "Found ✔") {
 				$("#paywithcashmodal").modal("hide");
 				toastr.info(
@@ -1400,7 +1443,15 @@ $(document).ready(function () {
 				$("#customer_typeselect").css("border", "2px solid red");
 				return false;
 			}
+			else {
+				  
+			savecreditdetailsbyregisterfromcash(balance_amount);
+ 			}
 		}
+
+		 
+
+	 
 
 		if (paying_amount == "") {
 			toastr.error("Paying amount is required");
@@ -1415,9 +1466,7 @@ $(document).ready(function () {
 			return false;
 		}
 
-		if (balance_amount != 0) {
-			savecreditdetailsbyregisterfromcash(balance_amount);
-		}
+	 
 
 		saveCashpaymentforregisterdetails(total_amount_cash);
 
@@ -2021,6 +2070,24 @@ ${
 		});
 	});
 
+	//baby 
+	function fetchallindividualdiscount(){
+		$.ajax({
+			url: base_url + "Controllerunit/fetchallindividualdiscount",
+			method: "POST",
+			success: function (data) {
+				 console.clear(); 
+				 
+				 $("#individualdiscountamount").html('Rs.'+data); 
+			},
+			error: function (err) {
+				alert(err);
+				console.error("Error found", err);
+			},
+		});
+
+	}
+
 	$("body").delegate(".edit_price_update", "click", function () {
 		let rowid = $(this).attr("rowid");
 		let valuetochange = prompt("Enter new price ");
@@ -2033,11 +2100,13 @@ ${
 					valuetochange: valuetochange,
 				},
 				success: function (data) {
-					console.clear(); 
+					 
 					console.log('Edit price update',data); 
 					toastr.info("Updated successfully");
 					fetchAllshoppingcartdata();
+					fetchallindividualdiscount();
 					savetemporarydateforsale();
+					
 				},
 				error: function (err) {
 					console.error("Error found", err);
