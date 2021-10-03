@@ -4497,11 +4497,7 @@ public function select_postponed(){
 
      
      public function loanpayingreports(){
- 
-        $balance_amount = $this->security->xss_clean($_POST['balance_amount']); 
-        $payment_to_bepadi = $this->security->xss_clean($_POST['payment_to_bepadi']); 
-        $recieving_amount = $this->security->xss_clean($_POST['recieving_amount']); 
-
+  
         
         $this->load->view('salesunit/loanpayingreports');
 
@@ -4514,6 +4510,10 @@ public function select_postponed(){
          $summery_id = $this->security->xss_clean($_POST['summery_id']); 
          $balance_amount = $this->security->xss_clean($_POST['balance_amount']); 
         $payment_to_bepadi = $this->security->xss_clean($_POST['payment_to_bepadi']); 
+
+        $this->session->set_userdata('recieving_amount_sec',$recieved_amount); 
+        $this->session->set_userdata('balanceamount',$balance_amount); 
+        $this->session->set_userdata('paymenttobepaid',$payment_to_bepadi); 
 
          $result = $this->main_model->detectcreditdetailsbycash($recieving_amount, $ordered_date_sec, $summery_id,$balance_amount);
         

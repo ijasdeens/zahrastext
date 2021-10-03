@@ -2617,9 +2617,9 @@ ${
 			url: base_url + "Controllerunit/loanpayingreports",
 			method: "POST",
 			data:{
-				balance_amount:balance_amount,
-				payment_to_bepadi:payment_to_bepadi,
-				recieving_amount:recieving_amount
+				balance_amounts:balance_amount,
+				payment_to_bepadis:payment_to_bepadi,
+				recieving_amounts:recieving_amount
 			}, 
 	 		success: function (data) {
 				 

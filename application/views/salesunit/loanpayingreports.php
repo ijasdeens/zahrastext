@@ -155,15 +155,15 @@
                     <div id="table">
                            <div class='details'>
                          <div class="p-2">
-                         Previous amount :  
+                         Previous amount : Rs. <?php echo number_format($this->session->paymenttobepaid,2)?>
                          </div>
                          <div class='details'>
                          <div class="p-2">
-                         Recieving amount :     
+                         Recieving amount : Rs. <?php echo number_format($this->session->recieved_amount)?>     
                          </div>
                          <div class='details'>
                          <div class="p-2">
-                         Amount to be paid :      <br>
+                         Amount to be paid : Rs. <?php echo number_format($this->session->balanceamount,2)?>      <br>
                          <span><small>(Previous amount - recieving amount)</small></span>
                          </div>
                          <span style="font-weight:bold">----------------------------------------------</span>
