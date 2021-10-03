@@ -1,7 +1,28 @@
 $(document).ready(function () {
 	const base_url = $("#base_url").val();
 
- 
+	function openloanrecieptamount(balance_amount,payment_to_bepadi,recieving_amount){
+	 
+		$.ajax({
+			url: base_url + "Controllerunit/loanpayingreports",
+			method: "POST",
+			data:{
+				balance_amounts:balance_amount,
+				payment_to_bepadis:payment_to_bepadi,
+				recieving_amounts:recieving_amount
+			}, 
+	 		success: function (data) {
+				 
+				window.open(
+					`${base_url}/Controllerunit/loanpayingreports`,
+					"_blank"
+				);
+			},
+			error: function (err) {
+				console.error("Error found", err);
+			},
+		});
+	}
 
 	function getfulldate() {
 		var today = new Date();
@@ -24,6 +45,7 @@ $(document).ready(function () {
 
 		return mydate;
 	}
+
 
 	function checkAlldetails() {
 		var today = new Date();
@@ -2485,6 +2507,8 @@ ${
 
 		let summery_id_fk = parseInt(sessionStorage.getItem("summery_id_fk"));
 
+		let balance_for_cheque_amount = parseFloat($('#balance_for_cheque_amount').val()).toFixed(2);
+
 		let status =
 			$("#display_status_loan_for_cheque").html() == "FULLY PAID"
 				? "Completed"
@@ -2524,7 +2548,11 @@ ${
 			return false;
 		}
 
-	 
+		cheque_loan_amount = parseFloat(cheque_loan_amount).toFixed(2); 
+		let balanceamount =0.00; 
+		balanceamount = ( balance_for_cheque_amount - cheque_loan_amount ); 
+
+		//balance, payment to be paid, recieving 
 
 
 		$.ajax({
@@ -2540,12 +2568,17 @@ ${
 				status: status,
 				ordered_date_sec: ordered_date,
 				cheque_loan_amount: cheque_loan_amount,
+				balanceamount:balanceamount,
+				balance_for_cheque_amount:balance_for_cheque_amount,
+				todaydate:getfulldate() 
 			},
 			success: function (data) {
 				if (data == 1) {
 					chequeSaveDetailsforregister(parseFloat(cheque_loan_amount).toFixed(2)); 
 					alert('Payment has been detected successfully by check payment'); 
-					window.location.reload(); 
+		openloanrecieptamount(balanceamount,balance_for_cheque_amount,cheque_loan_amount); 
+					
+					//window.location.reload(); 
 					
 				} else {
 					alert(data);
@@ -2611,28 +2644,7 @@ ${
 	});
 
 	 
-	function openloanrecieptamount(balance_amount,payment_to_bepadi,recieving_amount){
-	 
-		$.ajax({
-			url: base_url + "Controllerunit/loanpayingreports",
-			method: "POST",
-			data:{
-				balance_amounts:balance_amount,
-				payment_to_bepadis:payment_to_bepadi,
-				recieving_amounts:recieving_amount
-			}, 
-	 		success: function (data) {
-				 
-				window.open(
-					`${base_url}/Controllerunit/loanpayingreports`,
-					"_blank"
-				);
-			},
-			error: function (err) {
-				console.error("Error found", err);
-			},
-		});
-	}
+
 
 	$("#payloanbycashbtn").click(function (event) {
 		event.stopImmediatePropagation();
@@ -2682,6 +2694,7 @@ ${
 				summery_id: invoice_id,
 				balance_amount: balance_amount,
 				payment_to_bepadi:payment_to_bepadi,
+				date : getfulldate() 
 
 			},
 			success: function (data) {
@@ -3995,4 +4008,61 @@ $('#search_supplier_checks').click(function(){
   
 
  detectexpirechecksbyadmindetails(); 
+
+
+ 
+ function getloanpaymentmentcheckmethod(fromdate = null, todate = null, paymentmethod = null) {
+
+	let count = 0; 
+	let html = ''; 
+
+	$.ajax({
+		url: base_url + "Controllerunit/getloanpaymentmentcheckmethod",
+		method: "POST",
+		data: {
+			 fromdate:fromdate, 
+			 todate:todate, 
+			 paymentmethod:paymentmethod 
+		},
+		success: function (data) {
+			 let getData = JSON.parse(data); 
+			 if(getData==0){
+				$("#loanpaymentmentcheckmethod").html('<tr><td><span class="text text-danger font-weight-bold">No data found</span></td></tr>');
+				return false; 
+			 }
+			 else {
+				 getData.map(d => {
+					html+=`<tr>
+					<td>${++count}</td>
+					<td>Rs.${parseFloat(d.loan_previous_amount).toFixed(2)}</td>
+					<td>Rs.${parseFloat(d.loan_recieving_amount).toFixed(2)}</td>
+					<td>Rs. ${parseFloat(d.loan_balance_amount).toFixed(2)}</td>
+					<td>${d.loan_paid_method=='Check' ? '<span class="badge badge-info">Check</span>' : '<span class="badge badge-success">Cash</span>'}</td>
+					<td>${d.date}</td>
+					</tr>`;
+				 }); 
+				 $('#loanpaymentmentcheckmethod').html(html); 
+			 }
+		},
+		error: function (err) {
+			console.error("Error found", err);
+		},
+	});
+
+}
+
+getloanpaymentmentcheckmethod(); 
+
+
+$('#search_loan_amount_section').click(function(){
+	let from_date_fr_loan = $('#from_date_fr_loan').val(); 
+	let to_date_fr_loan = $('#to_date_fr_loan').val(); 
+	let payment_method_forloan = $('#payment_method_forloan').val()=='' ? null : $('#payment_method_forloan').val(); 
+
+	getloanpaymentmentcheckmethod(from_date_fr_loan,to_date_fr_loan,payment_method_forloan); 
+
+
+}); 
+
+
 }); //End of script

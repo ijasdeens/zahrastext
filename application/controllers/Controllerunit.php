@@ -4503,6 +4503,7 @@ public function select_postponed(){
 
 
      }
+ 
 
      public function detectcreditdetailsbycash(){
          $recieving_amount = $this->security->xss_clean($_POST['recieving_amount']); 
@@ -4511,13 +4512,40 @@ public function select_postponed(){
          $balance_amount = $this->security->xss_clean($_POST['balance_amount']); 
         $payment_to_bepadi = $this->security->xss_clean($_POST['payment_to_bepadi']); 
 
-        $this->session->set_userdata('recieving_amount_sec',$recieved_amount); 
+        $date = $this->security->xss_clean($_POST['date']); 
+
+        $this->session->set_userdata('recieving_amount_sec',$recieving_amount); 
         $this->session->set_userdata('balanceamount',$balance_amount); 
         $this->session->set_userdata('paymenttobepaid',$payment_to_bepadi); 
+
+
+        $savedataforloan = array(
+            'loan_previous_amount' => $payment_to_bepadi, 
+            'loan_recieving_amount' => $recieving_amount, 
+            'loan_balance_amount' => $balance_amount, 
+            'loan_paid_method' => 'Cash',  
+            'outlet_name' => $this->session->outlets_name, 
+            'outlet_id_fk' => $this->session->outlet_id, 
+            'date' => $date
+        );
+
+        $this->main_model->savepayingloanamount($savedataforloan); 
+        
+
 
          $result = $this->main_model->detectcreditdetailsbycash($recieving_amount, $ordered_date_sec, $summery_id,$balance_amount);
         
         
+
+     }
+
+     public function getloanpaymentmentcheckmethod(){
+         $fromdate = $this->security->xss_clean($_POST['fromdate']); 
+         $todate = $this->security->xss_clean($_POST['todate']); 
+         $paymentmethod = $this->security->xss_clean($_POST['paymentmethod']); 
+
+        $result = $this->main_model->getloanpaymentmentcheckmethod($fromdate,$todate, $paymentmethod, $this->session->outlet_id); 
+        echo json_encode($result); 
 
      }
 
@@ -4533,7 +4561,31 @@ public function select_postponed(){
         $ordered_date_sec = $this->security->xss_clean($_POST['ordered_date_sec']); 
 
         $cheque_loan_amount = $this->security->xss_clean($_POST['cheque_loan_amount']); 
- 
+        
+        $balanceamount = floatval($this->security->xss_clean($_POST['balanceamount']));
+        $balance_for_cheque_amount= floatval($this->security->xss_clean($_POST['balance_for_cheque_amount']));  
+        $todaydate = $this->security->xss_clean($_POST['todaydate']); 
+
+
+        $this->session->set_userdata('recieving_amount_sec',$cheque_loan_amount); 
+        $this->session->set_userdata('balanceamount',$balanceamount); 
+        $this->session->set_userdata('paymenttobepaid',$balance_for_cheque_amount); 
+
+
+        $savedataforloan = array(
+            'loan_previous_amount' => $balance_for_cheque_amount, 
+            'loan_recieving_amount' => $cheque_loan_amount, 
+            'loan_balance_amount' => $balanceamount, 
+            'loan_paid_method' => 'Check', 
+            'outlet_name' => $this->session->outlets_name, 
+            'outlet_id_fk' => $this->session->outlet_id, 
+            'date' => $todaydate 
+        );
+
+        $this->main_model->savepayingloanamount($savedataforloan); 
+
+
+
 
         $data = array(
             'bank_name' => $bank_name_for_loan_cheque, 

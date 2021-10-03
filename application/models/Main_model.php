@@ -1149,6 +1149,32 @@ class Main_model extends CI_Model {
         }
     }
 
+    public function savepayingloanamount($data){
+        $this->db->insert('loanpaiddetails',$data); 
+    }
+
+    public function getloanpaymentmentcheckmethod($fromdate, $todate, $paymentmethod, $outletid ){
+        $this->db->select('*'); 
+        $this->db->from('loanpaiddetails');
+        if($fromdate!=null){
+            $this->db->where('date>=',$fromdate); 
+        } 
+        if($todate!=null){
+            $this->db->where('date<=',$todate); 
+        }
+        if($paymentmethod!=null){
+            $this->db->where('loan_paid_method',$paymentmethod); 
+        }
+        $this->db->where('outlet_id_fk',$outletid); 
+        $result = $this->db->get(); 
+        if($result->num_rows() > 0) {
+            return $result->result(); 
+        }
+        else {
+            return 0;
+        }
+    }
+
     public function detectpaymentforcheck($summery_id_fk,$cheque_loan_amount){
         $mycheckloan = floatval($cheque_loan_amount); 
         return $this->db->query("update sales_credit_details set sales_credit_amount=(sales_credit_amount - ".$mycheckloan.") where summery_id_fk=".$summery_id_fk."");

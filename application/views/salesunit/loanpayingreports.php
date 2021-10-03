@@ -159,7 +159,7 @@
                          </div>
                          <div class='details'>
                          <div class="p-2">
-                         Recieving amount : Rs. <?php echo number_format($this->session->recieved_amount)?>     
+                         Recieving amount : Rs. <?php echo number_format($this->session->recieving_amount_sec)?>     
                          </div>
                          <div class='details'>
                          <div class="p-2">
