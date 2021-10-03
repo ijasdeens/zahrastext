@@ -918,6 +918,9 @@ $(document).ready(function () {
 		let totalnumberofpcs = 0;
 		fetchDatafordiscount();
 		getdataforprintfromshoppingcart();
+
+		let totalvaluesection = 0.00; 
+
 		$.ajax({
 			url: base_url + "Controllerunit/fetchAllshoppingcartdata",
 			method: "POST",
@@ -929,6 +932,7 @@ $(document).ready(function () {
 				$(".fullquantity").each(function () {
 					totalnumberofpcs += parseInt($(this).val());
 				});
+ 
 
 				$("#numberof_pcs_for_print").html("No of Pcs : " + totalnumberofpcs);
 			},
@@ -1290,6 +1294,7 @@ $(document).ready(function () {
 				todydate: getfulldate(),
 			},
 			success: function (data) {
+			 
 				console.log("Reduce quantity", data);
 				alert("Order has been made successfully");
 				window.open(
@@ -1420,6 +1425,7 @@ $(document).ready(function () {
 			},
 		});
 	};
+	//   $this->session->set_userdata('last_insert_id',$last_insert_id);
 
 	$("#paybycashfrm").submit(function (e) {
 		e.preventDefault();
@@ -1445,6 +1451,7 @@ $(document).ready(function () {
 					balance_amount : balance_amount 
 				},
 				success: function (data) {
+				 
 					 
 				},
 				error: function (err) {
@@ -1506,8 +1513,8 @@ $(document).ready(function () {
 				additional_information:additional_information
 			},
 			success: function (data) {
-				alert(data);
-				console.log(data);
+				//alert(data);
+			   console.log(data);
 				reduceProductQuantity();
 			},
 			error: function (err) {
@@ -1811,7 +1818,9 @@ ${d.ordered_date}
 		sessionStorage.setItem("ordered_dateforreturn", ordered_date);
 
 		$("#hidden_order_summery_id").val(order_summery_id);
-		let html = null;
+		let html = '';
+
+		let sumoftotalvalue = 0.00; 
 
 		$.ajax({
 			url: base_url + "Controllerunit/getproductdetails",
@@ -1821,21 +1830,27 @@ ${d.ordered_date}
 			},
 			success: function (data) {
 				let getData = JSON.parse(data);
+				console.clear(); 
+				console.log(getData); 
 				if (getData == 0) {
 					$("#product_name_section_display").html(
 						'<span class="text text-danger font-weight-bold">NO DATA FOUND</span>'
 					);
+					$('#total_amount_section').html('Rs.'+parseFloat(0).toFixed(2));
 					return false;
 				} else {
 					$("#product_name_section_display").html("");
 
 
 					getData.map((d) => {
+						$('#total_amount_section').html('Rs.'+parseFloat(d.fulltotalamount).toFixed(2));
+						sessionStorage.setItem('fulltotalamount',d.fulltotalamount); 
 						let subtotal = parseFloat(d.sub_total * d.choosen_quantity);
+						sumoftotalvalue = parseFloat(d.sub_total * d.choosen_quantity); 
 						html += `<tr>
 <td>${d.product_name}</td>
 <td class='choosen_quantity_column'>${d.choosen_quantity}</td>
-<td>${parseFloat(d.sub_total).toFixed(2)}</td>
+<td class="sub_total_amount_for_total">${parseFloat(d.sub_total).toFixed(2)}</td>
 <td>
 ${subtotal.toFixed(2)}
 </td>
@@ -1844,14 +1859,15 @@ ${subtotal.toFixed(2)}
 ${
 	d.choosen_quantity == 0
 		? `<button class="btn btn-primary btn-sm btn-block"  disabled><i class="fa fa-undo" aria-hidden="true"></i> Return</button>`
-		: `<button class="btn btn-primary btn-sm return_product_to_sale btn-block" product_id='${d.product_id}' product_name='${d.product_name}' price='${d.sub_total}' discount='${d.discount}' discounted_amount='${d.discounted_amount}' total_amount='${d.total_amount}' products_code='${d.products_code}' choosen_quantity='${d.choosen_quantity}'><i class="fa fa-undo" aria-hidden="true"></i> Return</button>`
+		: `<button class="btn btn-primary btn-sm return_product_to_sale btn-block" product_id='${d.product_id}' product_name='${d.product_name}' price='${d.sub_total}' discount='${d.discount}' discounted_amount='${d.discounted_amount}' total_amount='${d.fulltotalamount}' products_code='${d.products_code}' choosen_quantity='${d.choosen_quantity}'><i class="fa fa-undo" aria-hidden="true"></i> Return</button>`
 }
 
 </td>
 </tr>`;
+ 
 
 					});
-					$("#product_name_section_display").append(html);
+					$("#product_name_section_display").html(html);
 
 				}
 			},
@@ -1888,11 +1904,22 @@ ${
 
 	
 	$("#print_return_invoice").click(function () {
-		let refundedamount = prompt("Refunded amount");
+		let totalrefundableamount =0.00; 
+
+		$('.sub_total_amount_for_total').each(function(e){
+			totalrefundableamount+=parseFloat($(this).html()); 
+		})
+
+		let refundedamount = prompt("Refunded amount",parseFloat(sessionStorage.getItem('fulltotalamount')).toFixed(2));
 
 		let ordered_dateforreturn = sessionStorage.getItem("ordered_dateforreturn");
 
+		 
 		if (refundedamount != null) {
+			refundedamount = parseFloat(refundedamount).toFixed(2); 
+
+			if(refundedamount <= parseFloat(sessionStorage.getItem('fulltotalamount')).toFixed(2)){
+				
 			if ($(".return_quantity_value").val() !== 0) {
 				$.ajax({
 					url: base_url + "Controllerunit/print_return_invoice_section",
@@ -1915,10 +1942,20 @@ ${
 			} else {
 				alert("There is no product to return");
 			}
+
+			}
+			else {
+				alert('Refunded amount can not exceed the total amount'); 
+				window.location.reload(); 
+			 
+			}
+
 		}
 	});
 
 	//whileback
+
+	generaldatasection = 0; 
 
 	$("body").delegate(".return_product_to_sale", "click", function () {
 		let choosen_quantity_html = parseInt(
@@ -1936,6 +1973,7 @@ ${
 		let product_id = parseInt($(this).attr("product_id"));
 
 		let html = null;
+		let productpricesection = parseFloat($(this).attr('price')); 
  
 		if (return_quantity_val > choosen_quantity_html) {
 			alert("Returning quantity can not go over purcahsed quantity");
@@ -1947,6 +1985,9 @@ ${
 			$(this).parent().parent().find(".return_quantity_value").focus();
 			return false;
 		}
+		generaldatasection+=parseFloat(return_quantity_val * productpricesection).toFixed(2); 
+
+		$('#sumofsubtotaltotal_amount_section').html('Rs.'+parseFloat(generaldatasection).toFixed(2)); 
 
 		let product_name = $(this).attr("product_name");
 		let price = $(this).attr("price");
@@ -1962,6 +2003,9 @@ ${
 				return_quantity_val > 1 ? "have been" : "has been "
 			} added for return report`
 		);
+
+
+
 
 		$.ajax({
 			url: base_url + "Controllerunit/addproductsforreturn",
@@ -4034,6 +4078,7 @@ $('#search_supplier_checks').click(function(){
 				 getData.map(d => {
 					html+=`<tr>
 					<td>${++count}</td>
+					<td>${d.invoiceidsec}</td>
 					<td>Rs.${parseFloat(d.loan_previous_amount).toFixed(2)}</td>
 					<td>Rs.${parseFloat(d.loan_recieving_amount).toFixed(2)}</td>
 					<td>Rs. ${parseFloat(d.loan_balance_amount).toFixed(2)}</td>

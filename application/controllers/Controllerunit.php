@@ -561,6 +561,7 @@ class Controllerunit extends CI_Controller {
         );
 
           $last_insert_id = $this->main_model->saveamountforall($orderdetailsarray);
+
           $this->session->set_userdata('last_insert_id',$last_insert_id);
 
         $creditamountdata = array(
@@ -2568,10 +2569,11 @@ else
     }
 
     public function reduceProductQuantity(){
-        $last_insert_id = (int) $this->session->last_insert_id;
+        $last_insert_id =  $this->session->last_insert_id;
         $todydate = $this->security->xss_clean($_POST['todydate']);
 
         $nametaker = ''; 
+        
 
         foreach($this->cart->contents() as $items){
             $currentQuantity = (int)$items['qty'];
@@ -2608,7 +2610,7 @@ else
 
 
             $result = $this->main_model->saveorderdetails($data);
-             return $this->main_model->savedatafordetailsproduct($datafordetailsproduct,$productid,$outletid,$last_insert_id,$nametaker,$currentQuantity,$productid,$outletid,$todydate); 
+             $this->main_model->savedatafordetailsproduct($datafordetailsproduct,$productid,$outletid,$last_insert_id,$nametaker,$currentQuantity,$productid,$outletid,$todydate); 
 
 
         }
@@ -4526,7 +4528,8 @@ public function select_postponed(){
             'loan_paid_method' => 'Cash',  
             'outlet_name' => $this->session->outlets_name, 
             'outlet_id_fk' => $this->session->outlet_id, 
-            'date' => $date
+            'date' => $date,
+            'invoiceidsec' => $summery_id 
         );
 
         $this->main_model->savepayingloanamount($savedataforloan); 
@@ -4579,7 +4582,8 @@ public function select_postponed(){
             'loan_paid_method' => 'Check', 
             'outlet_name' => $this->session->outlets_name, 
             'outlet_id_fk' => $this->session->outlet_id, 
-            'date' => $todaydate 
+            'date' => $todaydate,
+            'invoiceidsec' => $summery_id_fk 
         );
 
         $this->main_model->savepayingloanamount($savedataforloan); 
@@ -4864,7 +4868,7 @@ public function select_postponed(){
 
         $chequestatus = 'Pending';
 
-        echo $this->session->subtractedamountfromtotal;
+       
 
         $orderedstatus = 1;
         $orderdetailsarray = array(
@@ -4887,7 +4891,9 @@ public function select_postponed(){
         $last_insert_id = $this->main_model->savecashamount($orderdetailsarray);
         $this->session->set_userdata('last_insert_id',$last_insert_id);
 
-        if($balance_amount!=0){
+         
+
+        if($paying_amount_given < $recieved_amount){
             $credit_data = array(
                 'sales_credit_amount' => $balance_amount,
                 'summery_id_fk' => $last_insert_id, 
@@ -4944,6 +4950,7 @@ public function select_postponed(){
         );
 
           $last_insert_id = $this->main_model->saveamountforall($orderdetailsarray);
+        
           $this->session->set_userdata('last_insert_id',$last_insert_id);
 
           if($cheque_amount_balance!=0){

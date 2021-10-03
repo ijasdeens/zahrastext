@@ -1819,10 +1819,10 @@ class Main_model extends CI_Model {
 
 
     public function getproductdetails($order_summery_id){
-        $this->db->select('order_summery.discount,order_summery.discounted_amount,order_summery.total_amount,products_section.products_id as product_id,products_section.product_name,products_section.product_price,order_details.choosen_quantity,products_section.products_id,products_section.products_code,order_details.choosen_quantity,order_details.sub_total');
+        $this->db->select('order_summery.discount,order_summery.discounted_amount,order_summery.total_amount as fulltotalamount,products_section.products_id as product_id,products_section.product_name,products_section.product_price,order_details.choosen_quantity,products_section.products_id,products_section.products_code,order_details.choosen_quantity,order_details.sub_total');
         $this->db->from('order_details');
-        $this->db->join('products_section','products_section.products_id=order_details.product_id');
-        $this->db->join('order_summery','order_summery.order_summery_id=order_details.summery_id');
+        $this->db->join('products_section','products_section.products_id=order_details.product_id','left');
+        $this->db->join('order_summery','order_summery.order_summery_id=order_details.summery_id','left');
         $this->db->where('order_details.summery_id',$order_summery_id);
         $result = $this->db->get();
         if($result->num_rows() >0){

@@ -958,6 +958,7 @@
                                                 <thead>
                                                     <tr>
                                                         <th>#NO</th>
+                                                        <th>Invoice ID</th>
                                                         <th>Previous amount</th>
                                                         <th>Paid amount</th>
                                                         <th>Amount to be paid</th>
@@ -1357,6 +1358,20 @@
                          <div class="container my-4">
                            <hr>
                             <div class="row my-4">
+                                <div class="container">
+                                    <div class="row">
+                                        <div class="col">
+                                            <span class="total_amount_tobepaid badge badge-primary">Total amount : </span>&nbsp; <span id='total_amount_section'>Rs.0.00</span>
+                                        </div>
+                                        
+                                    </div>
+                                    <div class="row my-2 d-none">
+                                        <div class="col">
+                                            <span class="total_sub_total badge badge-info">Sum of sub total : </span>&nbsp; <span id='sumofsubtotaltotal_amount_section'>Rs.0.00</span>
+                                        </div>
+                                        
+                                    </div>
+                                </div>
                                   <table class="table table-bordered">
                                         <thead>
                                             <tr>
