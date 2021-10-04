@@ -233,6 +233,27 @@
 
 <!--                    ADD PEOPLE-->
 
+<!--Add purcahse -->
+
+
+<a class="" data-toggle="collapse" href="#addpurcahsedetails" role="button" aria-expanded="false" aria-controls="collapseExample">
+        <li class="nav-item nav-category"><span class="nav-link">Purcahses&nbsp; <i class="fa fa-angle-double-down"></i></span></li>
+
+           </a>
+                    <div class="collapse" id="addpurcahsedetails">
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?php echo base_url()?>Controllerunit/addpurcahsedetails">
+                <span class="menu-title">Add purcahses</span>
+                <i class="icon-screen-desktop menu-icon"></i>
+              </a>
+                    </li>
+
+               
+                    </div>
+
+
+
 
 
                      <a class="" data-toggle="collapse" href="#outletcollapse" role="button" aria-expanded="false" aria-controls="collapseExample">

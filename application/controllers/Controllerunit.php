@@ -984,6 +984,20 @@ else
         }
      }
 
+     public function addpurcahsedetails(){
+        if($this->session->userdata('admin_id')!=''){
+            $data['allsuppliers'] = $this->main_model->getsupplierdetails(); 
+            $this->load->view('layouts/header');
+          $this->load->view('purcahsedetails/purcahsedetails',$data);
+          $this->load->view('layouts/footer');
+  
+          }
+          else {
+                redirect(base_url() . 'Controllerunit/loginoutlet');
+          }
+
+     }
+
     public function staffbase()
     {
         if($this->session->userdata('admin_id')!=''){
@@ -1784,6 +1798,62 @@ else
 
     }
 
+    public function frm_purcahsedetails(){
+        $supplier_name_section = $this->security->xss_clean($_POST['supplier_name_section']); 
+        $ref_no_forsupplier = $this->security->xss_clean($_POST['ref_no_forsupplier']); 
+        $purcahse_date = $this->security->xss_clean($_POST['purcahse_date']); 
+        $paid_amount = $this->security->xss_clean($_POST['paid_amount']); 
+        $total_amount = $this->security->xss_clean($_POST['total_amount']); 
+
+        if(isset($_FILES['bill_attachmentpic']['name'])){
+            
+         $config['upload_path']="./assets/img/uploaded_photos";
+         $config['allowed_types'] = 'gif|jpg|png|jpeg';
+        $this->load->library('upload',$config);
+        if($this->upload->do_upload("bill_attachmentpic")){
+            $data = $this->upload->data();
+            $pictureName = $data['file_name'];
+
+            $data = array(
+                'purcahse_details_ref' => $ref_no_forsupplier, 
+                'purcahse_details_date' => $purcahse_date, 
+                'purcahse_details_total_payment' => $total_amount, 
+                'paid_amount' => $paid_amount, 
+                'bill_url' => $pictureName, 
+                'supplier_id_fk' => $supplier_name_section
+            ); 
+
+            $this->main_model->frm_purcahsedetails($data); 
+
+        }
+
+        }
+        else {
+            $data = array(
+                'purcahse_details_ref' => $ref_no_forsupplier, 
+                'purcahse_details_date' => $purcahse_date, 
+                'purcahse_details_total_payment' => $total_amount, 
+                'paid_amount' => $paid_amount, 
+                'supplier_id_fk' => $supplier_name_section
+            
+            ); 
+
+            $this->main_model->frm_purcahsedetails($data); 
+
+
+        }
+
+    }
+
+    public function getpurcahsedetailsforsupplier(){
+        $fromdate = $this->security->xss_clean($_POST['fromdate']); 
+        $todate = $this->security->xss_clean($_POST['todate']); 
+        $supplier= $this->security->xss_clean($_POST['supplier']); 
+
+        $result = $this->main_model->getpurcahsedetailsforsupplier($fromdate, $todate, $supplier);
+        echo json_encode($result);  
+
+    }
 
     public function updateallproducts(){
 

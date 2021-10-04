@@ -2468,8 +2468,35 @@ class Main_model extends CI_Model {
         }
     }
 
+    public function frm_purcahsedetails($data){
+        return $this->db->insert('purcahse_details',$data); 
+    }
+
+    public function getpurcahsedetailsforsupplier($fromdate, $todate, $supplier){
+         $this->db->select('*'); 
+         $this->db->from('purcahse_details'); 
+         $this->db->join('supplier','supplier.supplier_id=purcahse_details.supplier_id_fk'); 
+        if($fromdate!=null){
+            $this->db->where('purcahse_details.purcahse_details_date>=',$fromdate); 
+        }
+        if($todate!=null){
+            $this->db->where('purcahse_details.purcahse_details_date<=',$todate); 
+        }
+        if($supplier!=''){
+            $this->db->where('purcahse_details.supplier_id_fk',$supplier); 
+        }
+        $result = $this->db->get(); 
+        if($result->num_rows() > 0) {
+            return $result->result(); 
+        }
+        else {
+            return 0; 
+        }
+
+    }
+
     public function getsupplierdetails(){
-        $this->db->select('supplier_id,supplier_name,mobile_number');
+        $this->db->select('*');
         $this->db->from('supplier');
         $result = $this->db->get();
 

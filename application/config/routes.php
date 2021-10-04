@@ -69,6 +69,8 @@ $route['printotalsummerydetails'] = 'Controllerunit/printotalsummerydetails';
 $route['productsinoutlets'] = 'Controllerunit/productsinoutlets'; 
 $route['loanpayingreports'] = 'Controllerunit/loanpayingreports'; 
 
+$route['addpurcahsedetails'] = 'Controllerunit/addpurcahsedetails'; 
+
 
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;

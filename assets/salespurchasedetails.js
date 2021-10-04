@@ -23,8 +23,8 @@ const showoffpurcahsedetails = () => {
 <td>${++count}</td>
 <td>${d.invoice_no}</td>
 <td>${d.ordered_date}</td>
-<td>${d.customer_name}</td>
-<td>${d.customer_mobile}</td>
+<td>${d.customer_name==null ? 'Walk-in' : d.customer_name}</td>
+<td>${d.customer_mobile==null ? 'Walk-in' : d.customer_mobile}</td>
 <td>${d.discount}</td>
 <td>${d.discounted_amount}</td>
 <td>${parseFloat(d.total_amount).toFixed(2)}</td>
