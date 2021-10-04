@@ -2472,7 +2472,11 @@ class Main_model extends CI_Model {
         return $this->db->insert('purcahse_details',$data); 
     }
 
-    public function getpurcahsedetailsforsupplier($fromdate, $todate, $supplier){
+    public function delete_purcahsedetails($purcahsedetialsid){
+        return $this->db->where('purcahse_details_id',$purcahsedetialsid)->delete('purcahse_details'); 
+    }
+
+    public function getpurcahsedetailsforsupplier($fromdate, $todate, $supplier,$refno){
          $this->db->select('*'); 
          $this->db->from('purcahse_details'); 
          $this->db->join('supplier','supplier.supplier_id=purcahse_details.supplier_id_fk'); 
@@ -2484,6 +2488,9 @@ class Main_model extends CI_Model {
         }
         if($supplier!=''){
             $this->db->where('purcahse_details.supplier_id_fk',$supplier); 
+        }
+        if($refno!=''){
+            $this->db->where('purcahse_details.purcahse_details_ref',$refno); 
         }
         $result = $this->db->get(); 
         if($result->num_rows() > 0) {

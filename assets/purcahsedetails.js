@@ -1,7 +1,7 @@
 $(document).ready(function () {
     const base_url = $('#base_url').val();
 
-    const getpurcahsedetailsforsupplier = (fromdate = null, todate = null, supplier = null) => {
+    const getpurcahsedetailsforsupplier = (fromdate = null, todate = null, supplier = null, refrenceno=null) => {
 
         let count = 0; 
         let html = ''; 
@@ -12,7 +12,8 @@ $(document).ready(function () {
             data: {
                 fromdate:fromdate,
                 todate:todate,
-                supplier:supplier
+                supplier:supplier,
+                refrenceno:refrenceno
             },
             success: function (data) {
                 let getData = JSON.parse(data); 
@@ -31,12 +32,23 @@ $(document).ready(function () {
                         <td>${parseFloat(d.purcahse_details_total_payment).toFixed(2)}</td>
                         <td>${parseFloat(d.paid_amount).toFixed(2)}</td>
                         <td>
-                        <a href='${base_url}assets/img/uploaded_photos/${d.bill_url}' class="bill_url_open"><u>SHOW</u></a>
+                        ${d.bill_url=='' ? `<a>NO ATTACHMENT</a>` : `
+                        <a href='${base_url}assets/img/uploaded_photos/${d.bill_url}' target='_blank' class="bill_url_open"><u>SHOW</u></a>
+                        
+                        `}
                         </td>
                         <td>
-                        <button class="btn btn-info btn-sm">Edit <i class="fa fa-pencil" aria-hidden='true'></i></button>
+                        <button class="btn btn-info btn-sm edit_purcahsedetails" 
+                        supplier_name = "${d.supplier_name}"
+                        company_name = "${d.org_name}"
+                        purcahse_details_ref = "${d.purcahse_details_ref}"
+                        purcahse_details_date="${d.purcahse_details_date}"
+                        purcahse_details_totalpayment = "${d.purcahse_details_total_payment}"
+                        paying_amount="${d.paid_amount}"
+                        supplier_id_fk = "${d.supplier_id_fk}"
+                         purcahse_details_id='${d.purcahse_details_id}'>Edit <i class="fa fa-pencil" aria-hidden='true'></i></button>
                         &nbsp; 
-                        <button class="btn btn-danger btn-sm">Delete <i class="fa fa-trash" aria-hidden='true'></i></button>
+                        <button class="btn btn-danger btn-sm delete_purcahsedetails d-none" purcahse_details_id='${d.purcahse_details_id}'>Delete <i class="fa fa-trash" aria-hidden='true'></i></button>
                         </td>
                         </tr>`;
                     }); 
@@ -52,6 +64,40 @@ $(document).ready(function () {
     }
 
     getpurcahsedetailsforsupplier(); 
+
+    $('body').delegate('.edit_purcahsedetails','click',function(){
+
+    
+        $("#ref_no_forsupplier").val($(this).attr('purcahse_details_ref')); 
+        $("#supplier_name_section").val($(this).attr('supplier_id_fk')); 
+        $("#purcahse_date").val($(this).attr('purcahse_details_date')); 
+        $('#totalpaymenttotbepaid').val($(this).attr('purcahse_details_totalpayment')); 
+
+    }); 
+
+
+    $('body').delegate('.delete_purcahsedetails','click',function(){
+        let purcahse_details_id = parseInt($(this).attr('purcahse_details_id')); 
+
+        if(confirm("Are you sure you want to delete it?")){
+            $.ajax({
+                url: base_url + 'Controllerunit/delete_purcahsedetails',
+                method: 'POST',
+                data: {
+                    purcahse_details_id: purcahse_details_id,
+                },
+                success: function (data) {
+                    alert('Deleted successfully'); 
+                    window.location.reload(); 
+                   
+                },
+                error: function (err) {
+                    console.error('Error found', err);
+                }
+            });
+        }
+
+    }); 
  
 
     $('#frm_purcahsedetails').submit(function(e){

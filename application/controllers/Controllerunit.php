@@ -1798,6 +1798,12 @@ else
 
     }
 
+    public function delete_purcahsedetails(){
+        $purcahse_details_id = (int)$this->security->xss_clean($_POST['purcahse_details_id']); 
+        $this->main_model->delete_purcahsedetails($purcahse_details_id); 
+
+    }
+
     public function frm_purcahsedetails(){
         $supplier_name_section = $this->security->xss_clean($_POST['supplier_name_section']); 
         $ref_no_forsupplier = $this->security->xss_clean($_POST['ref_no_forsupplier']); 
@@ -1849,8 +1855,9 @@ else
         $fromdate = $this->security->xss_clean($_POST['fromdate']); 
         $todate = $this->security->xss_clean($_POST['todate']); 
         $supplier= $this->security->xss_clean($_POST['supplier']); 
+        $refrenceno = $this->security->xss_clean($_POST['refrenceno']); 
 
-        $result = $this->main_model->getpurcahsedetailsforsupplier($fromdate, $todate, $supplier);
+        $result = $this->main_model->getpurcahsedetailsforsupplier($fromdate, $todate, $supplier,$refrenceno);
         echo json_encode($result);  
 
     }

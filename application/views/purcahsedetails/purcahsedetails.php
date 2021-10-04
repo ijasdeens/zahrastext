@@ -10,7 +10,7 @@
                 <div class="card">
                   <div class="card-body">
                     <h4 class="card-title text text-danger font-weight-bold">Purcahse details</h4>
-                     <form method='POST' id='frm_purcahsedetails'>
+                     <form method='POST' id='frm_purcahsedetails' class="purcahse_detaildform">
                          <div class="row">
                              <div class="col">
                                  <label for="supplier_name">Supplier name</label>
@@ -48,6 +48,7 @@
                              </div>
                              <div class="col-md-12 my-2">
                                  <input type="submit" class='form-control btn btn-success' id='save_trigger' value='save'>
+                                 <input type="submit" class='form-control btn btn-info d-none' id='update_trigger' value='Update'>
                              </div>
                          </div>
                      </form>
