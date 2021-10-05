@@ -1286,12 +1286,13 @@ $(document).ready(function () {
 		});
 	});
 
-	const reduceProductQuantity = () => {
+	const reduceProductQuantity = (lastinsertid) => {
 		$.ajax({
 			url: base_url + "Controllerunit/reduceProductQuantity",
 			method: "POST",
 			data: {
 				todydate: getfulldate(),
+				summeryid:lastinsertid 
 			},
 			success: function (data) {
 			 
@@ -1427,10 +1428,14 @@ $(document).ready(function () {
 	};
 	//   $this->session->set_userdata('last_insert_id',$last_insert_id);
 
+	$('#paywithcashmodal').on('shown.bs.modal', function() {
+        $(document).off('focusin.modal');
+    });
+
 	$("#paybycashfrm").submit(function (e) {
 		e.preventDefault();
 		let total_amount_cash = parseFloat($("#total_amount_cash").val());
-		let balance_amount = Math.abs($("#balance_amountbycash").val());
+		let balance_amount =Math.abs($("#balance_amountbycash").val());
 		let paying_amount = parseFloat($("#paying_amount").val());
 
 		let discountpercentage = $("#discountpercentage").html();
@@ -1463,14 +1468,10 @@ $(document).ready(function () {
 		}
 
 		else {
-		 
+		 //yellback
 			if ($("#messagesectionoffound").html() != "Found ✔") {
-				$("#paywithcashmodal").modal("hide");
-				toastr.info(
-					"Please choose customer by entering mobile number. Because balance amount will be considered as a credit."
-				);
-				$("#customer_typeselect").css("border", "2px solid red");
-				return false;
+				 alert("Please choose customer by entering mobile number. Because balance amount will be considered as a credit"); 
+				 window.location.reload(); 
 			}
 			else {
 				  
@@ -1515,7 +1516,7 @@ $(document).ready(function () {
 			success: function (data) {
 				//alert(data);
 			   console.log(data);
-				reduceProductQuantity();
+				reduceProductQuantity(data);
 			},
 			error: function (err) {
 				console.error("Error found", err);
@@ -1577,7 +1578,7 @@ $(document).ready(function () {
 
 
 		let value = $("#totalamounttocalculate").val();
-		let additional_information = $('#additional_information').val(); 
+		let additional_information = $('#sec_additional_information').val(); 
 
 		let discountpercentage = $("#discountpercentage").html();
 		let dicountvalue = $("#dicountvalue").html();

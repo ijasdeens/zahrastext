@@ -175,7 +175,7 @@
                                  $priceforchange+=floatval($items['price']) * $items['qty']; 
                                  
                                ++$numberofItems;
-                               $numberofpcs+=(int)$items['qty'];
+                               $numberofpcs+=floatval($items['qty']);
                                ?>
                                 <tr class="service" style="font-weight:bold">
                 <td class="tableitem" style="font-weight:bold">
@@ -189,7 +189,11 @@
                 $getactualprice = ($items['actual_price'] - $items['price']) * $items['qty']; 
                 ?>
                  <td class="tableitem"><p class="itemtext" style="font-weight:bold"><?php echo $items['qty']?></p></td>
-                <td class="tableitem"><p class="itemtext" style="font-weight:bold"><?php echo $this->cart->format_number($items['price']);?></p></td>
+                <td class="tableitem"><p class="itemtext" style="font-weight:bold">
+                (<?php echo $this->cart->format_number($items['actual_price'])?>) <br>
+                <?php echo $this->cart->format_number($items['price']);?></p>
+              
+              </td>
                 <td class="tableitem"><p class="itemtext" style="font-weight:bold"><?php echo number_format($getactualprice,2)?></p></td>
 
                 <td class="tableitem"><p class="itemtext"><?php echo $this->cart->format_number($items['subtotal']);?></p></td>
@@ -245,7 +249,8 @@
 
                         </table>
                         <center>
-                          <p style="font-weight:bold;font-size:15px;">Balance payment : Rs.<?php echo $this->session->mainbalance==null ? 0.00 : number_format($this->session->mainbalance,2)?></p>
+                          <p style="font-weight:bold; font-size:15px;">Given amount : Rs.<?php echo $this->session->recieved_amount==null ? 0. : number_format($this->session->recieved_amount,2)?></p>
+                          <p style="font-weight:bold;font-size:15px;">Balance payment : Rs.<?php echo $this->session->mainbalance==null ? 0. : number_format($this->session->mainbalance,2)?></p>
                         </center>
                     </div><!--End Table-->
                     <span>------------------------------------------</span>

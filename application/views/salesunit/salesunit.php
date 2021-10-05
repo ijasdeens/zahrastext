@@ -1152,7 +1152,7 @@
 
                  <div class="form-group">
                 <label for="payingamount">Recieving amount</label>
-                <input type="tel" class='form-control' id='paying_amount' autofocus>
+                <input type="text" class='form-control' id='paying_amount'>
                 </div>
                 <div class="form-group">
                     <label for="status">
@@ -1164,7 +1164,7 @@
 
                 <div class="form-group">
                 <label for="balanceamount">Balance</label>
-                <input type="tel" class='form-control' id='balance_amountbycash' disabled>
+                <input type="text" class='form-control' id='balance_amountbycash' disabled>
                 </div>
                 <div class="form-group">
                     <label for="additional_information">Additional Information</label>
@@ -1196,7 +1196,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label>Additional information</label>
-                                    <textarea class="form-control" id='additional_information'></textarea>
+                                    <textarea class="form-control" id='sec_additional_information'></textarea>
                                 </div>
                                 <div class="form-group">
                                     <input type="submit" class='form-control btn btn-success btn-lg' value='submit'>

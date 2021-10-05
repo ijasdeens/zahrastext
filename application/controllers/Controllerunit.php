@@ -2646,11 +2646,12 @@ else
     }
 
     public function reduceProductQuantity(){
-        $last_insert_id =  $this->session->last_insert_id;
+        $summeryid = $this->security->xss_clean($_POST['summeryid']); 
         $todydate = $this->security->xss_clean($_POST['todydate']);
 
         $nametaker = ''; 
         
+        $last_insert_id =(int)$summeryid;
 
         foreach($this->cart->contents() as $items){
             $currentQuantity = (int)$items['qty'];
@@ -4945,7 +4946,7 @@ public function select_postponed(){
 
         $chequestatus = 'Pending';
 
-       
+       $this->session->set_userdata('recieved_amount',$recieved_amount); 
 
         $orderedstatus = 1;
         $orderdetailsarray = array(
@@ -4968,6 +4969,8 @@ public function select_postponed(){
         $last_insert_id = $this->main_model->savecashamount($orderdetailsarray);
         $this->session->set_userdata('last_insert_id',$last_insert_id);
 
+        echo $last_insert_id; 
+
          
 
         if($paying_amount_given < $recieved_amount){
@@ -4984,8 +4987,10 @@ public function select_postponed(){
     }
 
     public function saveassessiontogetback(){
-        $balance_amount = $this->security->xss_clean($_POST['balance_amount']); 
-        echo $this->session->set_userdata('mainbalance',$balance_amount); 
+        $balance_amount = floatval($this->security->xss_clean($_POST['balance_amount'])); 
+        $this->session->set_userdata('mainbalance',0); 
+      
+       
     }
 
     public function savechequepayment(){
@@ -5008,6 +5013,8 @@ public function select_postponed(){
 
         $chequestatus = 'Pending';
 
+        $balanceamount = floatval(($paying_amount_given - $recieved_amount)); 
+
         $orderedstatus = 1;
         $orderdetailsarray = array(
             'ordered_date' => $fulltimewithdate,
@@ -5022,6 +5029,8 @@ public function select_postponed(){
             'status' => 'Sold',
             'invoice_no' => $sales_invoice_id, 
             'additional_text' => $paywithcheck_additoinalinformation,
+            'recieved_amount_fromcus' => $recieved_amount, 
+            'balance_amount_from_cus' => $balanceamount, 
             'discount_from_total_amount' => ($this->session->subtractedamountfromtotal=='NaN' || $this->session->subtractedamountfromtotal==null ) ? 0 : $this->session->subtractedamountfromtotal 
 
         );
