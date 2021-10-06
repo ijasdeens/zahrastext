@@ -1024,7 +1024,7 @@ $(document).ready(function () {
 			},
 			success: function (data) {
 			 
-				console.log('ADD TO CART',data); 
+				 
 				toastr.info("Added successfully");
 				fetchAllshoppingcartdata();
 			},
@@ -2433,7 +2433,7 @@ ${
   Action
   </button>
   <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-    <a class="dropdown-item pay_amount_bycashloan" summery_id='${
+    <a class="dropdown-item pay_amount_bycashloan" customer_name="${d.customer_name}" customer_address="${d.customer_address}" customer_mobile="${d.customer_mobile}" summery_id='${
 			d.order_summery_id
 		}' ordered_date='${d.ordered_date}' payment_method='${
 							d.payment_method
@@ -2442,7 +2442,7 @@ ${
 								? `${d.order_summery_id}`
 								: `${d.order_summery_id}`
 						}'}''  data-toggle='modal'>Pay credit by cash <i class="fa fa-money-bill-alt"></i></a>
-    <a class="dropdown-item pay_by_creditcheck" href="#" summery_id='${
+    <a class="dropdown-item pay_by_creditcheck" href="#" customer_name="${d.customer_name}" customer_address="${d.customer_address}" customer_mobile="${d.customer_mobile}" summery_id='${
 			d.order_summery_id
 		}' ordered_date='${d.ordered_date}' payment_method='${
 							d.payment_method
@@ -2648,6 +2648,10 @@ ${
 
 		sessionStorage.setItem("ordered_date_sec", ordered_date);
 
+		sessionStorage.setItem('customer_name_section',$(this).attr('customer_name')); 
+		sessionStorage.setItem('customer_address_section',$(this).attr('customer_address')); 
+		sessionStorage.setItem('customer_mobile_section',$(this).attr('customer_mobile')); 
+
 		$("#temp_key_id").val(loanamount);
 
 		sessionStorage.setItem("payment_method", payment_method);
@@ -2728,7 +2732,7 @@ ${
 			$("#recieving_amount").css("border", "2px solid red");
 			return false;
 		}
- 
+		
 	
 		$.ajax({
 			url: base_url + "Controllerunit/detectcreditdetailsbycash",
@@ -2739,12 +2743,15 @@ ${
 				summery_id: invoice_id,
 				balance_amount: balance_amount,
 				payment_to_bepadi:payment_to_bepadi,
-				date : getfulldate() 
+				date : getfulldate(), 
+				customer_name : sessionStorage.getItem('customer_name')==null ? 'walk-in' : sessionStorage.getItem('customer_name'), 
+				customer_mobile : sessionStorage.getItem('customer_mobile')==null ? 'Walk-in' : sessionStorage.getItem('customer_mobile'), 
+				customer_address : sessionStorage.getItem('customer_mobile')==null ? 'Walk-in' : sessionStorage.getItem('customer_mobile') 
 
 			},
 			success: function (data) {
 				alert('Product has been detected'); 
-				saveCashpaymentforregisterdetails(recieving_amount);
+			//	saveCashpaymentforregisterdetails(recieving_amount);
 		openloanrecieptamount(balance_amount,payment_to_bepadi,recieving_amount); 
 
 			},
@@ -2835,7 +2842,7 @@ ${
   Action
   </button>
   <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-    <a class="dropdown-item pay_amount_bycashloan" summery_id='${
+    <a class="dropdown-item pay_amount_bycashloan" customer_name="${d.customer_name}" customer_address="${d.customer_address}" customer_mobile="${d.customer_mobile}" summery_id='${
 			d.order_summery_id
 		}' ordered_date='${d.ordered_date}' payment_method='${
 							d.payment_method
@@ -2844,7 +2851,7 @@ ${
 								? `${d.order_summery_id}`
 								: `${d.order_summery_id}`
 						}'}''  data-toggle='modal'>Pay credit by cash <i class="fa fa-money-bill-alt"></i></a>
-    <a class="dropdown-item pay_by_creditcheck" href="#" summery_id='${
+    <a class="dropdown-item pay_by_creditcheck" href="#" customer_name="${d.customer_name}" customer_address="${d.customer_address}" customer_mobile="${d.customer_mobile}" summery_id='${
 			d.order_summery_id
 		}' ordered_date='${d.ordered_date}' payment_method='${
 							d.payment_method

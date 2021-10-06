@@ -1,4 +1,4 @@
-    <?php
+<?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Controllerunit extends CI_Controller {
@@ -7,6 +7,9 @@ class Controllerunit extends CI_Controller {
     public function __construct(){
         parent::__construct();
            $this->load->library('Zend');
+            
+
+
     }
 
 
@@ -70,9 +73,9 @@ class Controllerunit extends CI_Controller {
         $event_value = (int)$this->security->xss_clean($_POST['event_value']); 
         $result = $this->main_model->choose_outlets_for_particularsearch($event_value);
         
-        $sumofcost = 0; 
-        $sumofprice = 0; 
-        $sumofproduct = 0; 
+        $sumofcost = 0.00; 
+        $sumofprice = 0.00; 
+        $sumofproduct = 0.00; 
         $sumofquantity = 0; 
         if($result==0){
             return json_encode($result); 
@@ -80,8 +83,10 @@ class Controllerunit extends CI_Controller {
         else {
             $sumofproduct = count($result); 
             foreach($result as $res){
-                $sumofcost+=floatval($res->product_cost * $res->product_quantity); 
-                $sumofprice+=floatval($res->product_price * $res->product_quantity); 
+                $productcostsection = floatval($res->product_cost);
+                $product_quantity = floatval($res->product_quantity); 
+                $sumofcost+=floatval($productcostsection * $product_quantity); 
+                $sumofprice+=floatval($productcostsection * $product_quantity); 
                 $sumofquantity+=(int)$res->product_quantity; 
             }
             $data = array(
@@ -4592,6 +4597,11 @@ public function select_postponed(){
          $balance_amount = $this->security->xss_clean($_POST['balance_amount']); 
         $payment_to_bepadi = $this->security->xss_clean($_POST['payment_to_bepadi']); 
 
+
+        $customer_name = $this->security->xss_clean($_POST['customer_name']); 
+        $customer_mobile = $this->security->xss_clean($_POST['customer_mobile']); 
+        $customer_address = $this->security->xss_clean($_POST['customer_address']); 
+
         $date = $this->security->xss_clean($_POST['date']); 
 
         $this->session->set_userdata('recieving_amount_sec',$recieving_amount); 
@@ -4607,14 +4617,19 @@ public function select_postponed(){
             'outlet_name' => $this->session->outlets_name, 
             'outlet_id_fk' => $this->session->outlet_id, 
             'date' => $date,
-            'invoiceidsec' => $summery_id 
+            'invoiceidsec' => $summery_id, 
+            'customer_name' => $customer_name, 
+            'customer_mobile' => $customer_mobile, 
+            'customer_address' => $customer_address 
         );
 
-        $this->main_model->savepayingloanamount($savedataforloan); 
+        $this->main_model->savepayingloanamount($savedataforloan,$date, $this->session->outlet_id); 
+        
+        $this->main_model->addpaymentforloancreditpayment($recieving_amount); 
         
 
 
-         $result = $this->main_model->detectcreditdetailsbycash($recieving_amount, $ordered_date_sec, $summery_id,$balance_amount);
+       //  $result = $this->main_model->detectcreditdetailsbycash($recieving_amount, $ordered_date_sec, $summery_id,$balance_amount);
         
         
 
@@ -4948,6 +4963,8 @@ public function select_postponed(){
 
        $this->session->set_userdata('recieved_amount',$recieved_amount); 
 
+       $this->session->set_userdata('addtional_information',$additional_information); 
+
         $orderedstatus = 1;
         $orderdetailsarray = array(
             'ordered_date' => $fulltimewithdate,
@@ -4988,7 +5005,7 @@ public function select_postponed(){
 
     public function saveassessiontogetback(){
         $balance_amount = floatval($this->security->xss_clean($_POST['balance_amount'])); 
-        $this->session->set_userdata('mainbalance',0); 
+        $this->session->set_userdata('mainbalance',$balance_amount); 
       
        
     }

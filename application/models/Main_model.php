@@ -1153,6 +1153,20 @@ class Main_model extends CI_Model {
         $this->db->insert('loanpaiddetails',$data); 
     }
 
+    public function addpaymentforloancreditpayment($payment,$date,$outletidsection){
+        $this->db->select('register_details_id'); 
+        $this->db->from('register_details_section'); 
+        $this->db->where('date',$date); 
+        $this->db->where('outlet_id',$outletidsection); 
+        $result = $this->db->get(); 
+        if($result->num_rows() > 0) {
+            $this->db->query("update register_details_section set recieveddebt_forregister=(recieveddebt_forregister + ".$payment.") where date='".$date."' and outlet_id=".$outletidsection.""); 
+        }
+        else {
+            return $this->db->insert('register_details_section',array('recieveddebt_forregister' => $payment)); 
+        }
+    }
+
     public function getloanpaymentmentcheckmethod($fromdate, $todate, $paymentmethod, $outletid ){
         $this->db->select('*'); 
         $this->db->from('loanpaiddetails');

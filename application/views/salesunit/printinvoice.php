@@ -140,7 +140,10 @@
         </p>
 
            <p id="date_time" style="font-weight:bold"></p> 
+           
+         
             <p style="font-weight:bold">Invoice ID : <?php echo $invoice_id?></p>
+            <p style="font-weight:bold">Note : <?php echo $this->session->addtional_information;?></p>
       </div>
     </div><!--End Invoice Mid-->
     <span>------------------------------------------</span>

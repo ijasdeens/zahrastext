@@ -1622,6 +1622,18 @@
                
                 </div>
 
+                <div class="d-flex justify-content-between my-2">
+                    <div class="p-1">
+                    Recieved payment for credit : 
+                    </div>
+                    <div class="p-1" id='recievedpaymentforcredit'>
+                    Rs.00
+                    </div>
+
+               
+                </div>
+
+
                
 
                 <div class="d-flex justify-content-between my-2 bg-success text-white">
