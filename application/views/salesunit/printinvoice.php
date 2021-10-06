@@ -193,7 +193,7 @@
                 ?>
                  <td class="tableitem"><p class="itemtext" style="font-weight:bold"><?php echo $items['qty']?></p></td>
                 <td class="tableitem"><p class="itemtext" style="font-weight:bold">
-                (<?php echo $this->cart->format_number($items['actual_price'])?>) <br>
+                <?php echo $this->cart->format_number($items['actual_price'])?> <br>
                 <?php echo $this->cart->format_number($items['price']);?></p>
               
               </td>

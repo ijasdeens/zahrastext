@@ -294,9 +294,7 @@ class Controllerunit extends CI_Controller {
                     $this->session->set_userdata('checks_expiry_date_reminder',$mydata->cheque_days_ago);
                 }
 
-
-
-
+ 
              $data['expenses_type'] = $this->main_model->selectedgetexpensestype();
 
                 $companylogo = $this->main_model->companylogotaker();
@@ -4439,6 +4437,13 @@ public function select_postponed(){
     public function getSalessummerydetails(){
         $mydate = $this->security->xss_clean($_POST['mydate']); 
         $result = $this->main_model->getSalessummerydetails($mydate); 
+        echo json_encode($result); 
+    }
+
+    public function getSalessummerydetailsbydate(){
+        $from_date_section_to_search = $this->security->xss_clean($_POST['from_date_section_to_search']); 
+        $to_date_section_to_search = $this->security->xss_clean($_POST['to_date_section_to_search']); 
+        $result = $this->main_model->getSalessummerydetailsbydate($from_date_section_to_search, $to_date_section_to_search); 
         echo json_encode($result); 
     }
 

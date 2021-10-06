@@ -1558,7 +1558,9 @@
             </button>
             </div>
             <div class="container">
+                
             <div class="my-2">
+              
                 <button class='btn btn-success btn-sm d-none' id='exportexcelsectionforsummery'>Export as Excel <i class='fa fa-excel'></i></button>
                 &nbsp; 
                 
@@ -1566,20 +1568,23 @@
             </div>
             </div>
             <div class="modal-body text text-dark" id='cashinhandssectionsummery'>
-               <!-- <div class="container my-2 d-none">
-                    <div class="d-flex">
-                        <div class="p-2">
-                           FROM : <input type='date' class='form-control' id='from_date'/>  
-                        </div>
-                        <div class="p-2">
-                            TO : <input type='date' class='form-control' id='to_date'/>
-                        </div>
-                        <div class="p-2">
-                            <br/>
-                            <button class="btn btn-primary btn-sm" id='search_button_for_general_details'>Search <i class="fa fa-search" aria-hidden='true'></i></button>
-                        </div>
-                    </div>
-                </div>-->
+             <div class="container">
+                 <div class="row">
+                     <div class="col">
+                         <label for="from">FROM : </label>
+                         <input type="date" class="form-control" id='from_date_section_to_search'>
+                     </div>
+                     <div class="col">
+                         <label for="to">To :</label>
+                         <input type="date" class="form-control" id='to_date_section_to_search'>
+                     </div>
+                     <div class="col">
+                         <button class="btn btn-info my-4" id='search_button_forsummery'>Search <i class="fa fa-search"></i></button>
+                     </div>
+                 </div>
+             </div>  
+
+
                 <div class="container">
                 <div class="d-flex justify-content-between">
                     <div class="p-1">

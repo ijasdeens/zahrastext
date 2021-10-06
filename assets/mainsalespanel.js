@@ -2348,7 +2348,7 @@ ${
 					getData.map((d) => {
 						totalamountsection += parseFloat(d.expense_amount);
 
-						html = `<tr class="text text-center">
+						html+= `<tr class="text text-center">
                         <td>${++count}</td>
                         <td>${d.expense_name}</td>
                         <td>${d.expense_date}</td>
@@ -2363,8 +2363,9 @@ ${
                         </td>
                         </tr>
                         `;
-						$("#cashier_expense_list_section_outcome").append(html);
 					});
+					$("#cashier_expense_list_section_outcome").html(html);
+
 					$(".calculated_totalamount").html("Rs." + totalamountsection);
 				}
 			},
@@ -2909,6 +2910,70 @@ ${
 		});
 	}
 	gettotalsalesanddiscount();
+
+	$('#search_button_forsummery').click(function(){
+		let from_date_section_to_search = $('#from_date_section_to_search').val(); 
+		let to_date_section_to_search = $('#to_date_section_to_search').val(); 
+
+		if(from_date_section_to_search==''){
+			alert('From date is required'); 
+			$('#from_date_section_to_search').css('border','2px solid red'); 
+			return false; 
+		}
+
+		if(to_date_section_to_search==""){
+			alert('To date is required'); 
+			$('#to_date_section_to_search').css('border','2px solid red'); 
+			return false; 
+		}
+
+		$.ajax({
+			url: base_url + "Controllerunit/getSalessummerydetailsbydate",
+			method: "POST",
+			data: {
+				from_date_section_to_search: from_date_section_to_search,
+				to_date_section_to_search:to_date_section_to_search
+			},
+			success: function (data) {
+				let getData = JSON.parse(data);
+				if (getData != 0) {
+					getData.map((d) => {
+						$("#cashon_hands").html(
+							"Rs." + parseFloat(d.cash_in_hand).toFixed()
+						);
+						$("#cash_payments").html(
+							"Rs." + parseFloat(d.cash_payment).toFixed()
+						);
+						$("#cheque_payments").html(
+							"Rs." + parseFloat(d.cheque_payment).toFixed()
+						);
+						$("#Total_refunds").html(
+							"Rs." + parseFloat(d.refunded_amount).toFixed()
+						);
+						$('#expenses_amount').html("Rs."+ parseFloat(d.expenses_amount_reg).toFixed(2)); 
+
+						total_payments += parseFloat(d.cash_in_hand);
+						total_payments += parseFloat(d.cash_payment);
+						total_payments += parseFloat(d.cheque_payment);
+					});
+					$("#total_payment").html(
+						"Rs." + parseFloat(total_payments).toFixed(2)
+					);
+				}
+				else {
+					alert('No data found for particular dates'); 
+				}
+			},
+			error: function (err) {
+				console.error("Error found", err);
+			},
+		});
+
+
+
+
+
+	}); 
 
 	const getSalessummerydetails = () => {
 		var today = new Date();

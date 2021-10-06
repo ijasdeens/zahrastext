@@ -2691,6 +2691,21 @@ class Main_model extends CI_Model {
         }
     }
 
+    public function getSalessummerydetailsbydate($fromdate, $todate){
+        $this->db->select('*'); 
+        $this->db->from('register_details_section'); 
+        $this->db->where('date>=',$fromdate);
+        $this->db->where('date<=',$todate);
+        $result = $this->db->get(); 
+        if($result->num_rows() > 0){
+            return $result->result(); 
+        }
+        else {
+            return 0;
+        }
+
+    }
+
 
     public function getSalessummerydetails($date){
         $this->db->select('*'); 
