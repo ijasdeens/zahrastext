@@ -567,6 +567,8 @@ class Controllerunit extends CI_Controller {
 
           $this->session->set_userdata('last_insert_id',$last_insert_id);
 
+          echo $last_insert_id; 
+
         $creditamountdata = array(
             'sales_credit_amount' => $paying_amount_given, 
             'summery_id_fk ' => $last_insert_id,
@@ -2764,11 +2766,27 @@ else
         $this->session->set_userdata('currentdate',$currentdate); 
     }
 
+    public function setdatesforsumemry(){
+        $fromdate = $this->security->xss_clean($_POST['fromdate'])=='' ? null : $this->security->xss_clean($_POST['fromdate']); 
+        $todate = $this->security->xss_clean($_POST['todate'])=='' ? null : $this->security->xss_clean($_POST['todate']); 
+         $this->session->set_userdata('todaydateforsummery',$this->security->xss_clean($_POST['todaydate'])); 
+
+        $this->session->set_userdata('fromdateforsummery',$fromdate); 
+        $this->session->set_userdata('todateforsummery',$todate); 
+
+    }
+    
+    //whileback
     public function printotalsummerydetails(){
 
-    
+         
+        $fromdatesectionline =  $this->session->fromdateforsummery; 
+        $todatelinesection= $this->session->todateforsummery; 
+        $todaydate = $this->session->todaydateforsummery;
 
-        $result = $this->main_model->getsalessummerydataforprint($this->session->currentdate); 
+      
+        
+        $result = $this->main_model->getsalessummerydataforprint($this->session->outlet_id,$fromdatesectionline,$todatelinesection,$this->session->currentdate); 
         if($result!=0){
             foreach($result as $res){
                 $data['cash_in_hand'] = $res->cash_in_hand; 
@@ -4443,7 +4461,8 @@ public function select_postponed(){
     public function getSalessummerydetailsbydate(){
         $from_date_section_to_search = $this->security->xss_clean($_POST['from_date_section_to_search']); 
         $to_date_section_to_search = $this->security->xss_clean($_POST['to_date_section_to_search']); 
-        $result = $this->main_model->getSalessummerydetailsbydate($from_date_section_to_search, $to_date_section_to_search); 
+        $date = $this->security->xss_clean($_POST['date']); 
+        $result = $this->main_model->getSalessummerydetailsbydate($this->session->outlet_id,$date,$from_date_section_to_search, $to_date_section_to_search); 
         echo json_encode($result); 
     }
 
@@ -4630,7 +4649,7 @@ public function select_postponed(){
 
         $this->main_model->savepayingloanamount($savedataforloan,$date, $this->session->outlet_id); 
         
-        $this->main_model->addpaymentforloancreditpayment($recieving_amount); 
+        $this->main_model->addpaymentforloancreditpayment($recieving_amount, $date, $this->session->outlet_id); 
         
 
 

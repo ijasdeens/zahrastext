@@ -1310,6 +1310,10 @@ $(document).ready(function () {
 		});
 	};
 
+
+ 
+
+
 	$("#charge_for_sales").click(function () {
 		if ($("#customer_typeselect").val() != "walkin") {
 			if ($("#messagesectionoffound").html() != "Found ✔") {
@@ -1586,11 +1590,9 @@ $(document).ready(function () {
 		let temp_customerid = Number($("#temp_customer_id").val());
 
 		if (temp_customerid == "" && temp_customerid == 0) {
-			toastr.error("Please choose customer by mobile number");
-			$(".drawer").drawer("close");
-			$("#customer_typeselect").focus();
-			$("#customer_typeselect").css("border", "2px solid red");
-			return false;
+			 alert("Please choose customer by entering mobile number"); 
+			 window.location.reload(); 
+			 
 		}
 
 		if (value == "") {
@@ -1609,7 +1611,7 @@ $(document).ready(function () {
 					additional_information:additional_information
 				},
 				success: function (data) {
-					reduceProductQuantity();
+					reduceProductQuantity(data);
 				},
 				error: function (err) {
 					console.error("Error found", err);
@@ -2102,7 +2104,7 @@ ${
 			alert("Note section is required");
 			return false;
 		}
-		saveexpensedetailsforregister(expense_amount, getfulldate());
+		saveexpensedetailsforregister(expense_amount, expense_date);
 
 		$.ajax({
 			url: base_url + "Controllerunit/save_frm_expense_list_section",
@@ -2203,7 +2205,7 @@ ${
 
 		let mydate = [year, month, day].join("-");
 
-		let html = 0;
+		let html = '';
 		let count = 0;
 
 		console.log("date", mydate);
@@ -2224,19 +2226,23 @@ ${
 						'<span class="text text-danger font-weight-bold">NO EXPENSES FOUND</span>'
 					);
 
+					$(".calculated_totalamount").html(
+						"Rs." + parseFloat(0).toFixed(2)
+					);
+
 				 
 				} else {
 					 
 					getData.map((d) => {
 						totalamountsection += parseFloat(d.expense_amount);
-						html = `<tr class="text text-center">
+						html += `<tr class="text text-center">
                         <td>${++count}</td>
                         <td>${d.expense_name}</td>
                         <td>${d.expense_date}</td>
                         <td>Rs.${parseFloat(d.expense_amount).toFixed(2)}</td>
                         <td>${d.expense_note}</td>
                         <td>
-                        <button class="btn btn-danger btn-sm delete_expense_list" expense_amount="${d.expense_amount}" expense_id="${
+                        <button class="btn btn-danger btn-sm delete_expense_list" date="${d.expense_date}" expense_amount="${d.expense_amount}" expense_id="${
 													d.expenses_list_id
 												}">
                         <i class="fa fa-trash" aria-hidden='true'></i>
@@ -2244,8 +2250,9 @@ ${
                         </td>
                         </tr>
                         `;
-						$("#cashier_expense_list_section_outcome").append(html);
 					});
+					$("#cashier_expense_list_section_outcome").html(html);
+
 					$(".calculated_totalamount").html(
 						"Rs." + parseFloat(totalamountsection).toFixed(2)
 					);
@@ -2285,10 +2292,11 @@ ${
 	$("body").delegate(".delete_expense_list", "click", function () {
 		let value = parseInt($(this).attr("expense_id"));
 		let expense_amount = parseFloat($(this).attr('expense_amount')); 
+		let date = $(this).attr('date'); 
 	 
 
 		if (confirm("Are you sure you want to delete it?")) {
-			subtractexpenseamount(expense_amount,getfulldate());
+			subtractexpenseamount(expense_amount,date);
 
 			$.ajax({
 				url: base_url + "Controllerunit/delete_expense_list_from_cashier",
@@ -2911,54 +2919,103 @@ ${
 	}
 	gettotalsalesanddiscount();
 
+ 
+
+	const setdatesforsumemry = (fromdate='', todate='') => {
+		$.ajax({
+			url: base_url + "Controllerunit/setdatesforsumemry",
+			method: "POST",
+			data: {
+				fromdate: fromdate,
+				todate:todate, 
+				todaydate : getfulldate()
+			},
+			success: function (data) {
+				 console.log('Setting date for summery', data); 
+			},
+			error: function (err) {
+				alert('Error from setting date', err); 
+				console.error("Error found from setting date for summery", err);
+			},
+		});
+
+	}
+	setdatesforsumemry(); 
+
 	$('#search_button_forsummery').click(function(){
-		let from_date_section_to_search = $('#from_date_section_to_search').val(); 
-		let to_date_section_to_search = $('#to_date_section_to_search').val(); 
+		let from_date_section_to_search = $('#from_date_section_to_search_forsummey').val(); 
+		let to_date_section_to_search = $('#to_date_section_to_search_forsummery').val(); 
 
 		if(from_date_section_to_search==''){
-			alert('From date is required'); 
+			toastr.error("Please choose the date for 'FROM'");  
 			$('#from_date_section_to_search').css('border','2px solid red'); 
 			return false; 
 		}
 
 		if(to_date_section_to_search==""){
-			alert('To date is required'); 
+			 toastr.error("Please choose the date for 'To'");  
 			$('#to_date_section_to_search').css('border','2px solid red'); 
 			return false; 
 		}
+		let total_payments = 0.00; 
+		let cashindhandtotal = 0.00; 
+		let cashpaymenttotal = 0.00; 
+		let chequepaymenttotal = 0.00; 
+		let refunded_amounttotal = 0.00; 
+		let expenses_amount_reg = 0.00; 
+
+	 
 
 		$.ajax({
 			url: base_url + "Controllerunit/getSalessummerydetailsbydate",
 			method: "POST",
 			data: {
 				from_date_section_to_search: from_date_section_to_search,
-				to_date_section_to_search:to_date_section_to_search
+				to_date_section_to_search:to_date_section_to_search, 
+				date : getfulldate()
 			},
 			success: function (data) {
+		setdatesforsumemry(from_date_section_to_search,to_date_section_to_search); 
+
 				let getData = JSON.parse(data);
+				console.log('Date from summery search',getData); 
 				if (getData != 0) {
 					getData.map((d) => {
+						cashindhandtotal+= parseFloat(d.cash_in_hand); 
+						cashpaymenttotal+=parseFloat(d.cash_payment); 
+						chequepaymenttotal+=parseFloat(d.cheque_payment); 
+						refunded_amounttotal+=parseFloat(d.refunded_amount); 
+						expenses_amount_reg+=parseFloat(d.expenses_amount_reg); 
+
 						$("#cashon_hands").html(
-							"Rs." + parseFloat(d.cash_in_hand).toFixed()
+							"Rs." + parseFloat(cashindhandtotal).toFixed(2)
 						);
 						$("#cash_payments").html(
-							"Rs." + parseFloat(d.cash_payment).toFixed()
+							"Rs." + parseFloat(cashpaymenttotal).toFixed()
 						);
 						$("#cheque_payments").html(
-							"Rs." + parseFloat(d.cheque_payment).toFixed()
+							"Rs." + parseFloat(chequepaymenttotal).toFixed()
 						);
 						$("#Total_refunds").html(
-							"Rs." + parseFloat(d.refunded_amount).toFixed()
+							"Rs." + parseFloat(refunded_amounttotal).toFixed()
 						);
-						$('#expenses_amount').html("Rs."+ parseFloat(d.expenses_amount_reg).toFixed(2)); 
+						$('#expenses_amount').html("Rs."+ parseFloat(expenses_amount_reg).toFixed(2)); 
 
-						total_payments += parseFloat(d.cash_in_hand);
-						total_payments += parseFloat(d.cash_payment);
-						total_payments += parseFloat(d.cheque_payment);
+						total_payments += parseFloat(cashindhandtotal).toFixed(2);
+						total_payments += parseFloat(cashpaymenttotal).toFixed(2);
+						total_payments += parseFloat(chequepaymenttotal).toFixed(2);
+
 					});
 					$("#total_payment").html(
 						"Rs." + parseFloat(total_payments).toFixed(2)
 					);
+
+					
+					console.log('Cash in total', cashindhandtotal); 
+					console.log('Cashpayment total', cashpaymenttotal); 
+					console.log('Cheque payment total', chequepaymenttotal); 
+					console.log('Refunded amount total', refunded_amounttotal); 
+					console.log('expense amount reg', expenses_amount_reg); 
 				}
 				else {
 					alert('No data found for particular dates'); 

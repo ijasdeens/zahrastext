@@ -139,7 +139,7 @@
             <div class="row align-items-center">
                 <div class="col-lg-3">
                     <div class="brand-wrap">
-                        <img class="logo" src="<?php echo base_url()?>assets_ss/images/logos/squanchy.jpg">
+                        <img class="logo" src="<?php echo base_url()?>assets/logoimage/<?php echo $this->session->logo?>" class="img-fluid w-100 h-100">
                         <h2 class="logo-text">
                             Outlet Name :
                             <?php echo $this->session->outlets_name?>
@@ -506,7 +506,7 @@
     <section class="section-content padding-y-sm bg-default ">
         <div class="container-fluid">
             <div class="row">
-                <div class="col-md-8 card padding-y-sm card">
+                <div class="col-md-4 card padding-y-sm card">
                     <ul class="nav bg radius nav-pills nav-fill mb-3 bg d-none" role="tablist">
                         <li class="nav-item">
                             <a class="nav-link active show" data-toggle="pill" href="#nav-tab-card">
@@ -534,7 +534,7 @@
                     <?php else:?>
                     <?php foreach($products as $product):?>
                     <?php if($product->product_quantity!=0):?>
-                    <div class="col-md-4 product_wrapper">
+                    <div class="col-md-6 product_wrapper">
                         <figure class="card card-product">
 
                             <span class="badge badge-info">Available</span>
@@ -542,7 +542,7 @@
                                 <?php if(substr($product->product_pic,0,5)=='https'):?>
                                 <img src="<?= $product->product_pic?>">
                                 <?php else:?>
-                                <img src="<?php echo base_url()?>assets/img/uploaded_photos/<?php echo $product->product_pic?>">
+                                <img src="<?php echo base_url()?>assets/img/uploaded_photos/<?php echo $product->product_pic?>" class="img-fluid h-40">
                                 <?php endif;?>
                              </div>
                             <figcaption class="info-wrap">
@@ -574,7 +574,7 @@
                         <!-- card // -->
                     </div>
                     <?php else:?>
-                    <div class="col-md-3 product_wrapper">
+                    <div class="col-md-9 product_wrapper">
                         <figure class="card card-product">
 
                             <span class="badge badge-danger">Out of stock</span>
@@ -615,7 +615,7 @@
                 <!-- row.// -->
                 </span>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-8">
                 <div class="card">
                     <span id="cart">
 <table class="table table-hover shopping-cart-wrap">
@@ -962,7 +962,7 @@
                                                         <th>Previous amount</th>
                                                         <th>Paid amount</th>
                                                         <th>Amount to be paid</th>
-                                                        <th>Check payment</th>
+                                                        <th>Payment method</th>
                                                         <th>Date</th>
                                                        
                                                     </tr>
@@ -1564,7 +1564,7 @@
                 <button class='btn btn-success btn-sm d-none' id='exportexcelsectionforsummery'>Export as Excel <i class='fa fa-excel'></i></button>
                 &nbsp; 
                 
-                <a href="<?php echo base_url()?>Controllerunit/printotalsummerydetails" target='_blank' class='btn btn-primary btn-sm'>Print <i class="fa fa-print"></i> </a>
+                <a href="<?php echo base_url()?>Controllerunit/printotalsummerydetails" target='_blank'   class='btn btn-primary btn-sm' id='print_salesunitsectionforsummery'>Print <i class="fa fa-print"></i> </a>
             </div>
             </div>
             <div class="modal-body text text-dark" id='cashinhandssectionsummery'>
@@ -1572,11 +1572,11 @@
                  <div class="row">
                      <div class="col">
                          <label for="from">FROM : </label>
-                         <input type="date" class="form-control" id='from_date_section_to_search'>
+                         <input type="date" class="form-control" id='from_date_section_to_search_forsummey'>
                      </div>
                      <div class="col">
                          <label for="to">To :</label>
-                         <input type="date" class="form-control" id='to_date_section_to_search'>
+                         <input type="date" class="form-control" id='to_date_section_to_search_forsummery'>
                      </div>
                      <div class="col">
                          <button class="btn btn-info my-4" id='search_button_forsummery'>Search <i class="fa fa-search"></i></button>

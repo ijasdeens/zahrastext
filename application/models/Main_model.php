@@ -2691,11 +2691,12 @@ class Main_model extends CI_Model {
         }
     }
 
-    public function getSalessummerydetailsbydate($fromdate, $todate){
+    public function getSalessummerydetailsbydate($outletid,$date,$fromdate, $todate){
         $this->db->select('*'); 
         $this->db->from('register_details_section'); 
         $this->db->where('date>=',$fromdate);
         $this->db->where('date<=',$todate);
+        $this->db->where('outlet_id',$outletid); 
         $result = $this->db->get(); 
         if($result->num_rows() > 0){
             return $result->result(); 
@@ -2720,10 +2721,20 @@ class Main_model extends CI_Model {
         }
     }
 
-    public function getsalessummerydataforprint($date){
+    public function getsalessummerydataforprint($outletid,$fromdate, $todate,$date){
         $this->db->select('*'); 
         $this->db->from('register_details_section'); 
-        $this->db->where('date',$date);
+        $this->db->where('outlet_id',$outletid);
+
+        if($fromdate==null && $todate==null){
+            $this->db->where('date',$date);
+        
+        }
+        else {
+            $this->db->where('date>=',$fromdate); 
+            $this->db->where('date<=',$todate); 
+        }
+          
         $result = $this->db->get(); 
         if($result->num_rows() > 0){
             return $result->result(); 
