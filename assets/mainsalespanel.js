@@ -1645,11 +1645,9 @@ $(document).ready(function () {
 		let paywithcheck_additoinalinformation = $('#paywithcheck_additoinalinformation').val(); 
 
 		if (temp_customerid == "" || temp_customerid == 0) {
-			toastr.error("Please choose customer by mobile number");
-			$("#paywithcashmodal").modal("hide");
-			$("#customer_typeselect").focus();
-			$("#customer_typeselect").css("border", "2px solid red");
-			return false;
+			alert("Please choose the customer by mobile number"); 
+			window.location.reload(); 	 
+		 
 		}
 
 		if (
@@ -1681,7 +1679,7 @@ $(document).ready(function () {
 					paywithcheck_additoinalinformation:paywithcheck_additoinalinformation
 				},
 				success: function (data) {
-					reduceProductQuantity();
+					reduceProductQuantity(data);
 				},
 				error: function (err) {
 					console.error("Error found", err);
@@ -4209,6 +4207,9 @@ $('#search_supplier_checks').click(function(){
 					html+=`<tr>
 					<td>${++count}</td>
 					<td>${d.invoiceidsec}</td>
+					<td>${d.customer_name}</td>
+					<td>${d.customer_mobile}</td>
+					<td>${d.customer_address}</td>
 					<td>Rs.${parseFloat(d.loan_previous_amount).toFixed(2)}</td>
 					<td>Rs.${parseFloat(d.loan_recieving_amount).toFixed(2)}</td>
 					<td>Rs. ${parseFloat(d.loan_balance_amount).toFixed(2)}</td>

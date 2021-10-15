@@ -2658,6 +2658,9 @@ else
         
         $last_insert_id =(int)$summeryid;
 
+        $outletid = $this->session->outlet_id; 
+
+
         foreach($this->cart->contents() as $items){
             $currentQuantity = (int)$items['qty'];
             $availablequantity = (int)$items['availablequantity'];
@@ -2742,7 +2745,7 @@ else
     public function printinvoicesettings(){
         $data['given_amount'] = $this->session->given_amount;
 
-         $outletid = (int)$this->session->userdata('outlet_id');
+         $outletid = (int)$this->session->outlet_id;
         $result  = $this->main_model->getallsaveddetailsalong($outletid);
 
         $data['invoice_id'] = $this->main_model->getordersummeryid();
@@ -2776,7 +2779,7 @@ else
 
     }
     
-    //whileback
+ 
     public function printotalsummerydetails(){
 
          
@@ -5099,7 +5102,7 @@ public function select_postponed(){
         );
         $makepaymentwithcheque = $this->main_model->paying_method_cheque($checkdata);
 
-        echo $makepaymentwithcheque;
+        echo $last_insert_id;
     }
     
 

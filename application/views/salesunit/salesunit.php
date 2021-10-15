@@ -959,6 +959,9 @@
                                                     <tr>
                                                         <th>#NO</th>
                                                         <th>Invoice ID</th>
+                                                        <th>Customer name</th>
+                                                        <th>Customer mobile</th>
+                                                        <th>Customer address</th>
                                                         <th>Previous amount</th>
                                                         <th>Paid amount</th>
                                                         <th>Amount to be paid</th>

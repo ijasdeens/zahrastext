@@ -1180,6 +1180,7 @@ class Main_model extends CI_Model {
             $this->db->where('loan_paid_method',$paymentmethod); 
         }
         $this->db->where('outlet_id_fk',$outletid); 
+        $this->db->order_by('lgid','desc'); 
         $result = $this->db->get(); 
         if($result->num_rows() > 0) {
             return $result->result(); 

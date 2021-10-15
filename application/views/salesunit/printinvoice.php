@@ -140,9 +140,12 @@
         </p>
 
            <p id="date_time" style="font-weight:bold"></p> 
-           
+           <?php
+           $myinvoiceid = (int)$invoice_id; 
+             
+           ?>
          
-            <p style="font-weight:bold">Invoice ID : <?php echo $invoice_id?></p>
+            <p style="font-weight:bold">Invoice ID : <?php echo --$myinvoiceid?></p>
             <p style="font-weight:bold">Note : <?php echo $this->session->addtional_information;?></p>
       </div>
     </div><!--End Invoice Mid-->
