@@ -1167,6 +1167,30 @@ class Main_model extends CI_Model {
         }
     }
 
+    public function filterdataforprint($fromdate, $todate, $paymentmethod, $outletid){
+        $this->db->select('customer_name,customer_mobile,loan_balance_amount,invoiceidsec'); 
+        $this->db->from('loanpaiddetails'); 
+        if($fromdate!=""){
+            $this->db->where('date>=',$fromdate); 
+        }
+        if($todate!=''){
+            $this->db->where('date<=',$todate); 
+        }
+        if($paymentmethod!=""){
+            $this->db->where('loan_paid_method',$paymentmethod); 
+        }
+        $this->db->where('outlet_id_fk',$outletid); 
+        $this->db->order_by('lgid','desc'); 
+        $result = $this->db->get(); 
+        if($result->num_rows() > 0) {
+            return $result->result(); 
+        }
+        else {
+            return 0; 
+        }
+        
+    }
+
     public function getloanpaymentmentcheckmethod($fromdate, $todate, $paymentmethod, $outletid ){
         $this->db->select('*'); 
         $this->db->from('loanpaiddetails');
@@ -1197,7 +1221,7 @@ class Main_model extends CI_Model {
 
 
     public function savepaymentdetailsforreigsterdetails($mydate, $outletid,$loanamount) {
-         return $this->db->query('update register_details_section set cheque_payment=(cheque_payment + '.$loanamount.') where date="'.$mydate.'" and outlet_id='.$outletid.' '); 
+         return $this->db->query('update register_details_section set recieveddebt_forregister=(recieveddebt_forregister + '.$loanamount.') where date="'.$mydate.'" and outlet_id='.$outletid.' '); 
     }
 
     public function submit_loan_chequessection($data){
@@ -1304,6 +1328,20 @@ class Main_model extends CI_Model {
     public function searchsalesfordate($from_date,$to_date){
 
 
+    }
+
+    public function getallsummerydetails($ordersummery,$outletid){
+        $this->db->select('*'); 
+        $this->db->from('order_summery'); 
+        $this->db->where('order_summery_id',$ordersummery); 
+        $this->db->where('outlet_id',$outletid); 
+        $result = $this->db->get(); 
+        if($result->num_rows() > 0) {
+            return $result->result();
+        }
+        else {
+            return 0;
+        }
     }
 
     public function create_invoice_id(){
@@ -2676,12 +2714,18 @@ class Main_model extends CI_Model {
 
  
     
-    public function search_expense_bydate($fromdate, $expiredate){
+    public function search_expense_bydate($fromdate, $expiredate, $outletid){
         $this->db->select('expenses_list.expenses_list_id,expenses_list.expense_note,expenses_list.expense_date,expenses_list.expense_amount,expense_type.expense_name');
         $this->db->from('expenses_list'); 
         $this->db->join('expense_type','expense_type.expense_typeid=expenses_list.expense_type','left');
-        $this->db->where('expenses_list.expense_date >=',$fromdate);
-        $this->db->where('expenses_list.expense_date <=',$expiredate);
+        if($fromdate!=""){
+            $this->db->where('expenses_list.expense_date >=',$fromdate);
+
+        }
+        if($expiredate!=""){
+            $this->db->where('expenses_list.expense_date <=',$expiredate);
+         }
+        $this->db->where('expenses_list.outlet_id_fk',$outletid); 
 
         $result = $this->db->get(); 
         if($result->num_rows() > 0){
@@ -2955,14 +2999,14 @@ class Main_model extends CI_Model {
         $this->db->from('order_summery'); 
         $this->db->join('customer','customer.customer_id=order_summery.customer_id','left'); 
         $this->db->join('sales_credit_details','sales_credit_details.summery_id_fk=order_summery.order_summery_id','left');
-        if($fromdate!=null){
+        if($fromdate!=''){
             $this->db->where('SUBSTRING(ordered_date,1,10)>=',$fromdate);
 
         }
-        if($todate!=null){
+        if($todate!=''){
             $this->db->where('SUBSTRING(ordered_date,1,10)<=',$todate);
          }
-        if($statuschecker!=null){
+        if($statuschecker!=''){
             $this->db->where('order_summery.payment_method',$statuschecker); 
          }
         $this->db->where('order_summery.outlet_id',$outletid); 
@@ -3041,11 +3085,11 @@ class Main_model extends CI_Model {
                 if($balanceamount==0){
                     $this->db->where('summery_id_fk',$summeryid)->delete('sales_credit_details');
                      $this->db->query('update order_summery set payment_method="Cash" where order_summery_id='.$summeryid.'');
-                    return $this->db->query('update register_details_section set credit_payment=(credit_payment - '.$recamount.') where date="'.$ordereddate.'" ');
+                  //  return $this->db->query('update register_details_section set credit_payment=(credit_payment - '.$recamount.') where date="'.$ordereddate.'" ');
  
                 }
                 else {
-                    $this->db->query('update register_details_section set credit_payment=(credit_payment - '.$recamount.') where date="'.$ordereddate.'"');
+                   // $this->db->query('update register_details_section set credit_payment=(credit_payment - '.$recamount.') where date="'.$ordereddate.'"');
 
                     return $this->db->query('update sales_credit_details set sales_credit_amount=(sales_credit_amount - '.$recamount.') where summery_id_fk='.$summeryid.''); 
                 }

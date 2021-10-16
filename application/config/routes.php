@@ -71,6 +71,13 @@ $route['loanpayingreports'] = 'Controllerunit/loanpayingreports';
 
 $route['addpurcahsedetails'] = 'Controllerunit/addpurcahsedetails'; 
 
+$route['paidloanprint'] = 'Controllerunit/paidloanprint'; 
+
+$route['printsalessidesection'] = 'Controllerunit/printsalessidesection'; 
+$route['totalexpenseprint'] = 'Controllerunit/totalexpenseprint'; 
+
+
+$route['reprintsection/:num'] ='Controllerunit/reprintsection'; 
 
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;

@@ -305,6 +305,19 @@ class Controllerunit extends CI_Controller {
 
 
                 }
+                $from_to_search_purdate = ''; 
+                $to_to_search_purdate = ''; 
+                $status_cehcker = '';
+
+                $this->session->set_userdata('from_to_search_purdate_session',$from_to_search_purdate); 
+                $this->session->set_userdata('to_to_search_purdate_session',$to_to_search_purdate); 
+                $this->session->set_userdata('status_checker_session',$status_cehcker); 
+
+                $from_date_expense_list=''; 
+                $to_expense_list = ''; 
+                $this->session->set_userdata('fromdateforexpense',$from_date_expense_list); 
+                 $this->session->set_userdata('todateforexpense',$to_expense_list); 
+        
 
 
             $this->load->view('salesunit/salesunit',$data);
@@ -314,6 +327,7 @@ class Controllerunit extends CI_Controller {
         }
 
     }
+
 
     public function product_details_outlet_expired_showoffs(){
         $expired_date_before = (int)$this->session->expiry_reminder_date; 
@@ -807,6 +821,8 @@ else
         $result =  $this->main_model->showexpeseType();
         echo json_encode($result);
     }
+
+   
 
 
     public function showexpensesList(){
@@ -2683,7 +2699,8 @@ else
                 'product_id' => $productid,
                 'choosen_quantity' => $currentQuantity,
                 'status' => 1,
-                'sub_total' => $items['price']
+                'sub_total' => $items['price'], 
+                'actual_price' => $items['actual_price']
             );
 
             $datafordetailsproduct = array(
@@ -2705,6 +2722,26 @@ else
        //$this->load->view('salesunit/printinvoice');
     //    $this->cart->destroy();
     }
+
+    public function reprintsection($summeryiddata){
+       
+        $allsummerydetails = $this->main_model->getallsummerydetails($summeryiddata,$this->session->outlet_id); 
+
+        if($allsummerydetails!=0){
+            foreach($allsummerydetails as $details){
+                $data['ordered_date'] =$details->ordered_date; 
+                $data['invoice_id'] = $details->order_summery_id;
+                $data['addtional_information'] = $details->additional_text; 
+                $data['discount_percentage'] = $details->discount_from_total_amount;
+              
+                
+            }
+        }
+        
+
+          
+    }
+
 
     public function deletesessionforcarts(){
        
@@ -2762,6 +2799,7 @@ else
           $this->load->view('salesunit/printinvoice',$data);
            //$this->cart->destroy();
     }
+ 
 
 
     public function savecurrentdateinsession(){
@@ -4015,6 +4053,7 @@ public function select_postponed(){
     }
 
 
+    
     public function frmsms_group_message_section_forall(){
         $group_id = $this->security->xss_clean($_POST['group_id']);
         $group_sms_contact_text = $this->security->xss_clean($_POST['group_sms_contact_text']);
@@ -4450,10 +4489,20 @@ public function select_postponed(){
         $from_date_expense_list= $this->security->xss_clean($_POST['from_date_expense_list']); 
         $to_expense_list= $this->security->xss_clean($_POST['to_expense_list']); 
 
-        $result = $this->main_model->search_expense_bydate($from_date_expense_list,$to_expense_list); 
+        $this->session->set_userdata('fromdateforexpense',$from_date_expense_list); 
+        $this->session->set_userdata('todateforexpense',$to_expense_list); 
+
+        $result = $this->main_model->search_expense_bydate($from_date_expense_list,$to_expense_list, $this->session->outlet_id); 
         echo json_encode($result);
 
     }
+    
+    public function totalexpenseprint(){
+        $data['results'] = $this->main_model->search_expense_bydate($this->session->fromdateforexpense,$this->session->todateforexpense,$this->session->outlet_id);
+        $this->load->view('salesunit/expensesprint',$data);
+    
+    }
+
 
     public function getSalessummerydetails(){
         $mydate = $this->security->xss_clean($_POST['mydate']); 
@@ -4563,10 +4612,24 @@ public function select_postponed(){
          $to_to_search_purdate = $this->security->xss_clean($_POST['to_to_search_purdate']);
          $status_cehcker = $this->security->xss_clean($_POST['status_cehcker']); 
 
+        $this->session->set_userdata('from_to_search_purdate_session',$from_to_search_purdate); 
+        $this->session->set_userdata('to_to_search_purdate_session',$to_to_search_purdate); 
+        $this->session->set_userdata('status_checker_session',$status_cehcker); 
+
+
          $result = $this->main_model->showoffsalesunitsectionbysearch($from_to_search_purdate,$to_to_search_purdate,$status_cehcker, $this->session->outlet_id); 
          echo json_encode($result); 
          
      }
+
+     public function printsalessidesection(){
+         $from_to_search_purdate = $this->session->from_to_search_purdate_session; 
+         $to_to_search_purdate = $this->session->to_to_search_purdate_session; 
+         $status_cehcker = $this->session->status_checker_session;
+
+         $data['results'] =  $this->main_model->showoffsalesunitsectionbysearch($from_to_search_purdate,$to_to_search_purdate,$status_cehcker, $this->session->outlet_id);
+        $this->load->view('salesunit/salessideprint',$data);
+    }
 
      public function view_cus_details_fr_section(){
          $value = $this->security->xss_clean($_POST['value']); 
@@ -4656,7 +4719,7 @@ public function select_postponed(){
         
 
 
-       //  $result = $this->main_model->detectcreditdetailsbycash($recieving_amount, $ordered_date_sec, $summery_id,$balance_amount);
+         $result = $this->main_model->detectcreditdetailsbycash($recieving_amount, $ordered_date_sec, $summery_id,$balance_amount);
         
         
 
@@ -4667,10 +4730,29 @@ public function select_postponed(){
          $todate = $this->security->xss_clean($_POST['todate']); 
          $paymentmethod = $this->security->xss_clean($_POST['paymentmethod']); 
 
+         $this->session->set_userdata('fromdateforpaidloan',$fromdate); 
+         $this->session->set_userdata('todateforpaidloan',$todate); 
+         $this->session->set_userdata('payment_method',$paymentmethod); 
+
         $result = $this->main_model->getloanpaymentmentcheckmethod($fromdate,$todate, $paymentmethod, $this->session->outlet_id); 
         echo json_encode($result); 
 
      }
+
+     public function paidloanprint(){
+ 
+        $fromdate = $this->session->fromdateforpaidloan; 
+        $todate = $this->session->todateforpaidloan; 
+        $paymentmethod = $this->session->payment_method; 
+
+        $data['results'] = $this->main_model->filterdataforprint($fromdate,$todate,$paymentmethod, $this->session->outlet_id);
+         
+        
+
+        $this->load->view('salesunit/paidloanprint',$data);
+    }
+
+   
 
      public function submit_loan_chequessection(){
     
@@ -4695,6 +4777,10 @@ public function select_postponed(){
         $this->session->set_userdata('paymenttobepaid',$balance_for_cheque_amount); 
 
 
+        $customer_name_bycheck = $this->security->xss_clean($_POST['customer_name_bycheck']); 
+        $customer_address_bycheck = $this->security->xss_clean($_POST['customer_address_bycheck']); 
+        $customer_mobile_bycheck = $this->security->xss_clean($_POST['customer_mobile_bycheck']); 
+
         $savedataforloan = array(
             'loan_previous_amount' => $balance_for_cheque_amount, 
             'loan_recieving_amount' => $cheque_loan_amount, 
@@ -4703,7 +4789,10 @@ public function select_postponed(){
             'outlet_name' => $this->session->outlets_name, 
             'outlet_id_fk' => $this->session->outlet_id, 
             'date' => $todaydate,
-            'invoiceidsec' => $summery_id_fk 
+            'invoiceidsec' => $summery_id_fk, 
+            'customer_name' => $customer_name_bycheck, 
+            'customer_mobile' => $customer_mobile_bycheck,
+            'customer_address' => $customer_address_bycheck
         );
 
         $this->main_model->savepayingloanamount($savedataforloan); 
@@ -4723,9 +4812,9 @@ public function select_postponed(){
           
         );
         $this->main_model->detectpaymentforcheck($summery_id_fk,$cheque_loan_amount);  
-      echo  $this->main_model->submit_loan_chequessection($data);
+       $this->main_model->submit_loan_chequessection($data);
 
-       // echo  $this->main_model->savepaymentdetailsforreigsterdetails($ordered_date_sec,$this->session->outlet_id,$cheque_loan_amount); 
+        echo  $this->main_model->savepaymentdetailsforreigsterdetails($ordered_date_sec,$this->session->outlet_id,$cheque_loan_amount); 
 
 
      }
@@ -5032,7 +5121,7 @@ public function select_postponed(){
 
     public function saveassessiontogetback(){
         $balance_amount = floatval($this->security->xss_clean($_POST['balance_amount'])); 
-        $this->session->set_userdata('mainbalance',$balance_amount); 
+        echo $this->session->set_userdata('mainbalance',$balance_amount); 
       
        
     }

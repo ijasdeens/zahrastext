@@ -298,10 +298,10 @@ $config['encryption_key'] = '';
 */
 $config['sess_driver'] = 'files';
 $config['sess_cookie_name'] = 'project1_session';
-$config['sess_expiration'] = 9000000000;
+$config['sess_expiration'] = 604800;
 $config['sess_save_path'] = NULL;
 $config['sess_match_ip'] = FALSE;
-$config['sess_time_to_update'] = 300000000000000000000;
+$config['sess_time_to_update'] = 604800;
 $config['sess_regenerate_destroy'] = FALSE;
 
 /*
@@ -370,7 +370,7 @@ $config['global_xss_filtering'] = FALSE;
 $config['csrf_protection'] = FALSE;
 $config['csrf_token_name'] = 'csrf_test_name';
 $config['csrf_cookie_name'] = 'csrf_cookie_name';
-$config['csrf_expire'] = 7200;
+$config['csrf_expire'] = 604800;
 $config['csrf_regenerate'] = TRUE;
 $config['csrf_exclude_uris'] = array();
 

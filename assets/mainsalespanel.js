@@ -1305,7 +1305,7 @@ $(document).ready(function () {
 			},
 
 			error: function (err) {
-				console.error("Error found", err);
+				console.error("Error found from reduce quantity", err);
 			},
 		});
 	};
@@ -1460,7 +1460,7 @@ $(document).ready(function () {
 					balance_amount : balance_amount 
 				},
 				success: function (data) {
-				 
+					alert(data);
 					 
 				},
 				error: function (err) {
@@ -1519,7 +1519,7 @@ $(document).ready(function () {
 			},
 			success: function (data) {
 				//alert(data);
-			   console.log(data);
+			   console.log('From save cash payment',data);
 				reduceProductQuantity(data);
 			},
 			error: function (err) {
@@ -2321,10 +2321,12 @@ ${
 
 		if (from_date_expense_list == "") {
 			toastr.warning("Please enter the 'FROM' date");
+			$('#from_date_expense_list').css('border','2px solid red'); 
 			return false;
 		}
 		if (to_expense_list == "") {
 			toastr.warning("Please enter the 'TO' date");
+			$('#to_expense_list').css('border','2px solid red'); 
 			return false;
 		}
 
@@ -2440,6 +2442,11 @@ ${
   Action
   </button>
   <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+  <a target="_blank" href="${base_url}Controllerunit/reprintsection/${d.order_summery_id}" class="dropdown-item reprintsection" order_summery_id="${d.order_summery_id}" >Reprint <i class="fa fa-print"></i></a>
+
+
+
+
     <a class="dropdown-item pay_amount_bycashloan" customer_name="${d.customer_name}" customer_address="${d.customer_address}" customer_mobile="${d.customer_mobile}" summery_id='${
 			d.order_summery_id
 		}' ordered_date='${d.ordered_date}' payment_method='${
@@ -2475,6 +2482,8 @@ ${
 	};
 
 	showoffsalesunitsection();
+
+ 
 
 	$("#cheque_loan_amount").keydown(function () {
 		let typingamount = parseFloat($(this).val());
@@ -2514,6 +2523,11 @@ ${
 
 		$("#repayment_cheque_system").modal("show");
 		$("#modal_section_modal").modal("hide");
+
+		//queen
+		sessionStorage.setItem('customer_name_bycheck',$(this).attr('customer_name')); 
+		sessionStorage.setItem('customer_address_bycheck',$(this).attr('customer_address'));
+		sessionStorage.setItem('customer_mobile_bycheck',$(this).attr('customer_mobile'));  
 
 		$.ajax({
 			url: base_url + "Controllerunit/view_summery_id_fr",
@@ -2605,7 +2619,10 @@ ${
 		balanceamount = ( balance_for_cheque_amount - cheque_loan_amount ); 
 
 		//balance, payment to be paid, recieving 
-
+		/**	sessionStorage.setItem('customer_name_bycheck',$(this).attr('customer_name')); 
+		sessionStorage.setItem('customer_address_bycheck',$(this).attr('customer_address'));
+		sessionStorage.setItem('customer_mobile_bycheck',$(this).attr('customer_mobile'));  
+ */
 
 		$.ajax({
 			url: base_url + "Controllerunit/submit_loan_chequessection",
@@ -2622,7 +2639,10 @@ ${
 				cheque_loan_amount: cheque_loan_amount,
 				balanceamount:balanceamount,
 				balance_for_cheque_amount:balance_for_cheque_amount,
-				todaydate:getfulldate() 
+				todaydate:getfulldate(), 
+				customer_name_bycheck:sessionStorage.getItem('customer_name_bycheck')==null ? 'walk-in' : sessionStorage.getItem('customer_name_bycheck'), 
+				customer_address_bycheck:sessionStorage.getItem('customer_address_bycheck')==null ? 'walk-in' : sessionStorage.getItem('customer_address_bycheck'), 
+				customer_mobile_bycheck:sessionStorage.getItem('customer_mobile_bycheck')==null ? 'walk-in' : sessionStorage.getItem('customer_mobile_bycheck')
 			},
 			success: function (data) {
 				if (data == 1) {
@@ -2751,13 +2771,13 @@ ${
 				balance_amount: balance_amount,
 				payment_to_bepadi:payment_to_bepadi,
 				date : getfulldate(), 
-				customer_name : sessionStorage.getItem('customer_name')==null ? 'walk-in' : sessionStorage.getItem('customer_name'), 
-				customer_mobile : sessionStorage.getItem('customer_mobile')==null ? 'Walk-in' : sessionStorage.getItem('customer_mobile'), 
-				customer_address : sessionStorage.getItem('customer_mobile')==null ? 'Walk-in' : sessionStorage.getItem('customer_mobile') 
+				customer_name : sessionStorage.getItem('customer_name_section')==null ? 'walk-in' : sessionStorage.getItem('customer_name_section'), 
+				customer_mobile : sessionStorage.getItem('customer_mobile_section')==null ? 'Walk-in' : sessionStorage.getItem('customer_mobile_section'), 
+				customer_address : sessionStorage.getItem('customer_address_section')==null ? 'Walk-in' : sessionStorage.getItem('customer_address_section') 
 
 			},
 			success: function (data) {
-				alert('Product has been detected'); 
+				alert('Amount has been detected'); 
 			//	saveCashpaymentforregisterdetails(recieving_amount);
 		openloanrecieptamount(balance_amount,payment_to_bepadi,recieving_amount); 
 
@@ -2785,9 +2805,9 @@ ${
 	});
 
 	$("#search_bydateforfrontedn").click(function () {
-		let from_to_search_purdate = $("#from_to_search_purdate").val()=='' ? null : $("#from_to_search_purdate").val();
-		let to_to_search_purdate = $("#to_to_search_purdate").val()=='' ? null : $("#to_to_search_purdate").val();
-		let status_cehcker = $('#status_cehcker').val()=='' ? null : $('#status_cehcker').val(); 
+		let from_to_search_purdate = $("#from_to_search_purdate").val();
+		let to_to_search_purdate = $("#to_to_search_purdate").val();
+		let status_cehcker = $('#status_cehcker').val(); 
  
 	 
  

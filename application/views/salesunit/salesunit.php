@@ -852,14 +852,23 @@
                                      
                                         <button class="btn btn-info my-4 py-2" id='search_bydateforfrontedn'>Search <i class="fa fa-search" aria-hidden='true'></i></button>
                                        
+
                                    </div>
+                                   <br>
+                                   
  
+                               </div>
+                               <div class="float-right">
+                                   
                                </div>
                             </div>
                               <div class="my-2">
                                   <div class="float-right my-2">
-                                  <button class='btn btn-success my-4 py-2 btn-sm' id='exporttoexcelwholedata'><i class="fa fa-file-excel-o"></i>  Export as excel</button>
-                                  </div>
+                                  <button class='btn btn-success my-4 py-2 btn-sm d-none' id='exporttoexcelwholedata'><i class="fa fa-file-excel-o"></i>  Export as excel</button>
+                                <br>
+                                <a href="<?php echo base_url()?>Controllerunit/printsalessidesection" target="_blank" class="btn btn-primary btn-sm">Print <i class="fa fa-print"></i></a>
+
+                                </div>
                                   <input type="search" class='form-control' id='search_detailssectionforfrontendpurcahse' placeholder='Search'>
                               </div>
                                 <table class="table table-responsive" cellspacing="0" id='salessidedetailsfromfrontexcel'>
@@ -950,7 +959,10 @@
                                          </div>
                                          <div class="col">
                                          <button class="btn btn-info my-4 py-2" id='search_loan_amount_section'>Search <i class="fa fa-search" aria-hidden='true'></i></button>
-                                          </div>
+                                        <br>
+                                        <a target="_blank" href="<?php echo base_url()?>Controllerunit/paidloanprint" class="btn btn-primary my-2 py-2">Print <i class="fa fa-print" aria-hidden='true'></i></a> 
+                                        </div>
+                                           
                                      </div>
                                      <div class="">
                                          <div class="table tabel-responsive">
@@ -1477,6 +1489,11 @@
                      <div class="float-right">
                          Total amount : <span class="calculated_totalamount font-weight-bold text-danger"></span>
                      </div>
+                     <br>
+                     <div class="float-right">
+                         <a href="<?php echo base_url()?>Controllerunit/totalexpenseprint" target="_blank" class="btn btn-primary">Print <i class="fa fa-print"></i></a>
+                     </div>
+                     <br>
                      <table class='table table-striped table-responsive'>
                          <thead>
                              <tr>
