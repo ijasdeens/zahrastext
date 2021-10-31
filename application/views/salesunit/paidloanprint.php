@@ -162,7 +162,7 @@
                                 <th>Invoice ID</th>
                                 <th>Customer name</th>
                                 <th>Customer mobile</th>
-                                <th>Amount to be paid</th>
+                                <th>Paid amount</th>
                               </tr>
                             </thead>
                             <tbody>

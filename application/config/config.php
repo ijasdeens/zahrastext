@@ -98,7 +98,7 @@ $config['composer_autoload'] = FALSE;
 | DO NOT CHANGE THIS UNLESS YOU FULLY UNDERSTAND THE REPERCUSSIONS!!
 |
 */
-$config['permitted_uri_chars'] = '';
+$config['permitted_uri_chars'] = 'a-z 0-9~%.:_\-';
 
 /*
 |--------------------------------------------------------------------------
@@ -297,12 +297,13 @@ $config['encryption_key'] = '';
 |
 */
 $config['sess_driver'] = 'files';
-$config['sess_cookie_name'] = 'project1_session';
-$config['sess_expiration'] = 604800;
+$config['sess_cookie_name'] = '';
+$config['sess_expiration'] = 604800; //1 week
 $config['sess_save_path'] = NULL;
-$config['sess_match_ip'] = FALSE;
-$config['sess_time_to_update'] = 604800;
+$config['sess_time_to_update'] = 604800; // 1 week
 $config['sess_regenerate_destroy'] = FALSE;
+ 
+ 
 
 /*
 |--------------------------------------------------------------------------
@@ -351,7 +352,7 @@ $config['standardize_newlines'] = FALSE;
 |          for backwards compatibility purposes!
 |
 */
-$config['global_xss_filtering'] = FALSE;
+$config['global_xss_filtering'] = TRUE;
 
 /*
 |--------------------------------------------------------------------------
@@ -371,8 +372,9 @@ $config['csrf_protection'] = FALSE;
 $config['csrf_token_name'] = 'csrf_test_name';
 $config['csrf_cookie_name'] = 'csrf_cookie_name';
 $config['csrf_expire'] = 604800;
-$config['csrf_regenerate'] = TRUE;
+$config['csrf_regenerate'] = FALSE;
 $config['csrf_exclude_uris'] = array();
+$config['sess_match_useragent'] = FALSE;
 
 /*
 |--------------------------------------------------------------------------
@@ -403,7 +405,7 @@ $config['compress_output'] = FALSE;
 |
 | Options are 'local' or any PHP supported timezone. This preference tells
 | the system whether to use your server's local time as the master 'now'
-| reference, or convert it to the configured one timezone. See the 'date
+| reference, or convert it to the configured one timezone. See the 'date7
 | helper' page of the user guide for information regarding date handling.
 |
 */

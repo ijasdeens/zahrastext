@@ -11,6 +11,12 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | of this setting
 |
 */
+
+// Define Ajax Request
+//define('IS_AJAX', isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest');
+//
+
+
 defined('SHOW_DEBUG_BACKTRACE') OR define('SHOW_DEBUG_BACKTRACE', TRUE);
 
 /*

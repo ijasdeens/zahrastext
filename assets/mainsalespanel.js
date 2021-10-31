@@ -1,6 +1,136 @@
 $(document).ready(function () {
 	const base_url = $("#base_url").val();
 
+	sessionStorage.setItem('sessionchecker',1); 
+
+
+	function displayallproductdetials(){
+		let html = ``; 
+		$.ajax({
+			url: base_url + "Controllerunit/displayallproductdetials",
+			method: "POST",
+			cache:true, 
+	 		success: function (data) {
+			 let getData = JSON.parse(data); 
+			if(getData==0){
+				$('#outletproductdetailsection').html('<span class="text text-danger font-weight-bold">No data found</span>');
+				return false;  
+			} 
+			else {
+				getData.map(d => {
+					
+					if(d.product_quantity!=0){
+						html+=`<div class="col-md-6 product_wrapper">
+                        <figure class="card card-product">
+
+                            <span class="badge badge-info">Available</span>
+                            <div class="img-wrap">
+							${d.product_pic.substring(0,5)=='https' ? `<img src="${d.product_pic}"/>` : `<img src="${base_url}assets/img/uploaded_photos/${d.product_pic}"  class="img-fluid h-40"/>`}
+                                
+                                
+                             </div>
+                            <figcaption class="info-wrap">
+                                <a href="#" class="title">
+									${d.product_name} <br/>
+									${d.products_code} <br/>
+                                    
+                                </a>
+                                <span> (${d.product_unit})</span> <br/>
+                                <span class='text text-secondary font-weight-bold'>QTY : ${d.product_quantity}</span>
+                                <div class="action-wrap">
+                                    <a href="#" class="btn btn-primary btn-sm float-right btnaddshoppingcart" 
+                                    product_price="${d.product_price}" 
+                                    product_name="${d.product_name}" 
+                                    product_id="${d.products_id}"
+                                     product_pic="${d.product_pic}"
+                                      product_code='${d.products_code}' 
+                                      product_unit="${d.product_unit}"
+                                     availablequantity="${d.product_quantity}"
+                                      
+                                    > <i class="fa fa-cart-plus"></i> Add </a>
+                                    <div class="price-wrap h5">
+                                        <span class="price-new">Rs. ${parseFloat(d.product_price).toFixed(2)}</span>
+                                    </div>
+                                    <!-- price-wrap.// -->
+                                </div>
+                                <!-- action-wrap -->
+                            </figcaption>
+                        </figure>
+                        <!-- card // -->
+                    </div>`; 
+
+
+					}
+					else {
+
+						html+=`<div class="col-md-6 product_wrapper">
+                        <figure class="card card-product">
+
+                            <span class="badge badge-danger">Unavailable</span>
+                            <div class="img-wrap">
+							${d.product_pic.substring(0,5)=='https' ? `<img src="${d.product_pic}"/>` : `<img src="${base_url}assets/img/uploaded_photos/${d.product_pic}"/>"`}
+                                
+                                
+                             </div>
+                            <figcaption class="info-wrap">
+                                <a href="#" class="title">
+									${d.product_name} <br/>
+									${d.products_code} <br/>
+                                    
+                                </a>
+                                <span> (${d.product_unit})</span> <br/>
+                                <span class='text text-secondary font-weight-bold'>QTY : ${d.product_quantity}</span>
+                                <div class="action-wrap">
+                                    <a href="#" class="btn btn-danger btn-sm float-right" disabled><i class="fa fa-cart-plus"></i>Finished product</a>
+                                    <div class="price-wrap h5">
+                                        <span class="price-new">Rs. ${parseFloat(d.product_price).toFixed(2)}</span>
+                                    </div>
+                                    <!-- price-wrap.// -->
+                                </div>
+                                <!-- action-wrap -->
+                            </figcaption>
+                        </figure>
+                        <!-- card // -->
+                    </div>`; 
+
+
+					}
+
+
+
+				}); 
+
+				$('#outletproductdetailsection').html(html); 
+			}
+			},
+			error: function (err) {
+				console.error("Error found", err);
+			},
+		});
+
+	}
+
+	displayallproductdetials(); 
+
+
+	function checkoutletidexist(){
+		$.ajax({
+			url: base_url + "Controllerunit/checkoutletidexist",
+			method: "POST",
+			data:{
+			 
+			}, 
+	 		success: function (data) {
+			 
+				 
+			},
+			error: function (err) {
+				console.error("Error found", err);
+			},
+		});
+
+	}
+	checkoutletidexist(); 
 	function openloanrecieptamount(balance_amount,payment_to_bepadi,recieving_amount){
 	 
 		$.ajax({
@@ -443,9 +573,10 @@ $(document).ready(function () {
 	};
 
 	savetemporarydateforsale();
-	setInterval(function () {
+
+	/**	setInterval(function () {
 		savetemporarydateforsale();
-	}, 1500);
+	}, 1500); */
 
 	function getdateandtime() {
 		var months = [
@@ -760,7 +891,7 @@ $(document).ready(function () {
 			}
 
 			if (value.length != 10) {
-				toastr.error("Mobiler number must be 10 digits");
+				toastr.error("Mobile number must be 10 digits");
 				return false;
 			}
 
@@ -771,11 +902,19 @@ $(document).ready(function () {
 					value: value,
 				},
 				success: function (data) {
-					if (data == 1) {
+					let getData = JSON.parse(data); 
+				 
+					if (data != 0) {
+						$('#customer_name_text').html(getData.customer_name); 
+						$('#customer_address_text').html(getData.customer_address); 
+
 						$("#messagesectionoffound").removeClass("text-danger");
 						$("#messagesectionoffound").addClass("text-success");
 						$("#messagesectionoffound").html("Found ✔");
 						getCustomeridbfortemp();
+						
+
+
 					} else {
 						$("#messagesectionoffound").removeClass("text-success");
 						$("#messagesectionoffound").addClass("text-danger");
@@ -867,7 +1006,7 @@ $(document).ready(function () {
 			url: base_url + "Controllerunit/getdataforprintfromshoppingcart",
 			method: "POST",
 			success: function (data) {
-				console.log(data);
+				 
 				$("#product_details_to_display_forinvoice").html(data);
 			},
 			error: function (err) {
@@ -882,12 +1021,23 @@ $(document).ready(function () {
         if(e.which == 13){
              let value = $(this).val(); 
 			 let rowid = $(this).attr('rowid'); 
+			let availablequantity = $(this).attr('availablequantity'); 
+
 			 if(isNaN(value)){
 				 toastr.error("Only numbers are accepted for quantity"); 
 				 $(this).css('border','2px solid red'); 
 				 $(this).focus(); 
 			 } 
 			 else {
+				 value = parseFloat(value); 
+				 availablequantity = parseFloat(availablequantity); 
+
+				 if(value > availablequantity){
+					 toastr.error("Enter quantity exceeds limit quantity");
+					 $(this).val(availablequantity); 
+					 return false;  
+				 }
+				 
 				$.ajax({
 					url: base_url + "Controllerunit/changequantitysectionfromcashier",
 					method: "POST",
@@ -914,23 +1064,22 @@ $(document).ready(function () {
         }
     });
 
-	const fetchAllshoppingcartdata = () => {
+	const fetchAllshoppingcartdata = (myid=null) => {
 		let totalnumberofpcs = 0;
 		fetchDatafordiscount();
 		getdataforprintfromshoppingcart();
 
 		let totalvaluesection = 0.00; 
-
-		$.ajax({
+		
+ 		$.ajax({
 			url: base_url + "Controllerunit/fetchAllshoppingcartdata",
 			method: "POST",
 			success: function (data) {
-			 
-				console.log('From fetch all shopping data',data);
-				$("#showOffAllcartdetails").html(data);
+ 
+			 	$("#showOffAllcartdetails").html(data);
 
 				$(".fullquantity").each(function () {
-					totalnumberofpcs += parseInt($(this).val());
+					totalnumberofpcs += parseFloat($(this).val());
 				});
  
 
@@ -987,7 +1136,7 @@ $(document).ready(function () {
 			toastr.error("Please choose the customer");
 			$("#mobilenumberforcutomersearch").focus();
 			return false;
-		}
+		}	
 
 		$(this).attr("disabled", true);
 		$.ajax({
@@ -1007,9 +1156,7 @@ $(document).ready(function () {
 	});
 
 
-
-
-	$(".btnaddshoppingcart").click(function () {
+	$('body').delegate('.btnaddshoppingcart','click',function(){
 		$.ajax({
 			url: base_url + "Controllerunit/addtocartshoppingcart",
 			method: "POST",
@@ -1023,7 +1170,7 @@ $(document).ready(function () {
 				product_code: $(this).attr("product_code"),
 			},
 			success: function (data) {
-			 
+				 
 				 
 				toastr.info("Added successfully");
 				fetchAllshoppingcartdata();
@@ -1032,22 +1179,36 @@ $(document).ready(function () {
 				console.error("Error found", err);
 			},
 		});
-	});
+	}); 
+
+ 
 
 	$("body").delegate(".increasequantity", "click", function () {
-		let qty = parseInt($(this).attr("qty"));
+		let qty = parseFloat($(this).attr("qty"));
 		let rowid = $(this).attr("rowid");
 
-		$.ajax({
+		let myid = parseInt($(this).attr('myid')); 
+
+		let availablequantity = parseFloat($(this).attr('availablequantity')); 
+
+
+
+		if(qty > availablequantity){
+			toastr.warning("chosen quantity can not be more than available quantity"); 
+			return false; 
+		}
+
+		
+ 		$.ajax({
 			url: base_url + "Controllerunit/increasequantity",
 			method: "POST",
 			data: {
 				qty: qty,
 				rowid: rowid,
 			},
-			success: function (data) {
+			success: (data) =>  {
 				toastr.info("Increased...");
-				fetchAllshoppingcartdata();
+				fetchAllshoppingcartdata(myid);
 				fetchallindividualdiscount(); 
 			},
 			error: function (err) {
@@ -1176,12 +1337,15 @@ $(document).ready(function () {
 				} else {
 					console.log(getData);
 					getData.map((d) => {
-						let quantity = parseInt(d.quantity);
+						let quantity = parseFloat(d.quantity);
 						let price = parseFloat(d.product_price);
+						let actualrprice = parseFloat(d.actual_price); 
 						html += `<tr>
                         <td>${d.product_name}</td>
                         <td>${d.quantity}</td>
-                        <td>${d.product_price}</td>
+						<td>${d.product_code}</td>
+						<td>${parseFloat(actualrprice).toFixed(2)}</td>
+                        <td>${parseFloat(d.product_price)}</td>
                         <td>${quantity * price}</td>
                         </tr>`;
 					});
@@ -1359,11 +1523,7 @@ $(document).ready(function () {
 	});
 
 
-
-
-
-
-
+ 
 
 	$("#recieved_amount").keyup(function () {
 		let recievedAmount = parseFloat($(this).val());
@@ -1436,9 +1596,10 @@ $(document).ready(function () {
         $(document).off('focusin.modal');
     });
 
-	$("#paybycashfrm").submit(function (e) {
+	$("#paybycashbutton").click(function (e) {
 		e.preventDefault();
-		let total_amount_cash = parseFloat($("#total_amount_cash").val());
+		if(confirm("Are you sure you want to check out?")){
+			let total_amount_cash = parseFloat($("#total_amount_cash").val());
 		let balance_amount =Math.abs($("#balance_amountbycash").val());
 		let paying_amount = parseFloat($("#paying_amount").val());
 
@@ -1460,7 +1621,7 @@ $(document).ready(function () {
 					balance_amount : balance_amount 
 				},
 				success: function (data) {
-					alert(data);
+				  
 					 
 				},
 				error: function (err) {
@@ -1502,7 +1663,6 @@ $(document).ready(function () {
 
 	 
 
-		saveCashpaymentforregisterdetails(total_amount_cash);
 
 		$.ajax({
 			url: base_url + "Controllerunit/savecashamount",
@@ -1521,11 +1681,14 @@ $(document).ready(function () {
 				//alert(data);
 			   console.log('From save cash payment',data);
 				reduceProductQuantity(data);
+		saveCashpaymentforregisterdetails(total_amount_cash);
+
 			},
 			error: function (err) {
 				console.error("Error found", err);
 			},
 		});
+		}
 	});
 
 	$("#cashier_change_password").submit(function (e) {
@@ -1576,11 +1739,9 @@ $(document).ready(function () {
 		$('#amount_for_credit_details').val(parseFloat($('#totalamounttocalculate').val()).toFixed(2)); 
 	}); 
 
-	$('#frm_paycreditsection').submit(function(e){
-		e.preventDefault(); 
 
-
-
+	$('#savecreditamountsectionbutton').click(function(){
+ 
 		let value = $("#totalamounttocalculate").val();
 		let additional_information = $('#sec_additional_information').val(); 
 
@@ -1589,10 +1750,13 @@ $(document).ready(function () {
 		let sales_invoice_id = sessionStorage.getItem("sales_invoice_id");
 		let temp_customerid = Number($("#temp_customer_id").val());
 
-		if (temp_customerid == "" && temp_customerid == 0) {
-			 alert("Please choose customer by entering mobile number"); 
-			 window.location.reload(); 
-			 
+		if ($("#messagesectionoffound").html() != "Found ✔") {
+			toastr.error("Please choose the customer");
+			$("#mobilenumberforcutomersearch").focus();
+			$(".drawer").drawer("close");
+			$('#paywithcreditamountdetailsmodal').modal('hide'); 
+			$('#customer_typeselect').focus(); 
+			return false;
 		}
 
 		if (value == "") {
@@ -1618,15 +1782,23 @@ $(document).ready(function () {
 				},
 			});
 		}
+
+	}); 
+
+
+	$('#frm_paycreditsection').submit(function(e){
+		e.preventDefault(); 
+
+
 	})
 
 	$("#scredit_details_for_saveing").click(function () {
 	
 	});
 
-	$("#frm_paywithcheque").submit(function (e) {
-		e.preventDefault();
 
+	$('#submitformamountsectionforchecks').click(function(){
+		
 		let temp_customerid = Number($("#temp_customer_id").val());
 
 		let bank_name = $("#bank_name").val();
@@ -1643,6 +1815,48 @@ $(document).ready(function () {
 		let sales_invoice_id = sessionStorage.getItem("sales_invoice_id");
 
 		let paywithcheck_additoinalinformation = $('#paywithcheck_additoinalinformation').val(); 
+
+		if(bank_name==""){
+			toastr.error("Please enter the bank name"); 
+			$('#bank_name').css('border','2px solid red'); 
+			return false; 
+		}
+
+		if(bank_branch==""){
+			toastr.error("Please enter the branch name"); 
+			$('#bank_branch').css('border','2px solid red'); 
+			return false; 
+		}
+
+		if(account_no==''){
+			toastr.error("Account no is required"); 
+			$('#account_no').css('border','2px solid red'); 
+			return false; 
+			
+		}
+
+		if(cheque_date==''){
+			toastr.error("Check date is required"); 
+			$('#cheque_date').css('border','2px solid red'); 
+			return false; 
+			
+		}
+
+		if(recieved_amount==''){
+			toastr.error("Please enter the recieving amount"); 
+			return false; 
+		}
+
+		if(cheque_amount_balance==""){
+			toastr.error("");
+			
+			$('#cheque_amount_balance').css('border','2px solid red'); 
+			$('#cheque_amount_balance').focus(); 
+			return false; 
+		}
+
+
+
 
 		if (temp_customerid == "" || temp_customerid == 0) {
 			alert("Please choose the customer by mobile number"); 
@@ -1686,6 +1900,13 @@ $(document).ready(function () {
 				},
 			});
 		}
+
+	}); 
+
+
+	$("#frm_paywithcheque").submit(function (e) {
+		e.preventDefault();
+
 	});
 
 	$("#logout_section").click(function () {
@@ -2443,7 +2664,7 @@ ${
   </button>
   <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
   <a target="_blank" href="${base_url}Controllerunit/reprintsection/${d.order_summery_id}" class="dropdown-item reprintsection" order_summery_id="${d.order_summery_id}" >Reprint <i class="fa fa-print"></i></a>
-
+  <a href="#" class="dropdown-item deleteinvoicesectionarea" payment_method="${d.payment_method}" ordered_date="${d.ordered_date}" total_amount="${d.total_amount}" order_summery_id="${d.order_summery_id}">Delete <i class="fa fa-trash"></i></a>
 
 
 
@@ -2804,10 +3025,12 @@ ${
 		$("#balance_amount").val(answer);
 	});
 
+	//ironaman
 	$("#search_bydateforfrontedn").click(function () {
 		let from_to_search_purdate = $("#from_to_search_purdate").val();
 		let to_to_search_purdate = $("#to_to_search_purdate").val();
 		let status_cehcker = $('#status_cehcker').val(); 
+		let mobile_no_or_invoice_text= $('#mobile_no_or_invoice_text').val(); 
  
 	 
  
@@ -2819,7 +3042,8 @@ ${
 			data: {
 				from_to_search_purdate: from_to_search_purdate,
 				to_to_search_purdate: to_to_search_purdate,
-				status_cehcker:status_cehcker
+				status_cehcker:status_cehcker,
+				mobile_no_or_invoice_text:mobile_no_or_invoice_text
 			},
 			success: function (data) {
 				let getData = JSON.parse(data);
@@ -2830,6 +3054,7 @@ ${
 						'<span class="text text-danger font-weight-bold">NO DATA FOUND</span>'
 					);
 				} else {
+
 					getData.map((d) => {
 						html += `<tr>
                         <td>${d.invoice_no}</td>
@@ -2855,7 +3080,9 @@ ${
                         <td>
                         ${d.discounted_amount}
                         </td>
-						<td>${parseFloat(d.discount_from_total_amount).toFixed(2)}</td>
+						<td>
+						${parseFloat(d.discount_from_total_amount).toFixed(2)}
+						</td>
                             <td>
                             ${d.ordered_date}
                             </td>
@@ -2869,6 +3096,11 @@ ${
   Action
   </button>
   <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+  <a target="_blank" href="${base_url}Controllerunit/reprintsection/${d.order_summery_id}" class="dropdown-item reprintsection" order_summery_id="${d.order_summery_id}" >Reprint <i class="fa fa-print"></i></a>
+  <a href="#" class="dropdown-item deleteinvoicesectionarea" payment_method="${d.payment_method}" ordered_date="${d.ordered_date}" total_amount="${d.total_amount}" order_summery_id="${d.order_summery_id}">Delete <i class="fa fa-trash"></i></a>
+
+
+
     <a class="dropdown-item pay_amount_bycashloan" customer_name="${d.customer_name}" customer_address="${d.customer_address}" customer_mobile="${d.customer_mobile}" summery_id='${
 			d.order_summery_id
 		}' ordered_date='${d.ordered_date}' payment_method='${
@@ -2895,6 +3127,9 @@ ${
                         </tr>`;
 					});
 					$(".showoffsales_side_section").html(html);
+
+
+
 				}
 			},
 			error: function (err) {
@@ -2902,6 +3137,73 @@ ${
 			},
 		});
 	});
+
+	//pendrive
+	$('body').delegate('.deleteinvoicesectionarea','click',function(){
+
+		sessionStorage.setItem('order_id_to_delete',$(this).attr('order_summery_id')); 
+		sessionStorage.setItem('total_amount_todelete', $(this).attr('total_amount')); 
+		sessionStorage.setItem('deletforordereddate',$(this).attr('ordered_date')); 
+		sessionStorage.setItem('payment_method_section',$(this).attr('payment_method')); 
+
+		$('#modal_open_section_for_checkpassword').modal('show'); 
+
+		$('#modal_section_modal').modal('hide'); 
+
+		 
+
+
+	}); 
+
+	$('#verifybuttontoinvoicedelete').click(function(){
+		let value = $("#password_checkerforinvoice").val(); 
+
+		if(value==""){
+			toastr.error("Please enter the password before verification"); 
+			return false; //cashier_id
+		}
+		else {
+
+			if(confirm("Are you sure you want to delete it?")){
+				$.ajax({
+					url: base_url + "Controllerunit/checkpasswordbeforedeleteinginvoice",
+					method: "POST",
+					data:{
+						order_id:sessionStorage.getItem('order_id_to_delete'), 
+						total_amount_todelete:sessionStorage.getItem('total_amount_todelete'),
+						ordereddate : sessionStorage.getItem('deletforordereddate'), 
+						password : value,
+						payment_method : sessionStorage.getItem('payment_method_section') 
+					}, 
+					success: function (data) {
+						 if(data==1){
+							 alert('Deleted successfully'); 
+							 window.location.reload(); 
+						 }
+						 else {
+							 toastr.warning(data); 
+							 $("#password_checkerforinvoice").css('border','2px solid red'); 
+							 return false; 
+							 
+						 }
+					},
+					error: function (err) {
+						console.error("Error found", err);
+					},
+				});
+		
+
+			}
+			
+	
+
+
+		}
+
+
+
+	}); 
+
 
 	function gettotalsalesanddiscount() {
 		let sumoftotal = 0;
@@ -4203,10 +4505,14 @@ $('#search_supplier_checks').click(function(){
 
 
  
- function getloanpaymentmentcheckmethod(fromdate = null, todate = null, paymentmethod = null) {
+ function getloanpaymentmentcheckmethod(fromdate = null, todate = null, paymentmethod = null, mobile = null ) {
 
 	let count = 0; 
 	let html = ''; 
+
+
+	let totalpaidamount = 0.00; 
+	let totalamounttobepaid = 0.00; 
 
 	$.ajax({
 		url: base_url + "Controllerunit/getloanpaymentmentcheckmethod",
@@ -4214,16 +4520,22 @@ $('#search_supplier_checks').click(function(){
 		data: {
 			 fromdate:fromdate, 
 			 todate:todate, 
-			 paymentmethod:paymentmethod 
+			 paymentmethod:paymentmethod, 
+			 mobile:mobile 
 		},
 		success: function (data) {
 			 let getData = JSON.parse(data); 
 			 if(getData==0){
 				$("#loanpaymentmentcheckmethod").html('<tr><td><span class="text text-danger font-weight-bold">No data found</span></td></tr>');
+				$('#total_paidamounthtml').html('Rs. 0.00'); 
+				$('#total_amonttoebpaid').html('Rs. 0.00'); 
 				return false; 
 			 }
 			 else {
 				 getData.map(d => {
+					totalpaidamount+=parseFloat(d.loan_recieving_amount); 
+					totalamounttobepaid+=parseFloat(d.loan_balance_amount); 
+
 					html+=`<tr>
 					<td>${++count}</td>
 					<td>${d.invoiceidsec}</td>
@@ -4237,7 +4549,11 @@ $('#search_supplier_checks').click(function(){
 					<td>${d.date}</td>
 					</tr>`;
 				 }); 
+
 				 $('#loanpaymentmentcheckmethod').html(html); 
+				 $('#total_paidamounthtml').html('Rs.'+parseFloat(totalpaidamount).toFixed(2)); 
+				 $('#total_amonttoebpaid').html('Rs.'+parseFloat(totalamounttobepaid).toFixed(2)); 
+
 			 }
 		},
 		error: function (err) {
@@ -4254,8 +4570,9 @@ $('#search_loan_amount_section').click(function(){
 	let from_date_fr_loan = $('#from_date_fr_loan').val(); 
 	let to_date_fr_loan = $('#to_date_fr_loan').val(); 
 	let payment_method_forloan = $('#payment_method_forloan').val()=='' ? null : $('#payment_method_forloan').val(); 
+	let mobile_date_fr_section = $('#mobile_date_fr_section').val()=='' ? null : $("#mobile_date_fr_section").val(); 
 
-	getloanpaymentmentcheckmethod(from_date_fr_loan,to_date_fr_loan,payment_method_forloan); 
+	getloanpaymentmentcheckmethod(from_date_fr_loan,to_date_fr_loan,payment_method_forloan,mobile_date_fr_section); 
 
 
 }); 

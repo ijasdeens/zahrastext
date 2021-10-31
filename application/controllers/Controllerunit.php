@@ -7,7 +7,7 @@ class Controllerunit extends CI_Controller {
     public function __construct(){
         parent::__construct();
            $this->load->library('Zend');
-            
+           $this->load->library('session');
 
 
     }
@@ -77,6 +77,9 @@ class Controllerunit extends CI_Controller {
         $sumofprice = 0.00; 
         $sumofproduct = 0.00; 
         $sumofquantity = 0; 
+
+        $productsellingprice =0.00; 
+
         if($result==0){
             return json_encode($result); 
         } 
@@ -85,8 +88,9 @@ class Controllerunit extends CI_Controller {
             foreach($result as $res){
                 $productcostsection = floatval($res->product_cost);
                 $product_quantity = floatval($res->product_quantity); 
+                $productsellingprice = floatval($res->product_price);
                 $sumofcost+=floatval($productcostsection * $product_quantity); 
-                $sumofprice+=floatval($productcostsection * $product_quantity); 
+                $sumofprice+=floatval($productsellingprice * $product_quantity); 
                 $sumofquantity+=(int)$res->product_quantity; 
             }
             $data = array(
@@ -207,6 +211,9 @@ class Controllerunit extends CI_Controller {
      }
 
 
+     public function checkoutletidexist(){
+        echo 'My id'.$this->session->outlet_id; 
+     }
 
 
 
@@ -264,10 +271,15 @@ class Controllerunit extends CI_Controller {
              }
 
 
+           public function displayallproductdetials(){
+               $products = $this->main_model->getProductsforoutlet($this->session->outlet_id);
+               echo json_encode($products);  
+           } 
              
 
+
     public function salesunit(){
-        if($this->session->userdata('cashier_id')!=''){
+        if($this->session->userdata('cashier_id')!='' || $this->session->userdata('outlet_id')!=''){
 
                 $outletid = (int)$this->session->userdata('outlet_id');
 
@@ -561,6 +573,7 @@ class Controllerunit extends CI_Controller {
   $paying_amount_given = $this->security->xss_clean($_POST['value']);
         $additional_information = $this->security->xss_clean($_POST['additional_information']); 
 
+        $this->session->set_userdata('addtional_information',$additional_information); 
 
         $orderedstatus = 1;
         $orderdetailsarray = array(
@@ -625,6 +638,8 @@ class Controllerunit extends CI_Controller {
             'availablequantity' => $items->product_quantity,
             'product_pic' => $items->product_pic,
             'product_unit' =>$items->product_unit,
+            'product_code' => $items->product_code, 
+            'actual_price' => $items->actual_price, 
                 'type' => $type
              );
 
@@ -1674,7 +1689,39 @@ else
 
     }
 
+    public function checkpasswordbeforedeleteinginvoice(){
+        $order_id = $this->security->xss_clean($_POST['order_id']); 
+        $total_amount_todelete = $this->security->xss_clean($_POST['total_amount_todelete']); 
+        $ordereddate = $this->security->xss_clean($_POST['ordereddate']); 
+        $password = $this->security->xss_clean($_POST['password']); 
+        $payment_method = $this->security->xss_clean($_POST['payment_method']); 
+
+
+        $ordereddate = substr($ordereddate, 0,10); 
+
+        $checkapsswordresult = $this->main_model->checkpasswordsection($password, $this->session->cashier_id); 
+         
+        if( $checkapsswordresult==1){
+            
+            $this->main_model->deleteinvoicesection($order_id); 
+             
+            $subtractamountresult = $this->main_model->subtractamountsection($total_amount_todelete,$ordereddate,$payment_method, $this->session->outlet_id); 
+
+            echo  $subtractamountresult;
+
+        }
+        else {
+            echo "Invalid password"; 
+        }
+
+
+
+    }
+
+
     public function searchmobilenumber(){
+        $myarraydata = array(); 
+
         $value = $this->security->xss_clean($_POST['value']);
         $result = $this->main_model->searchmobilenumber($value);
         if($result==0){
@@ -1684,8 +1731,15 @@ else
             foreach($result as $customer){
             $this->session->set_userdata('customer_id',$customer->customer_id);
 
+                $myarraydata = array(
+                    'customer_name' => $customer->customer_name, 
+                    'customer_address' => $customer->customer_address,
+                    'status' => 1
+                ); 
+
             }
-            echo 1;
+            echo json_encode($myarraydata);
+           
         }
 
 
@@ -2427,6 +2481,7 @@ else
 
         );
         echo $this->cart->insert($data);
+        exit(); 
  
         }
         else {
@@ -2434,11 +2489,11 @@ else
             foreach($this->cart->contents() as $items){
                 if($items['type']!=$type){
                     $this->cart->destroy();
-                    if($items['id']==$_POST['product_id'] && $items['price']!=$_POST['product_price']){
+                    if($items['id']==$_POST['product_id']){
                         $data = array(
                             'id'      => $_POST['product_id'],
                             'qty'     => 1,
-                            'price'   => $items['price'],
+                            'price'   => $_POST['product_price'],
                             'name'    => $_POST['product_name'],
                             'availablequantity' => $_POST['availablequantity'],
                             'product_pic' => $_POST['product_pic'],
@@ -2455,7 +2510,7 @@ else
                         $data = array(
                             'id'      => $_POST['product_id'],
                             'qty'     => 1,
-                            'price'   => $_POST['product_price'],
+                            'price'   => $_POST['product_price'] ,
                             'name'    => $_POST['product_name'],
                             'availablequantity' => $_POST['availablequantity'],
                             'product_pic' => $_POST['product_pic'],
@@ -2476,11 +2531,11 @@ else
  
                 }
                 else {
-                    if($items['id']==$_POST['product_id'] && $items['price']!=$_POST['product_price']){
+                    if($items['id']==$_POST['product_id']){
                         $data = array(
                             'id'      => $_POST['product_id'],
                             'qty'     => 1,
-                            'price'   => $items['price'],
+                            'price'   =>$_POST['product_price'],
                             'name'    => $_POST['product_name'],
                             'availablequantity' => $_POST['availablequantity'],
                             'product_pic' => $_POST['product_pic'],
@@ -2490,7 +2545,8 @@ else
                             'actual_price' => $_POST['product_price']
                     
                             );
-                            echo $this->cart->insert($data);
+                      
+                            $this->cart->insert($data); 
                             exit(); 
 
                     }
@@ -2508,7 +2564,8 @@ else
                             'actual_price' => $_POST['product_price']
                     
                             );
-                            echo $this->cart->insert($data);
+                            
+                            $this->cart->insert($data); 
                             exit(); 
                     }
 
@@ -2648,6 +2705,8 @@ else
                 'sh_products_id' => $items['id'],
                     'quantity' => $items['qty'],
                     'shopping_hold_id' => $resultsaveholdcenter,
+                    'product_code' => $items['product_code'], 
+                    'actual_price' => $items['actual_price']
 
                 );
                 $result = $this->main_model->saveproductsforhold($data);
@@ -2700,7 +2759,8 @@ else
                 'choosen_quantity' => $currentQuantity,
                 'status' => 1,
                 'sub_total' => $items['price'], 
-                'actual_price' => $items['actual_price']
+                'actual_price' => $items['actual_price'],
+                'product_code_no' => $items['product_code']
             );
 
             $datafordetailsproduct = array(
@@ -2744,9 +2804,11 @@ else
 
 
     public function deletesessionforcarts(){
+        $this->load->library("cart");
        
-       $this->cart->destroy();
-       $this->session->set_userdata('mainbalance',0);
+        $this->cart->destroy();
+      $this->session->set_userdata('mainbalance',0);
+       
     }
 
     public function getordersummeryid(){
@@ -2944,20 +3006,20 @@ else
         </td>
         <td class="text-center">
             <div class="m-btn-group m-btn-group--pill btn-group mr-2" role="group" aria-label="...">
-                <button type="button" class="m-btn btn btn-default decreasequantity" qty="<?php echo $items['qty']?>"  rowid="<?php echo $items['rowid']?>"><i class="fa fa-minus"></i></button>
-                <input type="tel" rowid="<?php echo $items['rowid']?>" class="fullquantity_fromcashier text-center" value="<?php echo $items['qty']?>" style="max-width:50px;">
+                <button type="button" myid="<?php echo $items['id']?>" class="m-btn btn btn-default decreasequantity" qty="<?php echo $items['qty']?>"  rowid="<?php echo $items['rowid']?>"><i class="fa fa-minus"></i></button>
+                <input type="tel"   availablequantity="<?php echo $items['availablequantity']?>" rowid="<?php echo $items['rowid']?>" class="fullquantity_fromcashier text-center" value="<?php echo $items['qty']?>" style="max-width:50px;">
 <!--
                 <button type="button" class="m-btn btn btn-default fullquantity" readonly>
                     <?php echo $items['qty']?>
                 </button>
 -->
-                <button type="button" class="m-btn btn btn-default increasequantity" qty="<?php echo $items['qty']?>" rowid="<?php echo $items['rowid']?>"><i class="fa fa-plus"></i></button>
+                <button type="button" availablequantity="<?php echo $items['availablequantity']?>" myid="<?php echo $items['id']?>" class="m-btn btn btn-default increasequantity <?php echo $items['rowid']?>" qty="<?php echo $items['qty']?>" rowid="<?php echo $items['rowid']?>"><i class="fa fa-plus"></i></button>
             </div>
         </td>
     <?php
             $this->session->set_userdata('row_id', $items['rowid']);
         ?>
-        <td>
+        <td class="product_quantity_xs_time" rowid="<?php echo $items['rowid']?>">
  
             <?php echo $items['product_code']?>
         </td>
@@ -3043,6 +3105,22 @@ $this->cart->update($data);
 
 
     }
+
+    public function increasequantitybybarcode(){
+        $rowid = $this->security->xss_clean($_POST['rowid']); 
+        $qty = 1; 
+
+        $data = array(
+            'rowid' => $rowid,
+            'qty'   => ($qty + 1)
+            );
+    
+  $result = $this->cart->update($data);
+            echo $result; 
+    
+    } 
+
+
 
     public function deleteproductforcart(){
         $rowid = $this->security->xss_clean($_POST['rowid']);
@@ -4616,8 +4694,7 @@ public function select_postponed(){
         $this->session->set_userdata('to_to_search_purdate_session',$to_to_search_purdate); 
         $this->session->set_userdata('status_checker_session',$status_cehcker); 
 
-
-         $result = $this->main_model->showoffsalesunitsectionbysearch($from_to_search_purdate,$to_to_search_purdate,$status_cehcker, $this->session->outlet_id); 
+          $result = $this->main_model->showoffsalesunitsectionbysearch($from_to_search_purdate,$to_to_search_purdate,$status_cehcker, $this->session->outlet_id); 
          echo json_encode($result); 
          
      }
@@ -4656,12 +4733,7 @@ public function select_postponed(){
         echo json_encode($result); 
     }
 
-
-
-
-
-     //meow
-
+ 
      public function savecreditdetailsbyregisterfromcash(){
          $saveabledata = $this->security->xss_clean($_POST['saveabledata']); 
          $todaydate = $this->security->xss_clean($_POST['todaydate']); 
@@ -4729,12 +4801,14 @@ public function select_postponed(){
          $fromdate = $this->security->xss_clean($_POST['fromdate']); 
          $todate = $this->security->xss_clean($_POST['todate']); 
          $paymentmethod = $this->security->xss_clean($_POST['paymentmethod']); 
+         $mobile = $this->security->xss_clean($_POST['mobile']); 
 
          $this->session->set_userdata('fromdateforpaidloan',$fromdate); 
          $this->session->set_userdata('todateforpaidloan',$todate); 
          $this->session->set_userdata('payment_method',$paymentmethod); 
+         $this->session->set_userdata('mobileforloanamount',$mobile); 
 
-        $result = $this->main_model->getloanpaymentmentcheckmethod($fromdate,$todate, $paymentmethod, $this->session->outlet_id); 
+        $result = $this->main_model->getloanpaymentmentcheckmethod($fromdate,$todate, $paymentmethod, $this->session->outlet_id,$mobile); 
         echo json_encode($result); 
 
      }
@@ -4744,8 +4818,10 @@ public function select_postponed(){
         $fromdate = $this->session->fromdateforpaidloan; 
         $todate = $this->session->todateforpaidloan; 
         $paymentmethod = $this->session->payment_method; 
+        
 
-        $data['results'] = $this->main_model->filterdataforprint($fromdate,$todate,$paymentmethod, $this->session->outlet_id);
+
+        $data['results'] = $this->main_model->filterdataforprint($fromdate,$todate,$paymentmethod, $this->session->outlet_id, $this->session->mobileforloanamount);
          
         
 
@@ -5102,11 +5178,10 @@ public function select_postponed(){
         $last_insert_id = $this->main_model->savecashamount($orderdetailsarray);
         $this->session->set_userdata('last_insert_id',$last_insert_id);
 
-        echo $last_insert_id; 
 
          
 
-        if($paying_amount_given < $recieved_amount){
+        if($paying_amount_given > $recieved_amount){
             $credit_data = array(
                 'sales_credit_amount' => $balance_amount,
                 'summery_id_fk' => $last_insert_id, 
@@ -5114,6 +5189,7 @@ public function select_postponed(){
             );
             $this->main_model->savecreditamountnow($credit_data);
         }
+        echo $last_insert_id; 
 
 
 
@@ -5147,6 +5223,8 @@ public function select_postponed(){
         $chequestatus = 'Pending';
 
         $balanceamount = floatval(($paying_amount_given - $recieved_amount)); 
+
+        $this->session->set_userdata('addtional_information',$paywithcheck_additoinalinformation); 
 
         $orderedstatus = 1;
         $orderdetailsarray = array(

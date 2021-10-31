@@ -327,7 +327,12 @@ $(document).ready(function () {
         
         let balance = 0.00; 
 
-        let answer =  current_quantity_for_outlet - out_let_qty; 
+        if(out_let_qty > current_quantity_for_outlet){
+            alert("It exceeds its maximum quantity");
+            alert("Its maximum quantity is "+ current_quantity_for_outlet);  
+            $('#out_let_qty').val(current_quantity_for_outlet); 
+            return false; 
+        }
         
         let outlet_name = parseInt($('#outlet_name').val());
         let hidden_product_id = parseInt($('#hidden_product_id').val());

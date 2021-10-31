@@ -1,0 +1,80 @@
+<?php if($products==0):?>
+<span class="text text-danger font-weight-bold">No product found for this outlet</span>
+                    <?php else:?>
+                    <?php foreach($products as $product):?>
+                    <?php if($product->product_quantity!=0):?>
+                    <div class="col-md-6 product_wrapper">
+                        <figure class="card card-product">
+
+                            <span class="badge badge-info">Available</span>
+                            <div class="img-wrap">
+                                <?php if(substr($product->product_pic,0,5)=='https'):?>
+                                <img src="<?= $product->product_pic?>">
+                                <?php else:?>
+                                <img src="<?php echo base_url()?>assets/img/uploaded_photos/<?php echo $product->product_pic?>" class="img-fluid h-40">
+                                <?php endif;?>
+                             </div>
+                            <figcaption class="info-wrap">
+                                <a href="#" class="title">
+                                    <?php echo $product->product_name?><br>
+                                    <?php echo $product->products_code?><br>
+                                </a>
+                                <span> (<?php echo $product->product_unit?>)</span> <br/>
+                                <span class='text text-secondary font-weight-bold'>QTY : <?php echo $product->product_quantity?></span>
+                                <div class="action-wrap">
+                                    <a href="#" class="btn btn-primary btn-sm float-right btnaddshoppingcart" 
+                                    product_price="<?php echo $product->product_price;?>" 
+                                    product_name="<?php echo trim($product->product_name)?>" 
+                                    product_id="<?php echo $product->products_id?>"
+                                     product_pic="<?=$product->product_pic?>"
+                                      product_code='<?= $product->products_code?>' 
+                                      product_unit="<?= $product->product_unit?>"
+                                     availablequantity=<?php echo $product->product_quantity?>
+                                      
+                                    > <i class="fa fa-cart-plus"></i> Add </a>
+                                    <div class="price-wrap h5">
+                                        <span class="price-new">Rs.<?php echo number_format($product->product_price,2);?></span>
+                                    </div>
+                                    <!-- price-wrap.// -->
+                                </div>
+                                <!-- action-wrap -->
+                            </figcaption>
+                        </figure>
+                        <!-- card // -->
+                    </div>
+                    <?php else:?>
+                    <div class="col-md-9 product_wrapper" id='showproductdetailsection'>
+                        <figure class="card card-product">
+
+                            <span class="badge badge-danger">Out of stock</span>
+                            <div class="img-wrap">
+                                <?php if(substr($product->product_pic,0,5)=='https'):?>
+                                <img src="<?= $product->product_pic?>">
+                                <?php else:?>
+                                <img src="<?php echo base_url()?>assets/img/uploaded_photos/<?php echo $product->product_pic?>">
+                                <?php endif;?>
+
+                            </div>
+                            <figcaption class="info-wrap">
+                                <a href="#" class="title">
+                                    <?php echo $product->product_name?>
+                                </a>
+                                <div class="action-wrap">
+                                    <button class="btn btn-primary btn-sm float-right" disabled> <i class="fa fa-cart-plus"></i> Add </button>
+                                    <div class="price-wrap h5">
+                                        <span class="price-new">Rs.<?php echo number_format($product->product_price,2);?></span>
+                                    </div>
+                                    <!-- price-wrap.// -->
+                                </div>
+                                <!-- action-wrap -->
+                            </figcaption>
+                        </figure>
+                        <!-- card // -->
+                    </div>
+                    <?php endif;?>
+
+                    <!-- col // -->
+
+                    <?php endforeach;?>
+                    <?php endif;?>
+

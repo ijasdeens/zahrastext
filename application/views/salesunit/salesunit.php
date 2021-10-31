@@ -254,7 +254,7 @@
                     </div>
 
                     <div class="d-flex flex-row">
-                        <div class="p-2 d-none" id="customer_tag">Customer :</div>
+                        <div class="p-2 d-none" id="customer_tag">Customer</div>
                         <div class="p-2 d-none" id="customertypechosensection">
                             <div class="input-group">
                                 <input type="tel" class="form-control" placeholder="Search by mobile number" id="mobilenumberforcutomersearch">
@@ -265,6 +265,10 @@
                                 </div>
                             </div>
                             <span class="text" id="messagesectionoffound"></span>
+                            <div>
+                                Name : <span class="font-weight-bold text-danger" id='customer_name_text'></span> <br>
+                                Address : <span class="font-weight-bold text-danger" id='customer_address_text'></span>
+                            </div>
                         </div>
 
 
@@ -528,87 +532,7 @@
         <i class="fa fa-tags "></i>  Category 5</a></li>
                     </ul>
                     <span id="items">
-<div class="row all_products_cracker">
-<?php if($products==0):?>
-<span class="text text-danger font-weight-bold">No product found for this outlet</span>
-                    <?php else:?>
-                    <?php foreach($products as $product):?>
-                    <?php if($product->product_quantity!=0):?>
-                    <div class="col-md-6 product_wrapper">
-                        <figure class="card card-product">
-
-                            <span class="badge badge-info">Available</span>
-                            <div class="img-wrap">
-                                <?php if(substr($product->product_pic,0,5)=='https'):?>
-                                <img src="<?= $product->product_pic?>">
-                                <?php else:?>
-                                <img src="<?php echo base_url()?>assets/img/uploaded_photos/<?php echo $product->product_pic?>" class="img-fluid h-40">
-                                <?php endif;?>
-                             </div>
-                            <figcaption class="info-wrap">
-                                <a href="#" class="title">
-                                    <?php echo $product->product_name?><br>
-                                    <?php echo $product->products_code?><br>
-                                </a>
-                                <span> (<?php echo $product->product_unit?>)</span> <br/>
-                                <span class='text text-secondary font-weight-bold'>QTY : <?php echo $product->product_quantity?></span>
-                                <div class="action-wrap">
-                                    <a href="#" class="btn btn-primary btn-sm float-right btnaddshoppingcart" 
-                                    product_price="<?php echo $product->product_price;?>" 
-                                    product_name="<?php echo trim($product->product_name)?>" 
-                                    product_id="<?php echo $product->products_id?>"
-                                     product_pic="<?=$product->product_pic?>"
-                                      product_code='<?= $product->products_code?>' 
-                                      product_unit="<?= $product->product_unit?>"
-                                     availablequantity=<?php echo $product->product_quantity?>
-                                      
-                                    > <i class="fa fa-cart-plus"></i> Add </a>
-                                    <div class="price-wrap h5">
-                                        <span class="price-new">Rs.<?php echo number_format($product->product_price,2);?></span>
-                                    </div>
-                                    <!-- price-wrap.// -->
-                                </div>
-                                <!-- action-wrap -->
-                            </figcaption>
-                        </figure>
-                        <!-- card // -->
-                    </div>
-                    <?php else:?>
-                    <div class="col-md-9 product_wrapper">
-                        <figure class="card card-product">
-
-                            <span class="badge badge-danger">Out of stock</span>
-                            <div class="img-wrap">
-                                <?php if(substr($product->product_pic,0,5)=='https'):?>
-                                <img src="<?= $product->product_pic?>">
-                                <?php else:?>
-                                <img src="<?php echo base_url()?>assets/img/uploaded_photos/<?php echo $product->product_pic?>">
-                                <?php endif;?>
-
-                            </div>
-                            <figcaption class="info-wrap">
-                                <a href="#" class="title">
-                                    <?php echo $product->product_name?>
-                                </a>
-                                <div class="action-wrap">
-                                    <button class="btn btn-primary btn-sm float-right" disabled> <i class="fa fa-cart-plus"></i> Add </button>
-                                    <div class="price-wrap h5">
-                                        <span class="price-new">Rs.<?php echo number_format($product->product_price,2);?></span>
-                                    </div>
-                                    <!-- price-wrap.// -->
-                                </div>
-                                <!-- action-wrap -->
-                            </figcaption>
-                        </figure>
-                        <!-- card // -->
-                    </div>
-                    <?php endif;?>
-
-                    <!-- col // -->
-
-                    <?php endforeach;?>
-                    <?php endif;?>
-
+<div class="row all_products_cracker" id='outletproductdetailsection'>
 
 
                 </div>
@@ -767,6 +691,8 @@
                             <tr>
                             <th>Product Name</th>
                             <th>Quantity</th>
+                            <th>product code</th>
+                            <th>Actual price</th>
                             <th>Price</th>
                             <th>Sub total</th>
                             </tr>
@@ -798,6 +724,28 @@
                                 </tr>
                             </thead>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="modal fade" id='modal_open_section_for_checkpassword'>
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="text text-danger font-weight-bold">Check password for deleting</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form action="#" method='POST'>
+                            <div class="form-group">
+                                <label for="password">Type your password</label>
+                                <input type="password" class="form-control" id='password_checkerforinvoice' placeholder="Please enter your login password here to verify">
+                            </div>
+                            <div class="form-group">
+                                <button class="btn btn-info btn-sm form-control" type='button' id='verifybuttontoinvoicedelete'>Verify</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -847,6 +795,10 @@
                                            <option value="Cash">Cash</option>
                                            <option value="Credit">Credit</option>
                                        </select>
+                                   </div>
+                                   <div class="col">
+                                       <label for="">Mobile NO or Invoice NO</label>
+                                       <input type="text" class="form-control" id='mobile_no_or_invoice_text' placeholder="Mob/Invoice">
                                    </div>
                                    <div class="col">
                                      
@@ -949,6 +901,10 @@
                                              <label for="to">To</label>
                                              <input type="date" class='form-control' id='to_date_fr_loan'>
                                          </div>
+                                         <div>
+                                             <label for="mobile_date_fr_section">Mob : </label>
+                                             <input type="tel" placeholder="Ex : 07589531...." class="form-control" id='mobile_date_fr_section'>
+                                         </div>
                                          <div class="col">
                                              <label for="status">Payment method</label>
                                              <select id="payment_method_forloan" class='form-control'>
@@ -962,8 +918,17 @@
                                         <br>
                                         <a target="_blank" href="<?php echo base_url()?>Controllerunit/paidloanprint" class="btn btn-primary my-2 py-2">Print <i class="fa fa-print" aria-hidden='true'></i></a> 
                                         </div>
+
+                                        <br>
+                                        
                                            
                                      </div>
+                                        <div class="my-2">
+                                            <div class="my-2">
+                                                <span class="text text-primary font-weight-bold">Total paid amount : </span> <span class="text text-info font-weight-bold" id='total_paidamounthtml'></span> <br>
+                                                <span class="text text-primary font-weight-bold">Total amount to be paid : </span> <span class="text text-info font-weight-bold" id='total_amonttoebpaid'></span>
+                                            </div>
+                                        </div>
                                      <div class="">
                                          <div class="table tabel-responsive">
                                              <table class="table table-striped table-responsive">
@@ -1159,7 +1124,7 @@
 
            </div>
              <div class="modal-body">
-                <form method='POST' id='paybycashfrm'>
+                <form method='POST' id='#'>
                 <div class="form-group">
                 <label for="cash">Paying amount</label>
                 <input type="tel" class='form-control' disabled id='total_amount_cash'>
@@ -1187,7 +1152,7 @@
                 </div>
 
                 <div class="form-group">
-                <input type="submit" value="Pay" class="form-control btn btn-outline-success btn-lg">
+                <input type="button" id='paybycashbutton' value="Pay" class="form-control btn btn-outline-success btn-lg">
                 </div>
                 </form>
              </div>
@@ -1204,7 +1169,7 @@
         <h4>Pay with Credit</h4>
                         </div>
                         <div class="modal-body">
-                            <form method='POST' id='frm_paycreditsection'>
+                            <form method='POST' id='#'>
                                 <div class="form-group">
                                     <label>Amount</label>
                                     <input type="text" class='form-control' id='amount_for_credit_details' readonly>
@@ -1214,7 +1179,7 @@
                                     <textarea class="form-control" id='sec_additional_information'></textarea>
                                 </div>
                                 <div class="form-group">
-                                    <input type="submit" class='form-control btn btn-success btn-lg' value='submit'>
+                                  <button type='button' class="form-control btn btn-success btn-lg" id='savecreditamountsectionbutton'>Submit</button>
                                 </div>
                             </form>
                         </div>
@@ -1269,7 +1234,7 @@
          </div>
 
          <div class="form-group">
-         <input type="submit" class='form-control btn btn-outline-success' value='PAY'>
+        <button type='button' id='submitformamountsectionforchecks' class="form-control btn btn-outline-success">Submit</button>
          </div>
          </form>
         </div>
@@ -1452,8 +1417,7 @@
 <input type="hidden" id="invoice_id_hidden">
 
 
-
-
+ 
 <input type="hidden" id="hidden_order_summery_id">
 
 <!--    Return invoice    -->
@@ -1551,7 +1515,7 @@
                 </div>
                 <div class="form-group">
                     <label for="">Note for expense</label>
-                    <input type="text" class="form-control" id="note_for_expense_section">
+                    <input type="text" class="form-control" id="note_for_expense_section"/>
                 </div>
                 <div class="form-group">
                     <button type="submit" class="form-control btn btn-outline-success btn-sm">SAVE <i class="fa fa-save"></i></button>

@@ -246,6 +246,43 @@ class Main_model extends CI_Model {
 
     }
 
+    public function subtractamountsection($total_amount_todelete,$ordereddate, $paymentmethods, $outletid){
+        if($paymentmethods=="Cash"){
+           return $this->db->query("update register_details_section set cash_payment=(cash_payment - ".$total_amount_todelete.") where date='".$ordereddate."' and outlet_id=".$outletid.""); 
+        }
+
+        if($paymentmethods=="Cheque"){
+           return $this->db->query("update register_details_section set cheque_payment=(cheque_payment - ".$total_amount_todelete.") where date='".$ordereddate."' and outlet_id=".$outletid.""); 
+
+        }
+      
+        if($paymentmethods=="Credit"){
+           return $this->db->query("update register_details_section set credit_payment=(credit_payment - ".$total_amount_todelete.") where date='".$ordereddate."' and outlet_id=".$outletid.""); 
+
+        }
+
+
+    }
+
+    public function deleteinvoicesection($orderid){
+        return $this->db->where('order_summery_id',$orderid)->delete('order_summery'); 
+    }
+
+    public function checkpasswordsection($password, $cashierid){
+
+         $this->db->select('*'); 
+        $this->db->from('staff');
+        $this->db->where('staff_id', $cashierid); 
+        $this->db->where('password',$password); 
+        $result = $this->db->get(); 
+        if($result->num_rows() > 0) {
+            return 1; 
+        } 
+        else {
+            return 0; 
+        }
+    }
+
 
     public function searchmobilenumber($value){
         $this->db->select('*');
@@ -327,7 +364,7 @@ class Main_model extends CI_Model {
     }
 
     public function list_all_holdshowoffproduct($id){
-        $this->db->select('shopping_hold_products.quantity,products_section.product_name,products_section.product_price');
+        $this->db->select('shopping_hold_products.quantity,products_section.product_name,products_section.product_price,shopping_hold_products.product_code,shopping_hold_products.actual_price');
         $this->db->from('shopping_hold_products');
         $this->db->join('products_section','products_section.products_id=shopping_hold_products.sh_products_id');
         $this->db->where('shopping_hold_products.shopping_hold_id',$id);
@@ -342,7 +379,7 @@ class Main_model extends CI_Model {
 
 
     public function getproductback($id){
-        $this->db->select('products_section.product_unit,products_section.product_pic,products_for_outlet.product_quantity,products_section.products_id,shopping_hold_products.quantity,products_section.product_name,products_section.product_price');
+        $this->db->select('products_section.product_unit,products_section.product_pic,products_for_outlet.product_quantity,products_section.products_id,shopping_hold_products.quantity,products_section.product_name,products_section.product_price,shopping_hold_products.product_code,shopping_hold_products.actual_price');
         $this->db->from('shopping_hold_products');
         $this->db->join('products_section','products_section.products_id=shopping_hold_products.sh_products_id');
         $this->db->join('products_for_outlet','products_for_outlet.product_id=products_section.products_id');
@@ -1167,8 +1204,8 @@ class Main_model extends CI_Model {
         }
     }
 
-    public function filterdataforprint($fromdate, $todate, $paymentmethod, $outletid){
-        $this->db->select('customer_name,customer_mobile,loan_balance_amount,invoiceidsec'); 
+    public function filterdataforprint($fromdate, $todate, $paymentmethod, $outletid,$mobile){
+        $this->db->select('customer_name,customer_mobile, loan_recieving_amount as loan_balance_amount,invoiceidsec'); 
         $this->db->from('loanpaiddetails'); 
         if($fromdate!=""){
             $this->db->where('date>=',$fromdate); 
@@ -1179,6 +1216,11 @@ class Main_model extends CI_Model {
         if($paymentmethod!=""){
             $this->db->where('loan_paid_method',$paymentmethod); 
         }
+
+        if($mobile!=""){
+            $this->db->where('customer_mobile',$mobile); 
+        }
+
         $this->db->where('outlet_id_fk',$outletid); 
         $this->db->order_by('lgid','desc'); 
         $result = $this->db->get(); 
@@ -1191,7 +1233,7 @@ class Main_model extends CI_Model {
         
     }
 
-    public function getloanpaymentmentcheckmethod($fromdate, $todate, $paymentmethod, $outletid ){
+    public function getloanpaymentmentcheckmethod($fromdate, $todate, $paymentmethod, $outletid, $mobile){
         $this->db->select('*'); 
         $this->db->from('loanpaiddetails');
         if($fromdate!=null){
@@ -1203,6 +1245,11 @@ class Main_model extends CI_Model {
         if($paymentmethod!=null){
             $this->db->where('loan_paid_method',$paymentmethod); 
         }
+
+        if($mobile!=null){
+            $this->db->where('customer_mobile',$mobile);
+        }
+
         $this->db->where('outlet_id_fk',$outletid); 
         $this->db->order_by('lgid','desc'); 
         $result = $this->db->get(); 
@@ -1835,7 +1882,7 @@ class Main_model extends CI_Model {
         $this->db->join('brands','brands.brands_id=products_section.brand_id','left'); 
         $this->db->join('main_categories','main_categories.main_categoriesid=products_section.category_id','left'); 
         $this->db->join('sub_category','sub_category.sub_categoryid=products_section.sub_categoryid','left');
-        $this->db->where('products_for_outlet.product_id',$value); 
+        $this->db->where('products_for_outlet.outlet_id',$value); 
         $result = $this->db->get(); 
         if($result->num_rows() > 0) {
             return $result->result(); 
