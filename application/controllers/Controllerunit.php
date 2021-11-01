@@ -1703,7 +1703,7 @@ else
          
         if( $checkapsswordresult==1){
             
-            $this->main_model->deleteinvoicesection($order_id); 
+            $this->main_model->deleteinvoicesection($order_id, $this->session->outlet_id); 
              
             $subtractamountresult = $this->main_model->subtractamountsection($total_amount_todelete,$ordereddate,$payment_method, $this->session->outlet_id); 
 
@@ -3136,6 +3136,8 @@ $this->cart->update($data);
 
 
     public function removeallincart(){
+        $this->session->set_userdata('subtractedamountfromtotal',0); 
+        $this->session->set_userdata('mainbalance',0); 
         $this->cart->destroy();
     }
 
@@ -5273,7 +5275,7 @@ public function select_postponed(){
     }
     
 
-
+    //hulk
     public function savesubtractedamounttocache(){
         $answer = $this->security->xss_clean($_POST['answer']); 
         echo $this->session->set_userdata('subtractedamountfromtotal',$answer); 

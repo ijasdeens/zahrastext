@@ -1451,6 +1451,8 @@ $(document).ready(function () {
 	});
 
 	const reduceProductQuantity = (lastinsertid) => {
+		savetemporarydateforsale();
+		   
 		$.ajax({
 			url: base_url + "Controllerunit/reduceProductQuantity",
 			method: "POST",
@@ -2247,6 +2249,8 @@ ${
 			success: function (data) {
 				console.log(data);
 				fetchAllshoppingcartdata();
+				fetchDatafordiscount(); 
+				fetchallindividualdiscount(); 
 
 				//                                   $.ajax({
 				//                            url: base_url + 'Controllerunit/gotoreturnsalesunit',

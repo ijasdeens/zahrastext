@@ -264,7 +264,21 @@ class Main_model extends CI_Model {
 
     }
 
-    public function deleteinvoicesection($orderid){
+    public function deleteinvoicesection($orderid,$outletid){
+
+                $this->db->select('product_id,choosen_quantity'); 
+                $this->db->from('order_details'); 
+                $this->db->where('summery_id',$orderid); 
+                $result = $this->db->get(); 
+
+            if($result->num_rows() > 0) {
+                foreach($result->result() as $res){
+                    $chosenquantity = $res->choosen_quantity; 
+                    $productidsection = $res->product_id; 
+                    $this->db->query("update products_for_outlet set product_quantity=(product_quantity + ".$chosenquantity.") where product_id=".$productidsection." and outlet_id=".$outletid.""); 
+                }
+            }
+
         return $this->db->where('order_summery_id',$orderid)->delete('order_summery'); 
     }
 
