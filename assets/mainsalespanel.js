@@ -3,6 +3,675 @@ $(document).ready(function () {
 
 	sessionStorage.setItem('sessionchecker',1); 
 
+	sessionStorage.setItem('checklinessid','asd'); 
+
+		const setdatesforsumemry = (fromdate='', todate='') => {
+		$.ajax({
+			url: base_url + "Controllerunit/setdatesforsumemry",
+			method: "POST",
+			async:false, 
+			data: {
+				fromdate: fromdate,
+				todate:todate, 
+				todaydate : getfulldate()
+			},
+			success: function (data) {
+				//console.log('Setting date for summery', data); 
+			},
+			error: function (err) {
+				alert('Error from setting date', err); 
+				console.error("Error found from setting date for summery", err);
+			},
+		});
+
+	}
+	setdatesforsumemry(); 
+
+		function retriewdataforexpiredata(){
+
+		let count = 0; 
+		let html = '';
+
+		let mutedhtml = ''; 
+		
+		let currentdate = getfulldate(); 
+
+		let count_mutedproducts = 0 
+
+
+		let counted_systemforfront = 0; 
+
+		$.ajax({
+			url: base_url + "Controllerunit/retriewdataforexpiredata",
+			method: "POST",
+			success: function (data) {
+			let getData = JSON.parse(data); 
+			if(getData==1){
+				$('#product_details_outlet_expired_showoff').html('<span class="text text-danger font-weight-bold">NO DATA FOUND</span>');
+				$('#expired_date_count').html(count);
+				$('#muted_products_count').html(count_mutedproducts); 
+
+				return false; 
+			}
+			else {
+				  getData.map(d => {
+					  if(d.mute_option==1){
+						counted_systemforfront++;
+						  ++count;
+						html+=`<tr class="text text-center">
+						<td>${count}</td>
+						<td>${d.product_name}</td>
+						<td>${d.product_unit}</td>
+						<td>${d.mfd}</td>
+						<td>${d.exp}</td>
+						<td>${d.products_code}</td>
+						<td>Rs.${parseFloat(d.product_price).toFixed(2)}</td>
+						<td>
+						${d.exp <=currentdate ? '<span class="badge badge-danger font-weight-bold">EXPIRED</span>' : '<span class="badge badge-warning">EXPIRING SOON</span>'}
+						</td>
+						<td>
+						 ${d.mute_option==1 ? `<button product_id_fk="${d.product_id_fk}" class="btn btn-outline-danger muteexpproduct btn-sm">MUTE</button>` : `<button class="btn btn-info btn-sm muteexpproduct" product_id='${d.product_id_fk}'>UNMUTE</button>`}
+						</td>
+	
+						</tr>`;
+
+					  }
+					  else {
+						 ++count_mutedproducts;
+						mutedhtml+=`<tr class="text text-center">
+						<td>${++count}</td>
+						<td>${d.product_name}</td>
+						<td>${d.product_unit}</td>
+						<td>${d.mfd}</td>
+						<td>${d.exp}</td>
+						<td>${d.products_code}</td>
+						<td>Rs.${parseFloat(d.product_price).toFixed(2)}</td>
+						<td>
+						${d.exp <=currentdate ? '<span class="badge badge-danger font-weight-bold">EXPIRED</span>' : '<span class="badge badge-warning">EXPIRING SOON</span>'}
+						</td>
+						<td>
+						 ${d.mute_option==1 ? `<button product_id_fk="${d.product_id_fk}" class="btn btn-outline-danger muteexpproduct btn-sm">MUTE</button>` : `<button class="btn btn-info btn-sm unmuteexpproduct" product_id='${d.product_id_fk}'>UNMUTE</button>`}
+						</td>
+	
+						</tr>`;
+					  }
+					  $('#expired_date_count').html(counted_systemforfront);
+					  $('#muted_products_count').html(count_mutedproducts); 
+				  }); 
+				
+				
+
+				  $('#product_details_outlet_expired_showoff').html(html);
+				  $('#muted_product_details_outlet_expired_showoff').html(mutedhtml);
+			}
+			 
+			},
+			error: function (err) {
+				console.error("Retrieve expired date", err);
+			},
+		});
+
+	}
+
+	
+ 
+ function getloanpaymentmentcheckmethod(fromdate = null, todate = null, paymentmethod = null, mobile = null ) {
+
+	let count = 0; 
+	let html = ''; 
+
+
+	let totalpaidamount = 0.00; 
+	let totalamounttobepaid = 0.00; 
+
+	$.ajax({
+		url: base_url + "Controllerunit/getloanpaymentmentcheckmethod",
+		method: "POST",
+		async:false, 
+		data: {
+			 fromdate:fromdate, 
+			 todate:todate, 
+			 paymentmethod:paymentmethod, 
+			 mobile:mobile 
+		},
+		success: function (data) {
+			 let getData = JSON.parse(data); 
+			 if(getData==0){
+				$("#loanpaymentmentcheckmethod").html('<tr><td><span class="text text-danger font-weight-bold">No data found</span></td></tr>');
+				$('#total_paidamounthtml').html('Rs. 0.00'); 
+				$('#total_amonttoebpaid').html('Rs. 0.00'); 
+				return false; 
+			 }
+			 else {
+				 getData.map(d => {
+					totalpaidamount+=parseFloat(d.loan_recieving_amount); 
+					totalamounttobepaid+=parseFloat(d.loan_balance_amount); 
+
+					html+=`<tr>
+					<td>${++count}</td>
+					<td>${d.invoiceidsec}</td>
+					<td>${d.customer_name}</td>
+					<td>${d.customer_mobile}</td>
+					<td>${d.customer_address}</td>
+					<td>Rs.${parseFloat(d.loan_previous_amount).toFixed(2)}</td>
+					<td>Rs.${parseFloat(d.loan_recieving_amount).toFixed(2)}</td>
+					<td>Rs. ${parseFloat(d.loan_balance_amount).toFixed(2)}</td>
+					<td>${d.loan_paid_method=='Check' ? '<span class="badge badge-info">Check</span>' : '<span class="badge badge-success">Cash</span>'}</td>
+					<td>${d.date}</td>
+					</tr>`;
+				 }); 
+
+				 $('#loanpaymentmentcheckmethod').html(html); 
+				 $('#total_paidamounthtml').html('Rs.'+parseFloat(totalpaidamount).toFixed(2)); 
+				 $('#total_amonttoebpaid').html('Rs.'+parseFloat(totalamounttobepaid).toFixed(2)); 
+
+			 }
+		},
+		error: function (err) {
+			console.error("Error found", err);
+		},
+	});
+
+}
+
+getloanpaymentmentcheckmethod(); 
+
+	 const getallsupplierchequedetails = (fromdate=null, todate=null, checkstatus = null ) => {
+
+	let html = ''; 
+	let count = 0; 
+
+	let statuschecker = ''; 
+
+	let pending_count = 0; 
+	let complete_count = 0; 
+	let bounce_count = 0; 
+
+
+	let completed_amount = 0.00; 
+	let pending_amount = 0.00; 
+	let bounce_amount = 0.00; 
+
+
+	let total_count_to_showofftoout = 0; 
+
+	$.ajax({
+		url: base_url + "Controllerunit/getsuppliercheckdetails",
+		method: "POST",
+		data:{
+			fromdate:fromdate,
+			todate:todate,
+			checkstatus:checkstatus
+		}, 
+		success: function (data) {
+			 let getData = JSON.parse(data); 
+		 
+			 console.log('Get supplier details',getData); 
+			 if(getData==0){
+				 $('#getsupplier_detailsforgettingarea').html('<span class="text text-danger font-weight-bold">No data found</span>'); 
+			 }
+			 else {
+				getData.map(d => {
+					if(d.cheque_status=='completed'){
+						statuschecker = '<span class="badge badge-success">Completed</span>'; 
+						completed_amount+=parseFloat(d.amount).toFixed(2);
+						complete_count+=1; 
+					}
+					else if(d.cheque_status=='bounce'){
+						statuschecker = '<span class="badge badge-danger">bounced</span>'; 
+						bounce_amount+=parseFloat(d.amount).toFixed(2); 
+						bounce_count+=1; 	
+					}
+					else {
+						statuschecker = '<span class="badge badge-warning">Pending</span>'; 
+						pending_amount+=parseFloat(d.amount).toFixed(2);
+						pending_count+=1;
+					}
+
+					total_count_to_showofftoout+=(bounce_count + pending_count); 
+
+					html+=`<tr class="text text-center">
+					<td>${++count}</td>
+					<td>${d.supplier_name}</td>
+					<td>${d.mobile_number}</td>
+					<td>${d.org_name}</td>
+					<td>${d.supplier_addresses}</td>
+					<td>${d.supplier_accountno}</td>
+					<td>${d.bank_name}</td>
+					<td>${d.branch_name}</td>
+					<td>${d.account_no}</td>
+					<td>${d.cheque_date}</td>
+					<td>${statuschecker.toString()}</td>
+					<td>${d.note}</td>
+					<td>${parseFloat(d.amount).toFixed(2)}</td>
+					<td>
+					<div class="dropdown show">
+  <a class="btn btn-info dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Status action
+  </a>
+
+  <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+    <a class="dropdown-item status_action_pending" chques_id_fk='${d.chques_id_fk}' href="#">Pending</a>
+    <a class="dropdown-item status_action_bounce" chques_id_fk='${d.chques_id_fk}' href="#">Bounce</a>
+    <a class="dropdown-item statis_action_completed" chques_id_fk='${d.chques_id_fk}' href="#">Completed</a>
+  </div>
+</div>
+					</td>
+				 
+					</tr>`;
+				}); 
+
+				$('#getsupplier_detailsforgettingarea').html(html);
+				$('#check_details_count_for_moving').html(total_count_to_showofftoout); 
+				
+	$('#total_completed_amount').html('Rs.'+parseFloat(completed_amount).toFixed(2)); 
+	$("#total_amount_of_pending_checks").html('Rs.'+parseFloat(pending_amount).toFixed(2));
+	$('#total_amount_bounced_checks').html('Rs.'+parseFloat(bounce_amount).toFixed(2)); 
+			 }
+		},
+		error: function (err) {
+			console.error("Exipiry date founder error", err);
+		},
+	});
+
+ }
+
+	
+	const getSalessummerydetails = () => {
+		var today = new Date();
+
+		let date =
+			today.getFullYear() +
+			"-" +
+			(today.getMonth() + 1) +
+			"-" +
+			today.getDate();
+		var d = new Date(date),
+			month = "" + (d.getMonth() + 1),
+			day = "" + d.getDate(),
+			year = d.getFullYear();
+
+		if (month.length < 2) month = "0" + month;
+		if (day.length < 2) day = "0" + day;
+
+		let mydate = [year, month, day].join("-");
+
+		let count = 0;
+		let html = "";
+
+		let total_payments = 0;
+
+		$.ajax({
+			url: base_url + "Controllerunit/getSalessummerydetails",
+			method: "POST",
+			data: {
+				mydate: mydate,
+			},
+			success: function (data) {
+				let getData = JSON.parse(data);
+				if (getData != 0) {
+					getData.map((d) => {
+						$("#cashon_hands").html(
+							"Rs." + parseFloat(d.cash_in_hand).toFixed()
+						);
+						$("#cash_payments").html(
+							"Rs." + parseFloat(d.cash_payment).toFixed()
+						);
+						$("#cheque_payments").html(
+							"Rs." + parseFloat(d.cheque_payment).toFixed()
+						);
+						$("#Total_refunds").html(
+							"Rs." + parseFloat(d.refunded_amount).toFixed()
+						);
+						$('#expenses_amount').html("Rs."+ parseFloat(d.expenses_amount_reg).toFixed(2)); 
+
+						total_payments += parseFloat(d.cash_in_hand);
+						total_payments += parseFloat(d.cash_payment);
+						total_payments += parseFloat(d.cheque_payment);
+					});
+					$("#total_payment").html(
+						"Rs." + parseFloat(total_payments).toFixed(2)
+					);
+				}
+			},
+			error: function (err) {
+				console.error("Error found", err);
+			},
+		});
+	};
+
+	getSalessummerydetails();
+
+	const detectexpirechecksbyadmindetails = () => {
+ 
+	$.ajax({
+		url: base_url + "Controllerunit/detectexpirechecksbyadmindetails",
+		method: "POST",
+		data:{
+			currentdate : getfulldate()
+		}, 
+		success: function (data) {
+		 
+		},
+		error: function (err) {
+			
+			console.error("Exipiry date founder error", err);
+		},
+	});
+
+}
+
+
+	 const getdetailsofexpiredchecksforsupplier = () => {
+	$.ajax({
+		url: base_url + "Controllerunit/getdetailsofexpiredchecksforsupplier",
+		method: "POST",
+		data:{
+			currentdate : getfulldate()
+		}, 
+		success: function (data) {
+			getallsupplierchequedetails(); 
+			 
+		},
+		error: function (err) {
+			console.error("Exipiry date founder error", err);
+		},
+	});
+ }
+
+ getdetailsofexpiredchecksforsupplier();
+
+
+		function product_details_outlet_expired_showoff(){
+
+		$.ajax({
+			url: base_url + "Controllerunit/product_details_outlet_expired_showoffs",
+			method: "POST",
+			data:{
+				currentdate : getfulldate()
+			}, 
+			success: function (data) {
+				retriewdataforexpiredata();
+				console.log('Outlet expired date show off',data);
+			},
+			error: function (err) {
+				console.error("Exipiry date founder error", err);
+			},
+		});
+
+	}
+
+	product_details_outlet_expired_showoff();
+
+	
+
+	function gettotalsalesanddiscount() {
+		let sumoftotal = 0;
+		let sumofdiscount = 0;
+
+		$.ajax({
+			url: base_url + "Controllerunit/gettotalsalesanddiscount",
+			method: "POST",
+			data: {
+				todaydate: getfulldate(),
+			},
+			success: function (data) {
+				let getData = JSON.parse(data);
+				if (getData == 0) {
+					$("#total_sales").html("Rs.0.00");
+					$("#sumofdiscounts").html("Rs.0.00");
+				} else {
+					getData.map((d) => {
+						sumofdiscount += parseFloat(d.discounted_amount.substring(3));
+						sumoftotal += parseFloat(d.total_amount);
+					});
+
+					$("#total_sales").html("Rs." + parseFloat(sumoftotal).toFixed(2));
+					$("#sumofdiscounts").html(
+						"Rs." + parseFloat(sumofdiscount).toFixed(2)
+					);
+				}
+			},
+			error: function (err) {
+				console.error("Error found", err);
+			},
+		});
+	}
+	gettotalsalesanddiscount();
+
+
+	
+
+ 
+   const chequesbyadmindetails = (fromdate = null, todate = null, checkstatus = null) => {
+	let html = ''; 
+	let count = 0; 
+
+	let statuschecker = ''; 
+
+	let pending_count = 0; 
+	let complete_count = 0; 
+	let bounce_count = 0; 
+
+
+	let completed_amount = 0.00; 
+	let pending_amount = 0.00; 
+	let bounce_amount = 0.00;
+	
+	let total_count_to_showofftoout  = 0; 
+
+
+	$.ajax({
+		url: base_url + "Controllerunit/chequesbyadmindetails",
+		method: "POST",
+		data:{
+			fromdate:fromdate,
+			todate:todate,
+			checkstatus:checkstatus
+		}, 
+		success: function (data) {
+			 
+			let getData = JSON.parse(data); 
+			if(getData==0){
+				 $('#checks_by_admin_section_print').html('<tr><span class="text text-danger font-weight-bold">No data found</span></tr>'); 
+			} 
+			else {
+				console.log('required data',getData); 
+				getData.map(d => {
+					if(d.cheque_status=='completed'){
+						statuschecker = '<span class="badge badge-success">Completed</span>'; 
+						completed_amount+=parseFloat(d.amount).toFixed(2);
+						complete_count+=1; 
+					}
+					else if(d.cheque_status=='bounce'){
+						statuschecker = '<span class="badge badge-danger">bounced</span>'; 
+						bounce_amount+=parseFloat(d.amount).toFixed(2); 
+						bounce_count+=1; 	
+					}
+					else {
+						statuschecker = '<span class="badge badge-warning">Pending</span>'; 
+						pending_amount+=parseFloat(d.amount).toFixed(2);
+						pending_count+=1;
+					}
+
+					total_count_to_showofftoout+=(bounce_count + pending_count); 
+
+					html+=`<tr>
+					<td>${++count}</td>
+					<td>${d.customer_name}</td>
+					<td>${d.cheque_amount}</td>
+					<td>${statuschecker}</td>
+					<td>${d.bank_name}</td>
+					<td>${d.branch_name}</td>
+					<td>${d.cheque_date}</td>
+					<td>${parseFloat(d.cheque_amount).toFixed(2)}</td>
+					<td>${d.cheque_no}</td>
+					<td>
+					<div class="dropdown show">
+					<a class="btn btn-info dropdown-toggle" href="#" role="button" id="dropdownMenuLinkarea" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					Status action
+				  </a>
+					<div class="dropdown-menu" aria-labelledby="dropdownMenuLinkarea">
+					<a class="dropdown-item admin_status_action_pending" check_fk='${d.chques_id_fk}' chques_id_fk='${d.expired_checks_id}' href="#">Pending</a>
+					<a class="dropdown-item admin_status_action_bounce" check_fk='${d.chques_id_fk}' chques_id_fk='${d.expired_checks_id}' href="#">Bounce</a>
+					<a class="dropdown-item admin_statis_action_completed" check_fk='${d.chques_id_fk}' chques_id_fk='${d.expired_checks_id}' href="#">Completed</a>
+				  </div>
+				  </div>
+					</td>
+					</tr>`;
+				}); 
+
+				$('#checks_by_admin_section_print').html(html);
+				$('#checks_by_admin_count').html(total_count_to_showofftoout); 
+			}
+		},
+		error: function (err) {
+			
+			console.error("chequesbyadmindetails date founder error", err);
+		},
+	});
+
+
+   }
+
+   chequesbyadmindetails(); 
+
+
+	function getallfinishingproductsfromwarehouse(){
+        let count = 0; 
+        let html = ''; 
+
+        let muted_prodductscount = 0; 
+        let unmuted_productscount = 0; 
+        $.ajax({
+			url: base_url + "Controllerunit/getallfinishingproductsfromwarehouse",
+			method: "POST",
+			async:false, 
+			success: function (data) {
+				 let getData = JSON.parse(data); 
+                 console.log(getData);
+                  if(getData==0){
+                      $('#show_off_producsofrunninginwarehouse').html('<tr><td colspan="2"><span class="text text-danger font-weight-bold">NO DATA FOUND</span></td></tr>'); 
+                    return false; 
+                    }
+                  else {
+                    getData.map(d => {
+                        if(d.warehouse_mute_option==1){
+                            muted_prodductscount+=1
+                        }
+                        else {
+                            unmuted_productscount+=1;
+                        }
+                       
+                        html+=`<tr class="text text-center">
+                        <td>${++count}</td>
+                        <td>${d.product_name}</td>
+                        <td>${d.product_unit}</td>
+                        <td>${d.quantity}</td>
+                        <td>${d.alert_quantity}</td>
+                        <td>${d.warehouse_mute_option==1  ? `<span class="badge badge-success">Unmute</span>` : `<span class="badge badge-danger">Muted</span>`}</td>
+                        <td> 
+                            ${d.warehouse_mute_option==0  ? `<button product_id_fk='${d.product_id_fk}' class="btn btn-outline-danger btn-sm mute_warehouserunningproduct">MUTE</button>` : `<button product_id_fk='${d.product_id_fk}' class="btn btn-success btn-sm unmute_warehouserunningproduct">UNMUTE</button>`}
+                        </td>
+                        
+                        </tr>`; 
+                    }); 
+
+
+                    $('#show_off_producsofrunninginwarehouse').html(html);
+                    $('#Muted_products').html('Muted Products : '+unmuted_productscount); 
+                    $('#unmuted_products').html('Unmuted Products :'+muted_prodductscount);
+                    $('#show_unmuted_count_section').html(muted_prodductscount);
+
+
+                  }
+			},
+			error: function (err) {
+				console.error("Error found", err);
+			},
+		});
+
+
+    }
+	 
+
+    function getwarehousefinishingproducts(){
+        $.ajax({
+			url: base_url + "Controllerunit/getwarehousefinishingproducts",
+			method: "POST",
+			success: function (data) {
+				 console.log('Finishing products',data);
+                 getallfinishingproductsfromwarehouse();
+			},
+			error: function (err) {
+				console.error("Error found", err);
+			},
+		});
+
+    }
+
+    getwarehousefinishingproducts();
+
+	
+	const getCreditsbycustomerdetails = () => {
+		let html = "";
+		$.ajax({
+			url: base_url + "Controllerunit/getCreditsbycustomerdetails",
+			method: "POST",
+			data: {
+				date: getfulldate(),
+			},
+			success: function (data) {
+				let getData = JSON.parse(data);
+				if (getData == 0) {
+					$("#allcredit_details_forsalesectionfront").html(
+						'<tr><td><span class="text text-danger font-weight-bold">NO DATA FOUND</span></td></tr>'
+					);
+				} else {
+					getData.map((d) => {
+						html += `<tr>
+                    <td>${d.invoice_no}</td>
+                    <td>${d.customer_name}</td>
+                    <td>${d.customer_mobile}</td>
+                    <td>${d.customer_address}</td>
+                    <td>${d.ordered_date}</td>
+                    <td>${d.discount}</td>
+                    <td>${d.discounted_amount}</td>
+                    <td>${d.total_amount}</td>
+                    <td>${parseFloat(d.sales_credit_amount).toFixed(2)}</td>
+               
+                    </tr>`;
+					});
+
+					$("#allcredit_details_forsalesectionfront").html(html);
+				}
+			},
+			error: function (err) {
+				console.error("Error found", err);
+			},
+		});
+	};
+
+	getCreditsbycustomerdetails();
+
+
+	function checklinessid(){
+		$.ajax({
+			url: base_url + "Controllerunit/checklinessid",
+			method: "POST",
+			async:false, 
+	 		success: function (data) {
+				sessionStorage.setItem('checklinessid',data); 
+				 
+			},
+			error: function (err) {
+				console.error("Error found", err);
+			},
+		});
+
+	}
+
+	checklinessid(); 
 
 	function displayallproductdetials(){
 		let html = ``; 
@@ -303,6 +972,7 @@ $(document).ready(function () {
 		$.ajax({
 			url: base_url + "Controllerunit/chequeSaveDetailsforregister",
 			method: "POST",
+			async:false, 
 			data: {
 				mydate: mydate,
 				myvalue: value,
@@ -359,6 +1029,7 @@ $(document).ready(function () {
 		$.ajax({
 			url: base_url + "Controllerunit/saveCashpaymentforregisterdetails",
 			method: "POST",
+			async:false, 
 			data: {
 				mydate: getfulldate(),
 				myvalue: value,
@@ -554,6 +1225,7 @@ $(document).ready(function () {
 		$.ajax({
 			url: base_url + "Controllerunit/savetemporarydateforsale",
 			cache: true,
+			async:false, 
 			data: {
 				discountpercentage: discountpercentage,
 				subtractamounttotally: subtractamounttotally,
@@ -575,7 +1247,7 @@ $(document).ready(function () {
 	savetemporarydateforsale();
 
 	/**	setInterval(function () {
-		savetemporarydateforsale();
+	//	savetemporarydateforsale();
 	}, 1500); */
 
 	function getdateandtime() {
@@ -715,6 +1387,7 @@ $(document).ready(function () {
 		$.ajax({
 			url: base_url + "Controllerunit/fetchDatafordiscount",
 			method: "POST",
+			async:false, 
 			data: {
 				percentagevalue: percentagevalue,
 			},
@@ -907,6 +1580,7 @@ $(document).ready(function () {
 					if (data != 0) {
 						$('#customer_name_text').html(getData.customer_name); 
 						$('#customer_address_text').html(getData.customer_address); 
+					//	$('#customer_credit_liner').html('Rs.'+parseFloat(getData.customer_credit_details).toFixed(2)); 
 
 						$("#messagesectionoffound").removeClass("text-danger");
 						$("#messagesectionoffound").addClass("text-success");
@@ -990,6 +1664,7 @@ $(document).ready(function () {
 		$.ajax({
 			url: base_url + "Controllerunit/getsubtotalanddiscount",
 			method: "POST",
+			async:false, 
 			success: function (data) {
 				$("#subtotalvalue").html("<strong>Rs." + data + "</strong>");
 				$("#after_subtracted").html("<strong>Rs." + data + "</strong>");
@@ -1005,6 +1680,7 @@ $(document).ready(function () {
 		$.ajax({
 			url: base_url + "Controllerunit/getdataforprintfromshoppingcart",
 			method: "POST",
+			async:false, 
 			success: function (data) {
 				 
 				$("#product_details_to_display_forinvoice").html(data);
@@ -1123,6 +1799,19 @@ $(document).ready(function () {
 		});
 	});
 
+	$('#printingallsection').click(function(){
+		$.ajax({
+			url: base_url + "Controllerunit/printingallsection",
+			method: "POST",
+			success: function (data) {
+				 
+			},
+			error: function (err) {
+				console.error("Error found", err);
+			},
+		});
+
+	}); 
 
 	
 	$("#btnholdamountforcustomer_second").click(function () {
@@ -1368,6 +2057,7 @@ $(document).ready(function () {
 			$.ajax({
 				url: base_url + "Controllerunit/getproductback",
 				method: "POST",
+				async:false, 
 				data: {
 					shopping_hold: shopping_hold,
 					fulltimewithdate: fulltimewithdate(),
@@ -1451,16 +2141,18 @@ $(document).ready(function () {
 	});
 
 	const reduceProductQuantity = (lastinsertid) => {
-		savetemporarydateforsale();
 		   
 		$.ajax({
 			url: base_url + "Controllerunit/reduceProductQuantity",
 			method: "POST",
+			async:false, 
 			data: {
 				todydate: getfulldate(),
 				summeryid:lastinsertid 
 			},
 			success: function (data) {
+		savetemporarydateforsale();
+
 			 
 				console.log("Reduce quantity", data);
 				alert("Order has been made successfully");
@@ -1580,6 +2272,7 @@ $(document).ready(function () {
 		$.ajax({
 			url: base_url + "Controllerunit/savecreditdetailsbyregisterfromcash",
 			method: "POST",
+			async:false, 
 			data: {
 				saveabledata: data,
 				todaydate: getfulldate(),
@@ -1612,6 +2305,12 @@ $(document).ready(function () {
 
 		let additional_information = $('#additional_information').val(); 
 
+	 
+
+	 
+
+	 
+
 		if (sales_invoice_id == null) {
 		}
 
@@ -1619,6 +2318,7 @@ $(document).ready(function () {
 			$.ajax({
 				url: base_url + "Controllerunit/saveassessiontogetback",
 				method: "POST",
+				async:false, 
 				data: {
 					balance_amount : balance_amount 
 				},
@@ -1637,8 +2337,13 @@ $(document).ready(function () {
 		else {
 		 //yellback
 			if ($("#messagesectionoffound").html() != "Found ✔") {
-				 alert("Please choose customer by entering mobile number. Because balance amount will be considered as a credit"); 
-				 window.location.reload(); 
+				toastr.error("Please choose the customer");
+				$("#mobilenumberforcutomersearch").focus();
+				$(".drawer").drawer("close");
+				$('#paywithcashmodal').modal('hide'); 
+				$('#customer_typeselect').focus(); 
+				return false;
+				 
 			}
 			else {
 				  
@@ -1664,11 +2369,20 @@ $(document).ready(function () {
 		}
 
 	 
+		let discountpercentagevalue = $("#discountpercentage").html();
+		let subtractamounttotally = $("#subtractamounttotally").html();
+		let totalamount = $("#totalamount").html();
+		let amounttoshowoffpaying = $("#amounttoshowoffpaying").html();
+
+		let dicountvalueinnumber = $("#dicountvalue").html();
+
+		let individualdiscountamount = $('#individualdiscountamount').html(); 
 
 
 		$.ajax({
 			url: base_url + "Controllerunit/savecashamount",
 			method: "POST",
+			async:false, 
 			data: {
 				discountpercentage: discountpercentage,
 				dicountvalue: dicountvalue,
@@ -1677,7 +2391,15 @@ $(document).ready(function () {
 				balance_amount: balance_amount,
 				fulltimewithdate: fulltimewithdate(),
 				sales_invoice_id: sales_invoice_id,
-				additional_information:additional_information
+				additional_information:additional_information,
+		 		individualdiscountamount:individualdiscountamount,
+				discountpercentagevalue:discountpercentagevalue,
+				subtractamounttotally:subtractamounttotally,
+				totalamount:totalamount,
+				amounttoshowoffpaying:amounttoshowoffpaying,
+				dicountvalueinnumber:dicountvalueinnumber,
+
+
 			},
 			success: function (data) {
 				//alert(data);
@@ -1764,7 +2486,17 @@ $(document).ready(function () {
 		if (value == "") {
 			window.location.reload();
 		} else {
-			savedetailsforcreditinregister(value);
+
+				let discountpercentagevalue = $("#discountpercentage").html();
+		let subtractamounttotally = $("#subtractamounttotally").html();
+		let totalamount = $("#totalamount").html();
+		let amounttoshowoffpaying = $("#amounttoshowoffpaying").html();
+
+		let dicountvalueinnumber = $("#dicountvalue").html();
+
+		let individualdiscountamount = $('#individualdiscountamount').html(); 
+
+
 			$.ajax({
 				url: base_url + "Controllerunit/creditdetailsforsaving",
 				method: "POST",
@@ -1774,10 +2506,20 @@ $(document).ready(function () {
 					fulltimewithdate: fulltimewithdate(),
 					sales_invoice_id: sales_invoice_id,
 					value: value,
-					additional_information:additional_information
+					additional_information:additional_information, 
+					
+					discountpercentagevalue:discountpercentagevalue,
+					subtractamounttotally:subtractamounttotally,
+					totalamount:totalamount,
+					amounttoshowoffpaying:amounttoshowoffpaying,
+					dicountvalueinnumber:dicountvalueinnumber,
+					individualdiscountamount:individualdiscountamount
+
 				},
 				success: function (data) {
 					reduceProductQuantity(data);
+			savedetailsforcreditinregister(value);
+
 				},
 				error: function (err) {
 					console.error("Error found", err);
@@ -1858,14 +2600,17 @@ $(document).ready(function () {
 		}
 
 
+ 
 
-
-		if (temp_customerid == "" || temp_customerid == 0) {
-			alert("Please choose the customer by mobile number"); 
-			window.location.reload(); 	 
-		 
+		if ($("#messagesectionoffound").html() != "Found ✔") {
+			toastr.error("Please choose the customer");
+			$("#mobilenumberforcutomersearch").focus();
+			$(".drawer").drawer("close");
+			$('#paywithCheque').modal('hide'); 
+			$('#customer_typeselect').focus(); 
+			return false;
+			 
 		}
-
 		if (
 			bank_name != "" &&
 			bank_branch != "" &&
@@ -1880,6 +2625,7 @@ $(document).ready(function () {
 			$.ajax({
 				url: base_url + "Controllerunit/savechequepayment",
 				method: "POST",
+				async:false, 
 				data: {
 					discountpercentage: discountpercentage,
 					dicountvalue: dicountvalue,
@@ -1925,23 +2671,35 @@ $(document).ready(function () {
 	});
 
 	$("#search_by_barcode").keyup(function (e) {
-		if (e.keyCode === 13) {
+		if (e.keyCode == 13) {
 			let value = $(this).val();
 			 
 			$(this).val("");
 			$(this).focus();
 			let result = false; 
 
+			let checkexistingstatus = true; 
+			
+
 			$(".btnaddshoppingcart").each(function () {
 				if ($(this).attr("product_code") == value) {
+					result = true; 
+					
+					checkexistingstatus = false; 
+					 return false; 
+				} else {
 					$(this).click();
 					result = false; 
-					return false;
-				} else {
-					result = true; 
-					 
+					checkexistingstatus = true; 
+					return false; 
+
 				}
 			});
+			
+
+
+				alert(checkexistingstatus); 
+		
 
 			if(result==true){
 				alert('No product found with barcode'); 
@@ -2228,9 +2986,7 @@ ${
 			} added for return report`
 		);
 
-
-
-
+ 
 		$.ajax({
 			url: base_url + "Controllerunit/addproductsforreturn",
 			method: "POST",
@@ -2386,6 +3142,7 @@ ${
 		let rowid = $(this).attr("rowid");
 		let valuetochange = prompt("Enter new price ");
 		if (valuetochange != null) {
+			$('#search_by_barcode').focus(); 
 			$.ajax({
 				url: base_url + "Controllerunit/edit_price_update_section",
 				method: "POST",
@@ -2510,7 +3267,23 @@ ${
 	}
 
 
-	//bullback
+ 
+	$('#regulateloanbutton').click(function(){
+		
+		$.ajax({
+			url: base_url + "Controllerunit/regulateloanbuttonsection",
+			method: "POST",
+			async:false, 
+			success: function (data) {
+				 
+				alert('Success'); 
+			},
+			error: function (err) {
+				console.error("Error found", err);
+			},
+		});
+		
+	}); 
 
 	$("body").delegate(".delete_expense_list", "click", function () {
 		let value = parseInt($(this).attr("expense_id"));
@@ -2614,6 +3387,7 @@ ${
 		$.ajax({
 			url: base_url + "Controllerunit/showoffsalesunitsection",
 			method: "POST",
+			async:false, 
 			data: {
 				fulldate: getfulldate(),
 			},
@@ -2668,7 +3442,7 @@ ${
   </button>
   <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
   <a target="_blank" href="${base_url}Controllerunit/reprintsection/${d.order_summery_id}" class="dropdown-item reprintsection" order_summery_id="${d.order_summery_id}" >Reprint <i class="fa fa-print"></i></a>
-  <a href="#" class="dropdown-item deleteinvoicesectionarea" payment_method="${d.payment_method}" ordered_date="${d.ordered_date}" total_amount="${d.total_amount}" order_summery_id="${d.order_summery_id}">Delete <i class="fa fa-trash"></i></a>
+  <a href="#" class="dropdown-item deleteinvoicesectionarea" customer_mobile="${d.customer_mobile}" sales_credit_amount="${d.sales_credit_amount==null ? 0 : parseFloat(d.sales_credit_amount).toFixed(2)}" payment_method="${d.payment_method}" ordered_date="${d.ordered_date}" total_amount="${d.total_amount}" order_summery_id="${d.order_summery_id}">Delete <i class="fa fa-trash"></i></a>
 
 
 
@@ -3029,7 +3803,7 @@ ${
 		$("#balance_amount").val(answer);
 	});
 
-	//ironaman
+ 
 	$("#search_bydateforfrontedn").click(function () {
 		let from_to_search_purdate = $("#from_to_search_purdate").val();
 		let to_to_search_purdate = $("#to_to_search_purdate").val();
@@ -3101,7 +3875,7 @@ ${
   </button>
   <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
   <a target="_blank" href="${base_url}Controllerunit/reprintsection/${d.order_summery_id}" class="dropdown-item reprintsection" order_summery_id="${d.order_summery_id}" >Reprint <i class="fa fa-print"></i></a>
-  <a href="#" class="dropdown-item deleteinvoicesectionarea" payment_method="${d.payment_method}" ordered_date="${d.ordered_date}" total_amount="${d.total_amount}" order_summery_id="${d.order_summery_id}">Delete <i class="fa fa-trash"></i></a>
+  <a href="#" class="dropdown-item deleteinvoicesectionarea" customer_mobile="${d.customer_mobile}" sales_credit_amount="${d.sales_credit_amount==null ? 0 : parseFloat(d.sales_credit_amount).toFixed(2)}" payment_method="${d.payment_method}" ordered_date="${d.ordered_date}" total_amount="${d.total_amount}" order_summery_id="${d.order_summery_id}">Delete <i class="fa fa-trash"></i></a>
 
 
 
@@ -3149,6 +3923,9 @@ ${
 		sessionStorage.setItem('total_amount_todelete', $(this).attr('total_amount')); 
 		sessionStorage.setItem('deletforordereddate',$(this).attr('ordered_date')); 
 		sessionStorage.setItem('payment_method_section',$(this).attr('payment_method')); 
+		sessionStorage.setItem('customer_mobile',$(this).attr('customer_mobile')); 
+		sessionStorage.setItem('sales_credit_amount',$(this).attr('sales_credit_amount')); 
+		
 
 		$('#modal_open_section_for_checkpassword').modal('show'); 
 
@@ -3177,7 +3954,9 @@ ${
 						total_amount_todelete:sessionStorage.getItem('total_amount_todelete'),
 						ordereddate : sessionStorage.getItem('deletforordereddate'), 
 						password : value,
-						payment_method : sessionStorage.getItem('payment_method_section') 
+						payment_method : sessionStorage.getItem('payment_method_section'), 
+						customermobile : sessionStorage.getItem('customer_mobile'), 
+						sales_credit_amount:sessionStorage.getItem('sales_credit_amount')
 					}, 
 					success: function (data) {
 						 if(data==1){
@@ -3208,63 +3987,9 @@ ${
 
 	}); 
 
-
-	function gettotalsalesanddiscount() {
-		let sumoftotal = 0;
-		let sumofdiscount = 0;
-
-		$.ajax({
-			url: base_url + "Controllerunit/gettotalsalesanddiscount",
-			method: "POST",
-			data: {
-				todaydate: getfulldate(),
-			},
-			success: function (data) {
-				let getData = JSON.parse(data);
-				if (getData == 0) {
-					$("#total_sales").html("Rs.0.00");
-					$("#sumofdiscounts").html("Rs.0.00");
-				} else {
-					getData.map((d) => {
-						sumofdiscount += parseFloat(d.discounted_amount.substring(3));
-						sumoftotal += parseFloat(d.total_amount);
-					});
-
-					$("#total_sales").html("Rs." + parseFloat(sumoftotal).toFixed(2));
-					$("#sumofdiscounts").html(
-						"Rs." + parseFloat(sumofdiscount).toFixed(2)
-					);
-				}
-			},
-			error: function (err) {
-				console.error("Error found", err);
-			},
-		});
-	}
-	gettotalsalesanddiscount();
-
  
 
-	const setdatesforsumemry = (fromdate='', todate='') => {
-		$.ajax({
-			url: base_url + "Controllerunit/setdatesforsumemry",
-			method: "POST",
-			data: {
-				fromdate: fromdate,
-				todate:todate, 
-				todaydate : getfulldate()
-			},
-			success: function (data) {
-				 console.log('Setting date for summery', data); 
-			},
-			error: function (err) {
-				alert('Error from setting date', err); 
-				console.error("Error found from setting date for summery", err);
-			},
-		});
 
-	}
-	setdatesforsumemry(); 
 
 	$('#search_button_forsummery').click(function(){
 		let from_date_section_to_search = $('#from_date_section_to_search_forsummey').val(); 
@@ -3356,70 +4081,6 @@ ${
 
 	}); 
 
-	const getSalessummerydetails = () => {
-		var today = new Date();
-
-		let date =
-			today.getFullYear() +
-			"-" +
-			(today.getMonth() + 1) +
-			"-" +
-			today.getDate();
-		var d = new Date(date),
-			month = "" + (d.getMonth() + 1),
-			day = "" + d.getDate(),
-			year = d.getFullYear();
-
-		if (month.length < 2) month = "0" + month;
-		if (day.length < 2) day = "0" + day;
-
-		let mydate = [year, month, day].join("-");
-
-		let count = 0;
-		let html = "";
-
-		let total_payments = 0;
-
-		$.ajax({
-			url: base_url + "Controllerunit/getSalessummerydetails",
-			method: "POST",
-			data: {
-				mydate: mydate,
-			},
-			success: function (data) {
-				let getData = JSON.parse(data);
-				if (getData != 0) {
-					getData.map((d) => {
-						$("#cashon_hands").html(
-							"Rs." + parseFloat(d.cash_in_hand).toFixed()
-						);
-						$("#cash_payments").html(
-							"Rs." + parseFloat(d.cash_payment).toFixed()
-						);
-						$("#cheque_payments").html(
-							"Rs." + parseFloat(d.cheque_payment).toFixed()
-						);
-						$("#Total_refunds").html(
-							"Rs." + parseFloat(d.refunded_amount).toFixed()
-						);
-						$('#expenses_amount').html("Rs."+ parseFloat(d.expenses_amount_reg).toFixed(2)); 
-
-						total_payments += parseFloat(d.cash_in_hand);
-						total_payments += parseFloat(d.cash_payment);
-						total_payments += parseFloat(d.cheque_payment);
-					});
-					$("#total_payment").html(
-						"Rs." + parseFloat(total_payments).toFixed(2)
-					);
-				}
-			},
-			error: function (err) {
-				console.error("Error found", err);
-			},
-		});
-	};
-
-	getSalessummerydetails();
 
 	$("#view_all_sales_from_cashier").click(function () {
 		$("#sales_modal_section").modal("show");
@@ -3579,103 +4240,8 @@ ${
 		});
 	});
 
-	const getCreditsbycustomerdetails = () => {
-		let html = "";
-		$.ajax({
-			url: base_url + "Controllerunit/getCreditsbycustomerdetails",
-			method: "POST",
-			data: {
-				date: getfulldate(),
-			},
-			success: function (data) {
-				let getData = JSON.parse(data);
-				if (getData == 0) {
-					$("#allcredit_details_forsalesectionfront").html(
-						'<tr><td><span class="text text-danger font-weight-bold">NO DATA FOUND</span></td></tr>'
-					);
-				} else {
-					getData.map((d) => {
-						html += `<tr>
-                    <td>${d.invoice_no}</td>
-                    <td>${d.customer_name}</td>
-                    <td>${d.customer_mobile}</td>
-                    <td>${d.customer_address}</td>
-                    <td>${d.ordered_date}</td>
-                    <td>${d.discount}</td>
-                    <td>${d.discounted_amount}</td>
-                    <td>${d.total_amount}</td>
-                    <td>${parseFloat(d.sales_credit_amount).toFixed(2)}</td>
-               
-                    </tr>`;
-					});
 
-					$("#allcredit_details_forsalesectionfront").html(html);
-				}
-			},
-			error: function (err) {
-				console.error("Error found", err);
-			},
-		});
-	};
-
-	getCreditsbycustomerdetails();
-
-
-    function getallfinishingproductsfromwarehouse(){
-        let count = 0; 
-        let html = ''; 
-
-        let muted_prodductscount = 0; 
-        let unmuted_productscount = 0; 
-        $.ajax({
-			url: base_url + "Controllerunit/getallfinishingproductsfromwarehouse",
-			method: "POST",
-			success: function (data) {
-				 let getData = JSON.parse(data); 
-                 console.log(getData);
-                  if(getData==0){
-                      $('#show_off_producsofrunninginwarehouse').html('<tr><td colspan="2"><span class="text text-danger font-weight-bold">NO DATA FOUND</span></td></tr>'); 
-                    return false; 
-                    }
-                  else {
-                    getData.map(d => {
-                        if(d.warehouse_mute_option==1){
-                            muted_prodductscount+=1
-                        }
-                        else {
-                            unmuted_productscount+=1;
-                        }
-                       
-                        html+=`<tr class="text text-center">
-                        <td>${++count}</td>
-                        <td>${d.product_name}</td>
-                        <td>${d.product_unit}</td>
-                        <td>${d.quantity}</td>
-                        <td>${d.alert_quantity}</td>
-                        <td>${d.warehouse_mute_option==1  ? `<span class="badge badge-success">Unmute</span>` : `<span class="badge badge-danger">Muted</span>`}</td>
-                        <td> 
-                            ${d.warehouse_mute_option==0  ? `<button product_id_fk='${d.product_id_fk}' class="btn btn-outline-danger btn-sm mute_warehouserunningproduct">MUTE</button>` : `<button product_id_fk='${d.product_id_fk}' class="btn btn-success btn-sm unmute_warehouserunningproduct">UNMUTE</button>`}
-                        </td>
-                        
-                        </tr>`; 
-                    }); 
-
-
-                    $('#show_off_producsofrunninginwarehouse').html(html);
-                    $('#Muted_products').html('Muted Products : '+unmuted_productscount); 
-                    $('#unmuted_products').html('Unmuted Products :'+muted_prodductscount);
-                    $('#show_unmuted_count_section').html(muted_prodductscount);
-
-
-                  }
-			},
-			error: function (err) {
-				console.error("Error found", err);
-			},
-		});
-
-
-    }
+    
 
     $('body').delegate('.mute_warehouserunningproduct','click',function(){
         let product_id_fk = parseInt($(this).attr('product_id_fk')); 
@@ -3729,24 +4295,6 @@ $('body').delegate('.unmute_warehouserunningproduct','click',function(){
 });
 
  
- 
-
-    function getwarehousefinishingproducts(){
-        $.ajax({
-			url: base_url + "Controllerunit/getwarehousefinishingproducts",
-			method: "POST",
-			success: function (data) {
-				 console.log('Finishing products',data);
-                 getallfinishingproductsfromwarehouse();
-			},
-			error: function (err) {
-				console.error("Error found", err);
-			},
-		});
-
-    }
-
-    getwarehousefinishingproducts();
 
 
  
@@ -3817,91 +4365,6 @@ $('body').delegate('.unmute_warehouserunningproduct','click',function(){
 	
 
 
-	function retriewdataforexpiredata(){
-
-		let count = 0; 
-		let html = '';
-
-		let mutedhtml = ''; 
-		
-		let currentdate = getfulldate(); 
-
-		let count_mutedproducts = 0 
-
-
-		let counted_systemforfront = 0; 
-
-		$.ajax({
-			url: base_url + "Controllerunit/retriewdataforexpiredata",
-			method: "POST",
-			success: function (data) {
-			let getData = JSON.parse(data); 
-			if(getData==1){
-				$('#product_details_outlet_expired_showoff').html('<span class="text text-danger font-weight-bold">NO DATA FOUND</span>');
-				$('#expired_date_count').html(count);
-				$('#muted_products_count').html(count_mutedproducts); 
-
-				return false; 
-			}
-			else {
-				  getData.map(d => {
-					  if(d.mute_option==1){
-						counted_systemforfront++;
-						  ++count;
-						html+=`<tr class="text text-center">
-						<td>${count}</td>
-						<td>${d.product_name}</td>
-						<td>${d.product_unit}</td>
-						<td>${d.mfd}</td>
-						<td>${d.exp}</td>
-						<td>${d.products_code}</td>
-						<td>Rs.${parseFloat(d.product_price).toFixed(2)}</td>
-						<td>
-						${d.exp <=currentdate ? '<span class="badge badge-danger font-weight-bold">EXPIRED</span>' : '<span class="badge badge-warning">EXPIRING SOON</span>'}
-						</td>
-						<td>
-						 ${d.mute_option==1 ? `<button product_id_fk="${d.product_id_fk}" class="btn btn-outline-danger muteexpproduct btn-sm">MUTE</button>` : `<button class="btn btn-info btn-sm muteexpproduct" product_id='${d.product_id_fk}'>UNMUTE</button>`}
-						</td>
-	
-						</tr>`;
-
-					  }
-					  else {
-						 ++count_mutedproducts;
-						mutedhtml+=`<tr class="text text-center">
-						<td>${++count}</td>
-						<td>${d.product_name}</td>
-						<td>${d.product_unit}</td>
-						<td>${d.mfd}</td>
-						<td>${d.exp}</td>
-						<td>${d.products_code}</td>
-						<td>Rs.${parseFloat(d.product_price).toFixed(2)}</td>
-						<td>
-						${d.exp <=currentdate ? '<span class="badge badge-danger font-weight-bold">EXPIRED</span>' : '<span class="badge badge-warning">EXPIRING SOON</span>'}
-						</td>
-						<td>
-						 ${d.mute_option==1 ? `<button product_id_fk="${d.product_id_fk}" class="btn btn-outline-danger muteexpproduct btn-sm">MUTE</button>` : `<button class="btn btn-info btn-sm unmuteexpproduct" product_id='${d.product_id_fk}'>UNMUTE</button>`}
-						</td>
-	
-						</tr>`;
-					  }
-					  $('#expired_date_count').html(counted_systemforfront);
-					  $('#muted_products_count').html(count_mutedproducts); 
-				  }); 
-				
-				
-
-				  $('#product_details_outlet_expired_showoff').html(html);
-				  $('#muted_product_details_outlet_expired_showoff').html(mutedhtml);
-			}
-			 
-			},
-			error: function (err) {
-				console.error("Retrieve expired date", err);
-			},
-		});
-
-	}
 
 	$('body').delegate('.muteexpproduct ','click',function(){
 		let product_id_fk = Number($(this).attr('product_id_fk'));
@@ -3958,26 +4421,6 @@ $('body').delegate('.unmute_warehouserunningproduct','click',function(){
 	}); 
 
 
-	function product_details_outlet_expired_showoff(){
-
-		$.ajax({
-			url: base_url + "Controllerunit/product_details_outlet_expired_showoffs",
-			method: "POST",
-			data:{
-				currentdate : getfulldate()
-			}, 
-			success: function (data) {
-				retriewdataforexpiredata();
-				console.log('Outlet expired date show off',data);
-			},
-			error: function (err) {
-				console.error("Exipiry date founder error", err);
-			},
-		});
-
-	}
-
-	product_details_outlet_expired_showoff();
 
 
 
@@ -4066,121 +4509,9 @@ $('#exportexcelforcreditdetails').click(function(){
 
  
 
-const detectexpirechecksbyadmindetails = () => {
- 
-	$.ajax({
-		url: base_url + "Controllerunit/detectexpirechecksbyadmindetails",
-		method: "POST",
-		data:{
-			currentdate : getfulldate()
-		}, 
-		success: function (data) {
-		 
-		},
-		error: function (err) {
-			
-			console.error("Exipiry date founder error", err);
-		},
-	});
-
-}
 
 	
 
-
- 
-   const chequesbyadmindetails = (fromdate = null, todate = null, checkstatus = null) => {
-	let html = ''; 
-	let count = 0; 
-
-	let statuschecker = ''; 
-
-	let pending_count = 0; 
-	let complete_count = 0; 
-	let bounce_count = 0; 
-
-
-	let completed_amount = 0.00; 
-	let pending_amount = 0.00; 
-	let bounce_amount = 0.00;
-	
-	let total_count_to_showofftoout  = 0; 
-
-
-	$.ajax({
-		url: base_url + "Controllerunit/chequesbyadmindetails",
-		method: "POST",
-		data:{
-			fromdate:fromdate,
-			todate:todate,
-			checkstatus:checkstatus
-		}, 
-		success: function (data) {
-			 
-			let getData = JSON.parse(data); 
-			if(getData==0){
-				 $('#checks_by_admin_section_print').html('<tr><span class="text text-danger font-weight-bold">No data found</span></tr>'); 
-			} 
-			else {
-				console.log('required data',getData); 
-				getData.map(d => {
-					if(d.cheque_status=='completed'){
-						statuschecker = '<span class="badge badge-success">Completed</span>'; 
-						completed_amount+=parseFloat(d.amount).toFixed(2);
-						complete_count+=1; 
-					}
-					else if(d.cheque_status=='bounce'){
-						statuschecker = '<span class="badge badge-danger">bounced</span>'; 
-						bounce_amount+=parseFloat(d.amount).toFixed(2); 
-						bounce_count+=1; 	
-					}
-					else {
-						statuschecker = '<span class="badge badge-warning">Pending</span>'; 
-						pending_amount+=parseFloat(d.amount).toFixed(2);
-						pending_count+=1;
-					}
-
-					total_count_to_showofftoout+=(bounce_count + pending_count); 
-
-					html+=`<tr>
-					<td>${++count}</td>
-					<td>${d.customer_name}</td>
-					<td>${d.cheque_amount}</td>
-					<td>${statuschecker}</td>
-					<td>${d.bank_name}</td>
-					<td>${d.branch_name}</td>
-					<td>${d.cheque_date}</td>
-					<td>${parseFloat(d.cheque_amount).toFixed(2)}</td>
-					<td>${d.cheque_no}</td>
-					<td>
-					<div class="dropdown show">
-					<a class="btn btn-info dropdown-toggle" href="#" role="button" id="dropdownMenuLinkarea" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-					Status action
-				  </a>
-					<div class="dropdown-menu" aria-labelledby="dropdownMenuLinkarea">
-					<a class="dropdown-item admin_status_action_pending" check_fk='${d.chques_id_fk}' chques_id_fk='${d.expired_checks_id}' href="#">Pending</a>
-					<a class="dropdown-item admin_status_action_bounce" check_fk='${d.chques_id_fk}' chques_id_fk='${d.expired_checks_id}' href="#">Bounce</a>
-					<a class="dropdown-item admin_statis_action_completed" check_fk='${d.chques_id_fk}' chques_id_fk='${d.expired_checks_id}' href="#">Completed</a>
-				  </div>
-				  </div>
-					</td>
-					</tr>`;
-				}); 
-
-				$('#checks_by_admin_section_print').html(html);
-				$('#checks_by_admin_count').html(total_count_to_showofftoout); 
-			}
-		},
-		error: function (err) {
-			
-			console.error("chequesbyadmindetails date founder error", err);
-		},
-	});
-
-
-   }
-
-   chequesbyadmindetails(); 
 
    $('#searchforadmin_area_bycheck').click(function(){
 	let from_date_by_admin = $('#from_date_by_admin').val(); 
@@ -4290,105 +4621,6 @@ const detectexpirechecksbyadmindetails = () => {
 
 
 
- const getallsupplierchequedetails = (fromdate=null, todate=null, checkstatus = null ) => {
-
-	let html = ''; 
-	let count = 0; 
-
-	let statuschecker = ''; 
-
-	let pending_count = 0; 
-	let complete_count = 0; 
-	let bounce_count = 0; 
-
-
-	let completed_amount = 0.00; 
-	let pending_amount = 0.00; 
-	let bounce_amount = 0.00; 
-
-
-	let total_count_to_showofftoout = 0; 
-
-	$.ajax({
-		url: base_url + "Controllerunit/getsuppliercheckdetails",
-		method: "POST",
-		data:{
-			fromdate:fromdate,
-			todate:todate,
-			checkstatus:checkstatus
-		}, 
-		success: function (data) {
-			 let getData = JSON.parse(data); 
-		 
-			 console.log('Get supplier details',getData); 
-			 if(getData==0){
-				 $('#getsupplier_detailsforgettingarea').html('<span class="text text-danger font-weight-bold">No data found</span>'); 
-			 }
-			 else {
-				getData.map(d => {
-					if(d.cheque_status=='completed'){
-						statuschecker = '<span class="badge badge-success">Completed</span>'; 
-						completed_amount+=parseFloat(d.amount).toFixed(2);
-						complete_count+=1; 
-					}
-					else if(d.cheque_status=='bounce'){
-						statuschecker = '<span class="badge badge-danger">bounced</span>'; 
-						bounce_amount+=parseFloat(d.amount).toFixed(2); 
-						bounce_count+=1; 	
-					}
-					else {
-						statuschecker = '<span class="badge badge-warning">Pending</span>'; 
-						pending_amount+=parseFloat(d.amount).toFixed(2);
-						pending_count+=1;
-					}
-
-					total_count_to_showofftoout+=(bounce_count + pending_count); 
-
-					html+=`<tr class="text text-center">
-					<td>${++count}</td>
-					<td>${d.supplier_name}</td>
-					<td>${d.mobile_number}</td>
-					<td>${d.org_name}</td>
-					<td>${d.supplier_addresses}</td>
-					<td>${d.supplier_accountno}</td>
-					<td>${d.bank_name}</td>
-					<td>${d.branch_name}</td>
-					<td>${d.account_no}</td>
-					<td>${d.cheque_date}</td>
-					<td>${statuschecker.toString()}</td>
-					<td>${d.note}</td>
-					<td>${parseFloat(d.amount).toFixed(2)}</td>
-					<td>
-					<div class="dropdown show">
-  <a class="btn btn-info dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-    Status action
-  </a>
-
-  <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-    <a class="dropdown-item status_action_pending" chques_id_fk='${d.chques_id_fk}' href="#">Pending</a>
-    <a class="dropdown-item status_action_bounce" chques_id_fk='${d.chques_id_fk}' href="#">Bounce</a>
-    <a class="dropdown-item statis_action_completed" chques_id_fk='${d.chques_id_fk}' href="#">Completed</a>
-  </div>
-</div>
-					</td>
-				 
-					</tr>`;
-				}); 
-
-				$('#getsupplier_detailsforgettingarea').html(html);
-				$('#check_details_count_for_moving').html(total_count_to_showofftoout); 
-				
-	$('#total_completed_amount').html('Rs.'+parseFloat(completed_amount).toFixed(2)); 
-	$("#total_amount_of_pending_checks").html('Rs.'+parseFloat(pending_amount).toFixed(2));
-	$('#total_amount_bounced_checks').html('Rs.'+parseFloat(bounce_amount).toFixed(2)); 
-			 }
-		},
-		error: function (err) {
-			console.error("Exipiry date founder error", err);
-		},
-	});
-
- }
 
  
 $('#search_supplier_checks').click(function(){
@@ -4485,89 +4717,11 @@ $('#search_supplier_checks').click(function(){
 
 
 
- const getdetailsofexpiredchecksforsupplier = () => {
-	$.ajax({
-		url: base_url + "Controllerunit/getdetailsofexpiredchecksforsupplier",
-		method: "POST",
-		data:{
-			currentdate : getfulldate()
-		}, 
-		success: function (data) {
-			getallsupplierchequedetails(); 
-			 
-		},
-		error: function (err) {
-			console.error("Exipiry date founder error", err);
-		},
-	});
- }
 
- getdetailsofexpiredchecksforsupplier();
   
 
- detectexpirechecksbyadmindetails(); 
-
-
  
- function getloanpaymentmentcheckmethod(fromdate = null, todate = null, paymentmethod = null, mobile = null ) {
 
-	let count = 0; 
-	let html = ''; 
-
-
-	let totalpaidamount = 0.00; 
-	let totalamounttobepaid = 0.00; 
-
-	$.ajax({
-		url: base_url + "Controllerunit/getloanpaymentmentcheckmethod",
-		method: "POST",
-		data: {
-			 fromdate:fromdate, 
-			 todate:todate, 
-			 paymentmethod:paymentmethod, 
-			 mobile:mobile 
-		},
-		success: function (data) {
-			 let getData = JSON.parse(data); 
-			 if(getData==0){
-				$("#loanpaymentmentcheckmethod").html('<tr><td><span class="text text-danger font-weight-bold">No data found</span></td></tr>');
-				$('#total_paidamounthtml').html('Rs. 0.00'); 
-				$('#total_amonttoebpaid').html('Rs. 0.00'); 
-				return false; 
-			 }
-			 else {
-				 getData.map(d => {
-					totalpaidamount+=parseFloat(d.loan_recieving_amount); 
-					totalamounttobepaid+=parseFloat(d.loan_balance_amount); 
-
-					html+=`<tr>
-					<td>${++count}</td>
-					<td>${d.invoiceidsec}</td>
-					<td>${d.customer_name}</td>
-					<td>${d.customer_mobile}</td>
-					<td>${d.customer_address}</td>
-					<td>Rs.${parseFloat(d.loan_previous_amount).toFixed(2)}</td>
-					<td>Rs.${parseFloat(d.loan_recieving_amount).toFixed(2)}</td>
-					<td>Rs. ${parseFloat(d.loan_balance_amount).toFixed(2)}</td>
-					<td>${d.loan_paid_method=='Check' ? '<span class="badge badge-info">Check</span>' : '<span class="badge badge-success">Cash</span>'}</td>
-					<td>${d.date}</td>
-					</tr>`;
-				 }); 
-
-				 $('#loanpaymentmentcheckmethod').html(html); 
-				 $('#total_paidamounthtml').html('Rs.'+parseFloat(totalpaidamount).toFixed(2)); 
-				 $('#total_amonttoebpaid').html('Rs.'+parseFloat(totalamounttobepaid).toFixed(2)); 
-
-			 }
-		},
-		error: function (err) {
-			console.error("Error found", err);
-		},
-	});
-
-}
-
-getloanpaymentmentcheckmethod(); 
 
 
 $('#search_loan_amount_section').click(function(){

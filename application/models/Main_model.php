@@ -262,7 +262,12 @@ class Main_model extends CI_Model {
         }
 
 
+
     }
+
+
+    
+
 
     public function deleteinvoicesection($orderid,$outletid){
 
@@ -282,6 +287,10 @@ class Main_model extends CI_Model {
         return $this->db->where('order_summery_id',$orderid)->delete('order_summery'); 
     }
 
+    public function saveshoppingcartfortemp($data){
+        return $this->db->insert('order_temp_save',$data); 
+    }
+
     public function checkpasswordsection($password, $cashierid){
 
          $this->db->select('*'); 
@@ -297,6 +306,18 @@ class Main_model extends CI_Model {
         }
     }
 
+    public function getloanamountbycustomer(){
+        $this->db->select('*'); 
+        $this->db->from('customer'); 
+        $this->db->where('customer_credit >',0); 
+        $result = $this->db->get(); 
+        if($result->num_rows() > 0) {
+            return $result->result(); 
+        }
+        else {
+            return 0;
+        }
+    }
 
     public function searchmobilenumber($value){
         $this->db->select('*');
@@ -1949,6 +1970,20 @@ class Main_model extends CI_Model {
 
     }
 
+    public function getproductdetailssectionforreprint($summeryiddata, $outletid){
+        $this->db->select('*'); 
+        $this->db->from('order_details'); 
+        $this->db->join('products_section','products_section.products_id=order_details.product_id','left'); 
+        $this->db->where('summery_id',$summeryiddata); 
+        $result = $this->db->get(); 
+        if($result->num_rows() > 0) {
+            return $result->result(); 
+        }
+        else {
+            return 0;
+        }
+    }
+
 
     public function savetemporaryforsalesunitreturn($data){
         return $this->db->insert('return_temp_details',$data);
@@ -2290,7 +2325,7 @@ class Main_model extends CI_Model {
         $this->db->select('outlet_id');
         $this->db->from('temporary_data_of_sale');
         $this->db->where('outlet_id',$outletid);
-        $result =$this->db->get();
+        $result = $this->db->get();
         if($result->num_rows() > 0){
             return $this->db->where('outlet_id',$outletid)->update('temporary_data_of_sale',$data);
         }
@@ -3034,8 +3069,43 @@ class Main_model extends CI_Model {
     }
 
 
+    public function regulateloanbuttonsection(){
+        $this->db->select('order_summery.discount_from_total_amount,sales_credit_details.sales_credit_amount,customer.customer_name,customer.customer_mobile,customer.customer_address,order_summery.invoice_no,order_summery.customer_id,order_summery.payment_method,order_summery.order_summery_id,order_summery.total_amount,order_summery.discounted_amount,order_summery.ordered_date,order_summery.additional_text');
+        $this->db->from('order_summery'); 
+        $this->db->join('customer','customer.customer_id=order_summery.customer_id','left'); 
+        $this->db->join('sales_credit_details','sales_credit_details.summery_id_fk=order_summery.order_summery_id','left');
+      //  $this->db->where('SUBSTRING(ordered_date,1,10)',$date);
+     //   $this->db->where('sales_credit_amount.outlet_id',$outletid); 
+        $this->db->order_by('order_summery_id','desc');
+        $result = $this->db->get(); 
+        if($result->num_rows() > 0) {
+           foreach($result->result() as $row){
 
-    //copyback
+               $loanvalue=floatval($row->sales_credit_amount); 
+               $customermobile = $row->customer_mobile; 
+
+               $this->db->query("update customer set customer_credit=(customer_credit + ".$loanvalue.") where customer_mobile='".$customermobile."'"); 
+               
+           }
+        }
+        else {
+            return 0;
+        }
+
+    }
+
+
+    public function savecreditamountforcustomer($customerid, $customeridamount){
+        $this->db->query("update customer set customer_credit=(customer_credit + ".$customeridamount.") where customer_id=".$customerid.""); 
+
+    }
+    
+    public function subtractamountfromcustomer($customermobile, $loanvalue){
+        $this->db->query("update customer set customer_credit=(customer_credit - ".$loanvalue.") where customer_mobile='".$customermobile."'"); 
+ 
+    }
+
+ 
     public function showoffsalesunitsection($date,$outletid){
         $this->db->select('order_summery.discount_from_total_amount,sales_credit_details.sales_credit_amount,customer.customer_name,customer.customer_mobile,customer.customer_address,order_summery.invoice_no,order_summery.customer_id,order_summery.payment_method,order_summery.order_summery_id,order_summery.total_amount,order_summery.discounted_amount,order_summery.ordered_date,order_summery.additional_text');
         $this->db->from('order_summery'); 
@@ -3224,6 +3294,10 @@ class Main_model extends CI_Model {
            return 0; 
        }
        
+    }
+
+    public function regulateloanbutton(){
+
     }
 
     public function muteexpproduct($productid, $outletid){

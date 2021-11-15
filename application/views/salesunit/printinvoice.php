@@ -329,16 +329,18 @@
 
     <script>
 $(document).ready(function(){
-                    //         $.ajax({
-                    //     url: $('#base_url').val() + 'Controllerunit/deletesessionforcarts',
-                    //     method: 'POST',
-                    //     success: function (data) {
+                             $.ajax({
+                        url: $('#base_url').val() + 'Controllerunit/deletesessionforcarts',
+                        method: 'POST',
+                        success: function (data) {
 
-                    //     },
-                    //     error: function (err) {
-                    //         console.error('Error found', err);
-                    //     }
-                    // });
+                        },
+                        error: function (err) {
+                            console.error('Error found', err);
+                        }
+                    });
+
+                    
 
 }); 
 </script>

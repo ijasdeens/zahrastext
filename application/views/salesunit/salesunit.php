@@ -102,6 +102,8 @@
     </style>
     <!-- custom style -->
 </head>
+ 
+ 
 
 <body class="drawer drawer--right">
 <header role="banner">
@@ -144,6 +146,7 @@
                             Outlet Name :
                             <?php echo $this->session->outlets_name?>
                         </h2>
+                         
                         <div class="row mt-2">
                           <div class="col">
                               
@@ -267,7 +270,8 @@
                             <span class="text" id="messagesectionoffound"></span>
                             <div>
                                 Name : <span class="font-weight-bold text-danger" id='customer_name_text'></span> <br>
-                                Address : <span class="font-weight-bold text-danger" id='customer_address_text'></span>
+                                Address : <span class="font-weight-bold text-danger" id='customer_address_text'></span> <br>
+                                
                             </div>
                         </div>
 
@@ -818,6 +822,10 @@
                                   <div class="float-right my-2">
                                   <button class='btn btn-success my-4 py-2 btn-sm d-none' id='exporttoexcelwholedata'><i class="fa fa-file-excel-o"></i>  Export as excel</button>
                                 <br>
+                                <a href="<?php echo base_url()?>Controllerunit/getloanamountbycustomer" target="_blank" class="btn btn-danger btn-sm">Get loan amount by customer</a>
+                                <br/>
+                                <button class="btn btn-primary my-2 py-2" id='regulateloanbutton'>Regulate loan</button>
+
                                 <a href="<?php echo base_url()?>Controllerunit/printsalessidesection" target="_blank" class="btn btn-primary btn-sm">Print <i class="fa fa-print"></i></a>
 
                                 </div>
@@ -913,6 +921,7 @@
                                                  <option value="Check">check</option>
                                              </select>
                                          </div>
+
                                          <div class="col">
                                          <button class="btn btn-info my-4 py-2" id='search_loan_amount_section'>Search <i class="fa fa-search" aria-hidden='true'></i></button>
                                         <br>

@@ -6,8 +6,10 @@ class Controllerunit extends CI_Controller {
 
     public function __construct(){
         parent::__construct();
-           $this->load->library('Zend');
-           $this->load->library('session');
+        $this->load->library('session');
+           //$this->load->library('Zend');
+         
+           $this->load->helper('cookie');
 
 
     }
@@ -329,6 +331,21 @@ class Controllerunit extends CI_Controller {
                 $to_expense_list = ''; 
                 $this->session->set_userdata('fromdateforexpense',$from_date_expense_list); 
                  $this->session->set_userdata('todateforexpense',$to_expense_list); 
+
+                
+
+                 $name   = 'user';
+                 $value  = 'Raj';
+                 $expire = time()+1000;
+                 $path  = '/';
+                 $secure = TRUE;
+         
+                 setcookie($name,$value,$expire,$path); 
+         
+
+                
+
+
         
 
 
@@ -488,12 +505,7 @@ class Controllerunit extends CI_Controller {
     }
 
     
-
-
-    public function retriewdataforexpiredata(){
-        $result = $this->main_model->retriewdataforexpiredata($this->session->outlet_id); 
-        echo json_encode($result); 
-    }
+ 
 
     public function muteexpproduct(){
         $product_id_fk = $this->security->xss_clean($_POST['product_id_fk']); 
@@ -559,53 +571,8 @@ class Controllerunit extends CI_Controller {
 
     }
 
-
-
+ 
     
-
-    
-    public function creditdetailsforsaving(){
-        $discountpercentage = $this->security->xss_clean($_POST['discountpercentage']);
-        $dicountvalue = $this->security->xss_clean($_POST['dicountvalue']);
-        $fulltimewithdate = $this->security->xss_clean($_POST['fulltimewithdate']);
-        $sales_invoice_id = $this->security->xss_clean($_POST['sales_invoice_id']);
- $outletid = (int)$this->session->userdata('outlet_id');
-  $paying_amount_given = $this->security->xss_clean($_POST['value']);
-        $additional_information = $this->security->xss_clean($_POST['additional_information']); 
-
-        $this->session->set_userdata('addtional_information',$additional_information); 
-
-        $orderedstatus = 1;
-        $orderdetailsarray = array(
-            'ordered_date' => $fulltimewithdate,
-            'ordered_status' => 'Completed',
-            'discount' => $discountpercentage,
-            'discounted_amount' => $dicountvalue,
-            'total_amount' => $paying_amount_given,
-            'ordered_status' => $orderedstatus,
-            'customer_id' => (int)$this->session->userdata('customer_id'),
-            'payment_method' => 'Credit',
-            'outlet_id' => $this->session->outlet_id,
-            'status' => 'Sold',
-            'invoice_no' => $sales_invoice_id
-        );
-
-          $last_insert_id = $this->main_model->saveamountforall($orderdetailsarray);
-
-          $this->session->set_userdata('last_insert_id',$last_insert_id);
-
-          echo $last_insert_id; 
-
-        $creditamountdata = array(
-            'sales_credit_amount' => $paying_amount_given, 
-            'summery_id_fk ' => $last_insert_id,
-            'outlet_id' => $this->session->outlet_id,
-            'additional_information' => $additional_information
-        );
-
-          $this->main_model->savecreditdetailssection($creditamountdata); 
-
-    }
 
     
 
@@ -1696,13 +1663,18 @@ else
         $password = $this->security->xss_clean($_POST['password']); 
         $payment_method = $this->security->xss_clean($_POST['payment_method']); 
 
+        $customermobile = $this->security->xss_clean($_POST['customermobile']); 
+        $sales_credit_amount = $this->security->xss_clean($_POST['sales_credit_amount']); 
 
         $ordereddate = substr($ordereddate, 0,10); 
 
         $checkapsswordresult = $this->main_model->checkpasswordsection($password, $this->session->cashier_id); 
          
         if( $checkapsswordresult==1){
-            
+            if($sales_credit_amount!=0){
+            $this->main_model->subtractamountfromcustomer($customermobile,$sales_credit_amount ); 
+          }
+
             $this->main_model->deleteinvoicesection($order_id, $this->session->outlet_id); 
              
             $subtractamountresult = $this->main_model->subtractamountsection($total_amount_todelete,$ordereddate,$payment_method, $this->session->outlet_id); 
@@ -1722,6 +1694,8 @@ else
     public function searchmobilenumber(){
         $myarraydata = array(); 
 
+        $customerid = 0; 
+
         $value = $this->security->xss_clean($_POST['value']);
         $result = $this->main_model->searchmobilenumber($value);
         if($result==0){
@@ -1729,15 +1703,17 @@ else
         }
         else{
             foreach($result as $customer){
-            $this->session->set_userdata('customer_id',$customer->customer_id);
+            $customerid = $customer->customer_id; 
 
-                $myarraydata = array(
+                 $myarraydata = array(
                     'customer_name' => $customer->customer_name, 
                     'customer_address' => $customer->customer_address,
                     'status' => 1
                 ); 
 
             }
+            $this->session->set_userdata('customer_id',$customerid);
+
             echo json_encode($myarraydata);
            
         }
@@ -2480,6 +2456,25 @@ else
         'actual_price' => $_POST['product_price']
 
         );
+
+        $mydata = array(
+            'id'      => $_POST['product_id'],
+            'qty'     => 1,
+            'price'   =>  $_POST['product_price'],
+            'name'    => $_POST['product_name'],
+            'availablequantity' => $_POST['availablequantity'],
+            'product_pic' => $_POST['product_pic'],
+            'product_unit' => $_POST['product_unit'],
+            'product_code' => $_POST['product_code'],
+            'type' => $type,
+            'actual_price' => $_POST['product_price'],
+            'outlet_id' => $this->session->outlet_id
+    
+            );
+
+
+
+       // $this->main_model->saveshoppingcartfortemp($mydata); 
         echo $this->cart->insert($data);
         exit(); 
  
@@ -2749,6 +2744,7 @@ else
 
         }
 
+
             foreach($this->cart->contents() as $items){
             $currentQuantity = (int)$items['qty'];
              $productid = (int)$items['id'];
@@ -2786,19 +2782,33 @@ else
     public function reprintsection($summeryiddata){
        
         $allsummerydetails = $this->main_model->getallsummerydetails($summeryiddata,$this->session->outlet_id); 
+        
 
         if($allsummerydetails!=0){
             foreach($allsummerydetails as $details){
-                $data['ordered_date'] =$details->ordered_date; 
-                $data['invoice_id'] = $details->order_summery_id;
+                $data['ordered_date'] = $details->ordered_date; 
+                $data['invoice_id_no'] = $details->order_summery_id;
                 $data['addtional_information'] = $details->additional_text; 
                 $data['discount_percentage'] = $details->discount_from_total_amount;
-              
-                
+                $data['recieved_amount_fromcus'] = $details->recieved_amount_fromcus; 
+                $data['balance_amount_from_cus'] = $details->balance_amount_from_cus; 
+                $data['discount'] = $details->discount; 
+                $data['discountedamount'] = $details->discounted_amount; 
+                $data['before_discount_sub_total'] = $details->total_amount; 
+                $data['paying_amount'] = $details->paying_amount; 
+                $data['discount_percentage'] = $details->discount_percentage; 
+                $data['subtract'] = $details->subtract; 
+                $data['discount_amount'] = $details->discount_amount; 
+                $data['individual_discountamount'] = $details->individual_discountamount; 
+               
             }
         }
-        
 
+        $getallproductdetails = $this->main_model->getproductdetailssectionforreprint($summeryiddata, $this->session->outlet_id); 
+        
+        $data['boughproducts'] = $getallproductdetails; 
+
+        $this->load->view('salesunit/reprintinvoice', $data); 
           
     }
 
@@ -2808,6 +2818,8 @@ else
        
         $this->cart->destroy();
       $this->session->set_userdata('mainbalance',0);
+      $this->session->set_userdata('subtractedamountfromtotal',0); 
+
        
     }
 
@@ -4674,6 +4686,12 @@ public function select_postponed(){
         
      }
 
+     public function regulateloanbuttonsection(){
+         $result = $this->main_model->regulateloanbuttonsection(); 
+         echo $result; 
+     }
+
+
      public function gettotalsalesanddiscount(){
          $todaydate = $this->security->xss_clean($_POST['todaydate']); 
          $result = $this->main_model->gettotalsalesanddiscount($todaydate); 
@@ -4699,6 +4717,13 @@ public function select_postponed(){
           $result = $this->main_model->showoffsalesunitsectionbysearch($from_to_search_purdate,$to_to_search_purdate,$status_cehcker, $this->session->outlet_id); 
          echo json_encode($result); 
          
+     }
+
+     public function getloanamountbycustomer(){
+         $data['results'] = $this->main_model->getloanamountbycustomer(); 
+        $this->load->view('salesunit/customersideloanprint',$data);
+         
+
      }
 
      public function printsalessidesection(){
@@ -5137,6 +5162,90 @@ public function select_postponed(){
 
     }
 
+
+    public function creditdetailsforsaving(){
+        $discountpercentage = $this->security->xss_clean($_POST['discountpercentage']);
+        $dicountvalue = $this->security->xss_clean($_POST['dicountvalue']);
+        $fulltimewithdate = $this->security->xss_clean($_POST['fulltimewithdate']);
+        $sales_invoice_id = $this->security->xss_clean($_POST['sales_invoice_id']);
+ $outletid = (int)$this->session->userdata('outlet_id');
+  $paying_amount_given = $this->security->xss_clean($_POST['value']);
+        $additional_information = $this->security->xss_clean($_POST['additional_information']); 
+
+        $this->session->set_userdata('addtional_information',$additional_information); 
+
+        $individualdiscountamount = $this->security->xss_clean($_POST['individualdiscountamount']); 
+        $discountpercentagevalue= $this->security->xss_clean($_POST['discountpercentagevalue']); 
+        $subtractamounttotally = $this->security->xss_clean($_POST['subtractamounttotally']); 
+        $totalamount= $this->security->xss_clean($_POST['totalamount']); 
+        $amounttoshowoffpaying = $this->security->xss_clean($_POST['amounttoshowoffpaying']); 
+        $dicountvalueinnumber = $this->security->xss_clean($_POST['dicountvalueinnumber']); 
+ 
+         
+
+
+        $orderedstatus = 1;
+        $orderdetailsarray = array(
+            'ordered_date' => $fulltimewithdate,
+            'ordered_status' => 'Completed',
+            'discount' => $discountpercentage,
+            'discounted_amount' => $dicountvalue,
+            'total_amount' => $paying_amount_given,
+            'ordered_status' => $orderedstatus,
+            'customer_id' => (int)$this->session->userdata('customer_id'),
+            'payment_method' => 'Credit',
+            'outlet_id' => $this->session->outlet_id,
+            'status' => 'Sold',
+            'invoice_no' => $sales_invoice_id,
+            'additional_text' => $additional_information, 
+            'individual_discountamount' => $individualdiscountamount, 
+            'before_discount_sub_total' => $totalamount, 
+            'paying_amount' => $amounttoshowoffpaying, 
+            'discount_percentage' => $discountpercentagevalue, 
+            'subtract' => $subtractamounttotally, 
+            'discount_amount' => $dicountvalueinnumber, 
+            'discount_from_total_amount' => ($this->session->subtractedamountfromtotal=='NaN' || $this->session->subtractedamountfromtotal==null ) ? 0 : $this->session->subtractedamountfromtotal 
+
+        );
+
+          $last_insert_id = $this->main_model->saveamountforall($orderdetailsarray);
+
+          $this->session->set_userdata('last_insert_id',$last_insert_id);
+
+          echo $last_insert_id; 
+
+        $creditamountdata = array(
+            'sales_credit_amount' => $paying_amount_given, 
+            'summery_id_fk ' => $last_insert_id,
+            'outlet_id' => $this->session->outlet_id,
+            'additional_information' => $additional_information
+        );
+
+          $this->main_model->savecreditdetailssection($creditamountdata); 
+          $this->main_model->savecreditamountforcustomer($this->session->userdata('customer_id'), $paying_amount_given); 
+    }
+
+
+
+
+
+
+    public function checklinessid(){
+        echo $_COOKIE['PHPSESSID']; 
+
+    }
+
+    public function retriewdataforexpiredata(){
+        $result =$this->main_model->retriewdataforexpiredata($this->session->outlet_id); 
+        echo json_encode($result); 
+    }
+
+    public function regulateloanbutton(){
+         $this->main_model->regulateloanbutton(); 
+    }
+
+
+
     public function savecashamount(){
 
         $paying_amount_given  = $this->security->xss_clean($_POST['paying_amount_given']);
@@ -5159,6 +5268,19 @@ public function select_postponed(){
 
        $this->session->set_userdata('addtional_information',$additional_information); 
 
+       $getbalanceamount = ($recieved_amount - $paying_amount_given); 
+
+       $individualdiscountamount = $this->security->xss_clean($_POST['individualdiscountamount']); 
+       $discountpercentagevalue= $this->security->xss_clean($_POST['discountpercentagevalue']); 
+       $subtractamounttotally = $this->security->xss_clean($_POST['subtractamounttotally']); 
+       $totalamount= $this->security->xss_clean($_POST['totalamount']); 
+       $amounttoshowoffpaying = $this->security->xss_clean($_POST['amounttoshowoffpaying']); 
+       $dicountvalueinnumber = $this->security->xss_clean($_POST['dicountvalueinnumber']); 
+
+
+ 
+
+
         $orderedstatus = 1;
         $orderdetailsarray = array(
             'ordered_date' => $fulltimewithdate,
@@ -5173,6 +5295,14 @@ public function select_postponed(){
             'status' => 'Sold',
             'invoice_no' => $sales_invoice_id,
             'additional_text' => $additional_information, 
+            'recieved_amount_fromcus' => floatval($this->session->recieved_amount), 
+            'balance_amount_from_cus' => floatval($getbalanceamount), 
+            'individual_discountamount' => $individualdiscountamount, 
+            'before_discount_sub_total' => $totalamount, 
+            'paying_amount' => $amounttoshowoffpaying, 
+            'discount_percentage' => $discountpercentagevalue, 
+            'subtract' => $subtractamounttotally, 
+            'discount_amount' => $dicountvalueinnumber, 
             'discount_from_total_amount' => ($this->session->subtractedamountfromtotal=='NaN' || $this->session->subtractedamountfromtotal==null ) ? 0 : $this->session->subtractedamountfromtotal 
        
         );
@@ -5190,6 +5320,7 @@ public function select_postponed(){
                 'outlet_id' => $this->session->outlet_id
             );
             $this->main_model->savecreditamountnow($credit_data);
+            $this->main_model->savecreditamountforcustomer($this->session->userdata('customer_id'),$balance_amount); 
         }
         echo $last_insert_id; 
 
@@ -5258,6 +5389,7 @@ public function select_postponed(){
                   'summery_id_fk' => $last_insert_id
               );
               $this->main_model->savecreditamountnow($credit_data);
+              $this->main_model->savecreditamountforcustomer($this->session->userdata('customer_id'), $cheque_amount_balance); 
           }
 
           $checkdata = array(

@@ -41,7 +41,7 @@
   text-align: center;
 }
 #invoice-POS p {
-  font-size: 1rem;
+  font-size: 11px;
   color: #000;
   line-height: 1.2em;
 }
@@ -53,7 +53,7 @@
   min-height: 100px;
 }
 #invoice-POS #mid {
-  min-height: 80px;
+  min-height: 0px !important;
 }
 #invoice-POS #bot {
   min-height: 50px;
@@ -87,7 +87,7 @@
   border-collapse: collapse;
 }
 #invoice-POS .tabletitle {
-  font-size: 0.5em;
+  font-size: 11px;
 }
 #invoice-POS .service {
   border-bottom: 1px solid #EEE;
@@ -96,16 +96,16 @@
   width: 24mm;
 }
 #invoice-POS .itemtext {
-  font-size: 0.75rem;
+  font-size: 11px;
 }
 #invoice-POS #legalcopy {
-  margin-top: 5mm;
+  margin-top: 1mm;
 }
 
     .tablebottomsection{
         margin-top: -20px;
     }
-
+ 
 </style>
 
 
@@ -135,32 +135,34 @@
             Address :    <?= $this->session->address?><br/>
               Phone   : <?php echo $this->session->outlet_mobile?> <br/>
                Cashier : <?php echo $this->session->staffname;?> <br>
+           <span id="date_time" style="font-weight:bold"></span> <br/>
                 
-
-        </p>
-
-           <p id="date_time" style="font-weight:bold"></p> 
            <?php
-           $myinvoiceid = (int)$invoice_id; 
+           $myinvoiceid = (int)$invoice_id_no; 
+           
              
            ?>
          
-            <p style="font-weight:bold">Invoice ID : <?php echo --$myinvoiceid?></p>
-            <p style="font-weight:bold">Note : <?php echo $addtional_information;?></p>
+            <span style="font-weight:bold">Invoice ID : <?php echo $myinvoiceid?></span><br>
+            <span style="font-weight:bold">Note : <?php echo $addtional_information;?></span>
+
+        </p>
+
+          
       </div>
     </div><!--End Invoice Mid-->
-    <span>------------------------------------------</span>
+    <span>------------------------------------------------</span>
     <div id="bot">
 
                     <div id="table">
-                        <table style="text-align:center">
+                        <table style="text-align:center" id='maintablesectionforproducts'>
                           <thead>
                                 <tr class="tabletitle">
-                                <td class="item"><h2>ITEM</h2></td>
-                                <td class="Hours"><h2>QTY</h2></td>
-                                <td class="Rate"><h2>Price</h2></td>
-                                <td class="Hours"><h2>Dis amount</h2></td>
-                                 <td class="rate"><h2>AMOUNT</h2></td>
+                                <td class="item"><h4>ITEM</h4></td>
+                                <td class="Hours"><h4>QTY</h4></td>
+                                <td class="Rate"><h4>Price</h4></td>
+                                <td class="Hours"><h4>Dis amount</h4></td>
+                                 <td class="rate"><h4>AMOUNT</h4></td>
                             </tr>
                           </thead>
                            <?php
@@ -170,109 +172,151 @@
                             $priceforactual = 0.00; 
                             $priceforchange = 0.00;
                             $priceforanswer = 0; 
+
+
+                            $totalamountofsection = 0.00; 
                             
 
                             ?>
 
                            <tbody id="product_details_to_display_forinvoice">
-                                <?php foreach($this->cart->contents() as $items):?>
+                               
+                                  <?php foreach($boughproducts as $product):?>
                                 <?php
-                                 $priceforactual+=floatval($items['actual_price']) * $items['qty'];
-                                 $priceforchange+=floatval($items['price']) * $items['qty']; 
+                                 $priceforactual+=floatval($product->actual_price) * $product->choosen_quantity;
+                                 $priceforchange+=floatval($product->sub_total) * $product->choosen_quantity; 
                                  
                                ++$numberofItems;
-                               $numberofpcs+=floatval($items['qty']);
+                               $numberofpcs+=floatval($product->choosen_quantity);
                                ?>
                                 <tr class="service" style="font-weight:bold">
                 <td class="tableitem" style="font-weight:bold">
-                       <p class="itemtext" style="font-weight:bold"><?php echo $items['name']?>   <br>
-                      <small style="font-weight:bold"><?php echo $items['product_code']?></small></p>
+                       <p class="itemtext" style="font-weight:bold"><?php echo $product->product_name?>   <br>
+                      <small style="font-weight:bold"><?php echo $product->product_code_no?></small></p>
 
 
                 </td>
                 <?php
 
-                $getactualprice = ($items['actual_price'] - $items['price']) * $items['qty']; 
+                $getactualprice = ($product->actual_price - $product->sub_total) * $product->choosen_quantity; 
+                $totalamountofsection+=floatval($getactualprice); 
                 ?>
-                 <td class="tableitem"><p class="itemtext" style="font-weight:bold"><?php echo $items['qty']?></p></td>
+                 <td class="tableitem"><p class="itemtext" style="font-weight:bold"><?php echo $product->choosen_quantity?></p></td>
                 <td class="tableitem"><p class="itemtext" style="font-weight:bold">
-                <?php echo $this->cart->format_number($items['actual_price'])?> <br>
-                <?php echo $this->cart->format_number($items['price']);?></p>
+                <?php echo number_format($product->actual_price,2)?> <br>
+                <?php echo number_format($product->sub_total,2);?></p>
               
               </td>
                 <td class="tableitem"><p class="itemtext" style="font-weight:bold"><?php echo number_format($getactualprice,2)?></p></td>
 
-                <td class="tableitem"><p class="itemtext"><?php echo $this->cart->format_number($items['subtotal']);?></p></td>
+                <td class="tableitem"><p class="itemtext"><?php echo number_format($totalamountofsection,2);?></p></td>
             </tr>
                                 <?php endforeach;?>
  
                            </tbody>
-
+                                  <!--
                             <tr class="tabletitle tablebottomsection">
-                                <td style="font-size:12px;font-weight:bold">SUB TOTAL</td>
+                                <td style="font-size:9px;font-weight:bold">SUB TOTAL</td>
                                 <td></td>
                                 <td></td>
-                                <td class="payment"><h2 id="display_sub_total_print"><?php echo $before_discount_sub_total?></h2></td>
+                                <td class="payment"><h2 id="display_sub_total_print"></h2></td>
 
                             </tr>
                                <tr class="tabletitle tablebottomsection">
                                 <td style="font-size:12px;font-weight:bold">Discount</td>
 
-                              <td colspan="2"><h2 id="discount_percentage"><?php echo $discount_percentage?></h2></td>
-                                <td class="payment"><h2><?php echo  $discount_amount?></h2></td>
+                              <td colspan="2"><h2 id="discount_percentage">*/</h2></td>
+                                <td class="payment"><h2> /h2></td>
                             </tr>
                             <tr class="tabletitle tablebottomsection">
                                 <td style="font-size:12px;font-weight:bold">Dis amount from total</td>
 
                               <td colspan="2"><h2 id="discount_from_total"></h2></td>
-                                <td class="payment"><h2>Rs. <?php echo number_format($this->session->subtractedamountfromtotal,2)?></td>
+                                <td class="payment"><h2>Rs.  </td>
                             </tr>
                             <tr class="tabletitle tablebottomsection">
                                 <td style="font-size:12px;font-weight:bold">Individual Dis amount</td>
 
                               <td colspan="2"><h2 id="discount_from_total"></h2></td>
-                                <td class="payment"><h2>Rs. <?php 
-                                $answer = ($priceforactual - $priceforchange);
-                                echo number_format($answer,2); 
-                                ?></td>
+                                <td class="payment"><h2>Rs.</td>
                             </tr>
 
                                 <tr class="tabletitle tablebottomsection">
                                 <td style="font-size:12px;font-weight:bold">Sub total</td>
                                 <td></td>
                                 <td></td>
-                                <td class="payment"><h2 id="given_cash_amounts"><?php echo substr($paying_amount,4)?></h2></td>
+                                <td class="payment"><h2 id="given_cash_amounts"> </h2></td>
                             </tr>
                             
                            </tr>
                                 <tr class="tabletitle tablebottomsection">
-                                <td style="font-size:12px;font-weight:bold">No of Pcs <?php echo $numberofpcs?></td>
+                                <td style="font-size:12px;font-weight:bold">No of Pcs  </td>
                                 <td></td>
                                 <td></td>
-                                <td class="payment"><h2 id="given_cash_amounts">No of Items : <?php echo $numberofItems?></h2></td>
+                                <td class="payment"><h2 id="given_cash_amounts">No of Items :  </h2></td>
                             </tr>
-
+-->
 
                         </table>
+                        <?php
+                        $mynumberformataccount = floatval($this->session->subtractedamountfromtotal); 
+                        ?>
+                        <p style="float:right">
+                                  <span style="font-size:11px;font-weight:bold">Sub total :</span> 
+                                  <span style="font-size:11px; font-weight:bold"><?php echo $before_discount_sub_total?></span>
+                                  <br>
+                                  <span style="font-size:11px; font-weight:bold">Discount : </span>
+                            <span style="font-size:11px; font-weight:bold">%<?php echo $discount?></span>
+                                  <br>
+                                  <span style="font-size:11px; font-weight:bold">Dis amount from total : </span>
+                                  <span style="font-size:11px; font-weight:bold"><?php echo $discountedamount?></span>
+                                  <br>
+                                  <span style="font-size:11px; font-weight:bold">Individual Dis amount : </span>
+                                  <span style="font-size:11px; font-weight:bold">
+                                <?php
+                                echo $individual_discountamount; 
+                                ?>
+                                </span><br>
+                                <span style="font-size:11px; font-weight:bold">Sub total :</span>
+                                <span style="font-size:11px; font-weight:bold"><?php echo floatval(number_format($before_discount_sub_total,2))?></span>
+
+                          </div>
+                         
+                         <?php
+                         $recievedamount = floatval($recieved_amount_fromcus); 
+                         $mainbalancesystem = floatval($balance_amount_from_cus); 
+                         ?>
+                                 
                         <center>
-                          <p style="font-weight:bold; font-size:15px;">Given amount : Rs.0</p>
-                          <p style="font-weight:bold;font-size:15px;">Balance payment : Rs.0</p>
+                          <p style="font-weight:bold; font-size:11px;">Given amount : Rs.<?php echo number_format($recievedamount,2)?>
+                        <br>
+                        Balance payment : Rs.<?php echo number_format($mainbalancesystem,2)?>
+                      <br>
+
+                      </p>
+                      
+                           
                         </center>
+                        
                     </div><!--End Table-->
-                    <span>------------------------------------------</span>
+
+                     
 
 
                     </div>
+                    <p>------------------------------------------------</p>
+
                     
-                    <div class="my-4">
-                    
-                      <p style="font-weight:bold">Please bring your bill while coming to return your products.</p> 
-                      <p style="font-weight:bold">Exchange is only acceptable by 7 days</p>
-                      <p style="font-weight:bold">Thank you for purcahsing.</p>
-                    </div>
-                    <span>--------------------------------------------</span>
-                    
-                  <span style="font-size:12px; font-weight: bold;">  POS System delivered by CodeAccelerator - 075-89 53 142</span>
+                    <div class="">
+                      <p style="font-weight:bold; font-size:11px;">Please bring your bill while coming to return your products. <br>Exchange is only acceptable by 7 Days
+                    <br>
+                    Thank you for purchasing <br>
+                    <span>---------------------------------------------------------------------</span>
+
+                    POS System delivered by CodeAccelerator - 075-89 53 142
+                    </p> 
+                     </div>
+                  
                 </div><!--End InvoiceBot-->
   </div>
   <!--End Invoice-->
@@ -289,18 +333,18 @@
 
     <script>
 $(document).ready(function(){
-                            $.ajax({
-                        url: $('#base_url').val() + 'Controllerunit/deletesessionforcarts',
-                        method: 'POST',
-                        success: function (data) {
+                    //         $.ajax({
+                    //     url: $('#base_url').val() + 'Controllerunit/deletesessionforcarts',
+                    //     method: 'POST',
+                    //     success: function (data) {
 
-                        },
-                        error: function (err) {
-                            console.error('Error found', err);
-                        }
-                    });
+                    //     },
+                    //     error: function (err) {
+                    //         console.error('Error found', err);
+                    //     }
+                    // });
 
-});
+}); 
 </script>
 
     <script>
