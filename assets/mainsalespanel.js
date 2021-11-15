@@ -301,6 +301,8 @@ getloanpaymentmentcheckmethod();
 
 		let total_payments = 0;
 
+		let totalcreditedamount = 0; 
+
 		$.ajax({
 			url: base_url + "Controllerunit/getSalessummerydetails",
 			method: "POST",
@@ -324,6 +326,7 @@ getloanpaymentmentcheckmethod();
 							"Rs." + parseFloat(d.refunded_amount).toFixed()
 						);
 						$('#expenses_amount').html("Rs."+ parseFloat(d.expenses_amount_reg).toFixed(2)); 
+						$('#recievedpaymentforcreditsection').html('Rs.'+parseFloat(d.recieveddebt_forregister).toFixed(2)); 
 
 						total_payments += parseFloat(d.cash_in_hand);
 						total_payments += parseFloat(d.cash_payment);
@@ -1580,7 +1583,7 @@ getloanpaymentmentcheckmethod();
 					if (data != 0) {
 						$('#customer_name_text').html(getData.customer_name); 
 						$('#customer_address_text').html(getData.customer_address); 
-					//	$('#customer_credit_liner').html('Rs.'+parseFloat(getData.customer_credit_details).toFixed(2)); 
+						$('#customer_credit_liner').html('Rs. '+getData.customer_credit_details); 
 
 						$("#messagesectionoffound").removeClass("text-danger");
 						$("#messagesectionoffound").addClass("text-success");
@@ -1611,6 +1614,7 @@ getloanpaymentmentcheckmethod();
 		let customer_name = $("#customer_name").val();
 		let customer_mobile = $("#customer_mobilenumber").val();
 		let customer_address = $("#customer_address").val();
+		let outstandingcreditamount= $('#outstandingcreditamount').val(); 
 
 		if (customer_name == "") {
 			toastr.danger("Customer name is required");
@@ -1621,6 +1625,15 @@ getloanpaymentmentcheckmethod();
 			return false;
 		}
 
+		if(outstandingcreditamount!=""){
+			if(isNaN(outstandingcreditamount)){
+				alert("Only numbers are accepted"); 
+				$('#outstandingcreditamount').css('border','2px solid red'); 
+				$('#outstandingcreditamount').focus(); 
+				return false; 
+			}
+		}
+
 		$.ajax({
 			url: base_url + "Controllerunit/savecustomers",
 			method: "POST",
@@ -1628,6 +1641,7 @@ getloanpaymentmentcheckmethod();
 				customerName: customer_name,
 				customerMobileNumber: customer_mobile,
 				customer_address: customer_address,
+				outstandingcreditamount:outstandingcreditamount=="" ? 0 : outstandingcreditamount
 			},
 			success: function (data) {
 				if (data == 1) {
@@ -2679,31 +2693,47 @@ getloanpaymentmentcheckmethod();
 			let result = false; 
 
 			let checkexistingstatus = true; 
-			
 
+			
+	 
 			$(".btnaddshoppingcart").each(function () {
 				if ($(this).attr("product_code") == value) {
-					result = true; 
+					$('.increasequantity').each(function(){
+						if($(this).attr('product_code')==value){
+						$(this).click();
+						checkexistingstatus = false; 
+						result = true; 
+						return false; 
+
+						}
+
+						
+
+						 
+					}); 
+
+					if(!result){
+						$(this).click(); 
+						checkexistingstatus = false; 
+					}
+					
 					
 					checkexistingstatus = false; 
-					 return false; 
-				} else {
-					$(this).click();
-					result = false; 
-					checkexistingstatus = true; 
 					return false; 
+
+				} 
+				else {
+					console.log('second function'); 
+					checkexistingstatus = true; 
 
 				}
 			});
 			
-
-
-				alert(checkexistingstatus); 
-		
-
-			if(result==true){
+			if(checkexistingstatus==true){
 				alert('No product found with barcode'); 
 			}
+ 
+ 
 		}
 	});
 
@@ -4013,6 +4043,8 @@ ${
 		let refunded_amounttotal = 0.00; 
 		let expenses_amount_reg = 0.00; 
 
+		let paidexpensiveamount = 0.00; 
+
 	 
 
 		$.ajax({
@@ -4035,6 +4067,7 @@ ${
 						chequepaymenttotal+=parseFloat(d.cheque_payment); 
 						refunded_amounttotal+=parseFloat(d.refunded_amount); 
 						expenses_amount_reg+=parseFloat(d.expenses_amount_reg); 
+						paidexpensiveamount+=parseFloat(d.recieveddebt_forregister); 
 
 						$("#cashon_hands").html(
 							"Rs." + parseFloat(cashindhandtotal).toFixed(2)
@@ -4049,6 +4082,8 @@ ${
 							"Rs." + parseFloat(refunded_amounttotal).toFixed()
 						);
 						$('#expenses_amount').html("Rs."+ parseFloat(expenses_amount_reg).toFixed(2)); 
+
+						$('#recievedpaymentforcreditsection').html('Rs'+parseFloat(paidexpensiveamount).toFixed(2)); 
 
 						total_payments += parseFloat(cashindhandtotal).toFixed(2);
 						total_payments += parseFloat(cashpaymenttotal).toFixed(2);

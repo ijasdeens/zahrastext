@@ -144,13 +144,13 @@
 
         </p>
 
-           <p id="date_time" style="font-weight:bold"></p><br>
+           <p id="date_time" style="font-weight:bold"></p><br/>
            
       </div>
     </div><!--End Invoice Mid-->
     <?php
     $totalamount = 0; 
-    $totalamount = ($cash_in_hand + $cash_payment); 
+    $totalamount = ($cash_in_hand + $cash_payment + $recieveddebt_forregister); 
 
     $amountstoberecieved = 0; 
 
@@ -188,11 +188,17 @@
                          <div class="p-2">
                          Expenses amount :    Rs. <?php echo number_format($expenses_amount_reg,2)?>
                          </div>
+                          <div class="details">
+                            <div class="p-2">
+                              Recieved credit : Rs. <?php echo number_format($recieveddebt_forregister,2)?>
+                            </div>
+                          </div>
+
                          <span style="font-weight:bold">----------------------------------------------</span>
 
                          <div class="details">
                            <div class="p-2">
-                          <small style="font-weight:bold"> (Cash in hand + Cash payment )</small> :Rs. <?php echo number_format($totalamount,2)?>
+                          <small style="font-weight:bold"> (Cash in hand + Cash payment + Recieved credit )</small> :Rs. <?php echo number_format($totalamount,2)?>
                             
                            </div>
                          </div>
@@ -218,9 +224,6 @@
                            </div>
                          </div>
                       
-                      
-
-
                        </div>
                     </div><!--End Table-->
 
@@ -231,7 +234,7 @@
                      <center></center>
                     </div>
                     <hr/>
-                  <span style="font-size:12px; font-weight: bold;">  POS System delivered by CodeAccelerator - 0758953142</span>
+                  <span style="font-size:12px; font-weight: bold;">POS System delivered by B.M. Ijas deen - 0758953142</span>
                 </div><!--End InvoiceBot-->
   </div>
   <!--End Invoice-->

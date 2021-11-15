@@ -1649,8 +1649,9 @@ else
         $customerMobileNumber = $this->security->xss_clean($_POST['customerMobileNumber']);
         $customerName = $this->security->xss_clean($_POST['customerName']);
         $customer_address = $this->security->xss_clean($_POST['customer_address']); 
+        $outstandingcreditamount = $this->security->xss_clean($_POST['outstandingcreditamount']); 
 
-            $result = $this->main_model->savecustomers($customerMobileNumber,$customerName,$customer_address);
+            $result = $this->main_model->savecustomers($customerMobileNumber,$customerName,$customer_address,$outstandingcreditamount);
 
             echo $result;
 
@@ -1704,10 +1705,12 @@ else
         else{
             foreach($result as $customer){
             $customerid = $customer->customer_id; 
+            $value = floatval($customer->customer_credit); 
 
                  $myarraydata = array(
                     'customer_name' => $customer->customer_name, 
                     'customer_address' => $customer->customer_address,
+                    'customer_credit_details' => number_format( $value,2), 
                     'status' => 1
                 ); 
 
@@ -2911,6 +2914,7 @@ else
                 $data['refunded_amount'] = $res->refunded_amount; 
                 $data['date'] = $res->date; 
                 $data['expenses_amount_reg'] = $res->expenses_amount_reg;
+                $data['recieveddebt_forregister'] = $res->recieveddebt_forregister; 
                  
             }
         }
@@ -3018,14 +3022,14 @@ else
         </td>
         <td class="text-center">
             <div class="m-btn-group m-btn-group--pill btn-group mr-2" role="group" aria-label="...">
-                <button type="button" myid="<?php echo $items['id']?>" class="m-btn btn btn-default decreasequantity" qty="<?php echo $items['qty']?>"  rowid="<?php echo $items['rowid']?>"><i class="fa fa-minus"></i></button>
+                <button type="button" product_code="<?php echo $items['product_code']?>" myid="<?php echo $items['id']?>" class="m-btn btn btn-default decreasequantity" qty="<?php echo $items['qty']?>"  rowid="<?php echo $items['rowid']?>"><i class="fa fa-minus"></i></button>
                 <input type="tel"   availablequantity="<?php echo $items['availablequantity']?>" rowid="<?php echo $items['rowid']?>" class="fullquantity_fromcashier text-center" value="<?php echo $items['qty']?>" style="max-width:50px;">
 <!--
                 <button type="button" class="m-btn btn btn-default fullquantity" readonly>
                     <?php echo $items['qty']?>
                 </button>
 -->
-                <button type="button" availablequantity="<?php echo $items['availablequantity']?>" myid="<?php echo $items['id']?>" class="m-btn btn btn-default increasequantity <?php echo $items['rowid']?>" qty="<?php echo $items['qty']?>" rowid="<?php echo $items['rowid']?>"><i class="fa fa-plus"></i></button>
+                <button type="button" product_code="<?php echo $items['product_code']?>" availablequantity="<?php echo $items['availablequantity']?>" myid="<?php echo $items['id']?>" class="m-btn btn btn-default increasequantity <?php echo $items['rowid']?>" qty="<?php echo $items['qty']?>" rowid="<?php echo $items['rowid']?>"><i class="fa fa-plus"></i></button>
             </div>
         </td>
     <?php
@@ -4709,12 +4713,14 @@ public function select_postponed(){
          $from_to_search_purdate = $this->security->xss_clean($_POST['from_to_search_purdate']); 
          $to_to_search_purdate = $this->security->xss_clean($_POST['to_to_search_purdate']);
          $status_cehcker = $this->security->xss_clean($_POST['status_cehcker']); 
+         $mobile_no_or_invoice_text = $this->security->xss_clean($_POST['mobile_no_or_invoice_text']); 
 
         $this->session->set_userdata('from_to_search_purdate_session',$from_to_search_purdate); 
         $this->session->set_userdata('to_to_search_purdate_session',$to_to_search_purdate); 
         $this->session->set_userdata('status_checker_session',$status_cehcker); 
+        $this->session->set_userdata('mobileNumberto_searchsales',$mobile_no_or_invoice_text); 
 
-          $result = $this->main_model->showoffsalesunitsectionbysearch($from_to_search_purdate,$to_to_search_purdate,$status_cehcker, $this->session->outlet_id); 
+          $result = $this->main_model->showoffsalesunitsectionbysearch($mobile_no_or_invoice_text,$from_to_search_purdate,$to_to_search_purdate,$status_cehcker, $this->session->outlet_id); 
          echo json_encode($result); 
          
      }
@@ -4730,8 +4736,9 @@ public function select_postponed(){
          $from_to_search_purdate = $this->session->from_to_search_purdate_session; 
          $to_to_search_purdate = $this->session->to_to_search_purdate_session; 
          $status_cehcker = $this->session->status_checker_session;
+         $mobile = $this->session->mobileNumberto_searchsales; 
 
-         $data['results'] =  $this->main_model->showoffsalesunitsectionbysearch($from_to_search_purdate,$to_to_search_purdate,$status_cehcker, $this->session->outlet_id);
+         $data['results'] =  $this->main_model->showoffsalesunitsectionbysearch($mobile,$from_to_search_purdate,$to_to_search_purdate,$status_cehcker, $this->session->outlet_id);
         $this->load->view('salesunit/salessideprint',$data);
     }
 

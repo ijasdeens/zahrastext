@@ -271,6 +271,7 @@
                             <div>
                                 Name : <span class="font-weight-bold text-danger" id='customer_name_text'></span> <br>
                                 Address : <span class="font-weight-bold text-danger" id='customer_address_text'></span> <br>
+                                Credit : <span class="font-weight-bold text-danger" id='customer_credit_liner'></span>
                                 
                             </div>
                         </div>
@@ -1275,6 +1276,10 @@
                             <textarea class='form-control' id='customer_address'></textarea>
                         </div>
                         <div class="form-group">
+                            <label for="outstandingcreditamount">Outstanding credit</label>
+                            <input type='text' class="form-control" id='outstandingcreditamount' value="0"/>
+                        </div>
+                        <div class="form-group">
                             <button class="btn btn-outline-success btn-lg form-control" type="submit">Save</button>
                         </div>
 
@@ -1624,7 +1629,7 @@
                     <div class="p-1">
                     Recieved payment for credit : 
                     </div>
-                    <div class="p-1" id='recievedpaymentforcredit'>
+                    <div class="p-1" id='recievedpaymentforcreditsection'>
                     Rs.00
                     </div>
 

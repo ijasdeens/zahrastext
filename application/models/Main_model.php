@@ -230,7 +230,7 @@ class Main_model extends CI_Model {
         }
     }
 
-    public function savecustomers($customerMobileNumber,$customerName,$customeraddress){
+    public function savecustomers($customerMobileNumber,$customerName,$customeraddress,$creditamount){
 
         $this->db->select('*');
         $this->db->from('customer');
@@ -240,7 +240,7 @@ class Main_model extends CI_Model {
             return 1;
         }
         else {
-            $this->db->insert('customer',array('customer_name' =>$customerName,'customer_mobile' => $customerMobileNumber,'customer_address' => $customeraddress));
+            $this->db->insert('customer',array('customer_credit' =>$creditamount,'customer_name' =>$customerName,'customer_mobile' => $customerMobileNumber,'customer_address' => $customeraddress));
         }
 
 
@@ -3124,7 +3124,7 @@ class Main_model extends CI_Model {
         
     }
 
-    public function showoffsalesunitsectionbysearch($fromdate, $todate, $statuschecker,$outletid){
+    public function showoffsalesunitsectionbysearch($mobile,$fromdate, $todate, $statuschecker,$outletid){
        
          $this->db->select('order_summery.discount_from_total_amount,sales_credit_details.sales_credit_amount,customer.customer_name,customer.customer_mobile,customer.customer_address,order_summery.invoice_no,order_summery.customer_id,order_summery.payment_method,order_summery.order_summery_id,order_summery.total_amount,order_summery.discounted_amount,order_summery.ordered_date,order_summery.additional_text');
         $this->db->from('order_summery'); 
@@ -3140,6 +3140,10 @@ class Main_model extends CI_Model {
         if($statuschecker!=''){
             $this->db->where('order_summery.payment_method',$statuschecker); 
          }
+         if($mobile!=''){
+             $this->db->where('customer.customer_mobile',$mobile); 
+         }
+
         $this->db->where('order_summery.outlet_id',$outletid); 
 
         $this->db->order_by('order_summery_id','desc');

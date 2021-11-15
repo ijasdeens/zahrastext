@@ -309,7 +309,7 @@
                     Thank you for purchasing <br>
                     <span>---------------------------------------------------------------------</span>
 
-                    POS System delivered by CodeAccelerator - 075-89 53 142
+                    POS System delivered by B.M. Ijas deen - 075-89 53 142
                     </p> 
                      </div>
                   
