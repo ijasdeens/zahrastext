@@ -2607,81 +2607,18 @@ else
         $type='returned';
 
         $choosen_quantity = $this->security->xss_clean($_POST['choosen_quantity']);
+        $data = array(
+            'id'      => $product_id,
+            'qty'     => $return_quantity_val,
+            'price'   => $price,
+            'name'    => $product_name,
+            'availablequantity' => 1,
+            'product_code' => $products_code,
+            'type' => $type,
+            'summery_id' => $order_summery_id
+                      );
+              $this->cart->insert($data);
 
-        if(count($this->cart->contents())==0){
-
-            $data = array(
-                    'id'      => $product_id,
-                    'qty'     => $return_quantity_val,
-                    'price'   => $price,
-                    'name'    => $product_name,
-                    'availablequantity' => 1,
-                    'product_code' => $products_code,
-                    'type' => $type,
-                    'summery_id' => $order_summery_id
-                              );
-                      $this->cart->insert($data);
-
-
-
-        }
-        else {
-            #if cart is not empty
-
-            foreach($this->cart->contents() as $items){
-
-                if($items['type']==$type){
-
-
-                    if($items['qty'] <= $choosen_quantity){
-
-                        $data = array(
-                    'id'      => $product_id,
-                    'qty'     => $return_quantity_val,
-                    'price'   => $price,
-                    'name'    => $product_name,
-                    'availablequantity' => 1,
-                    'product_code' => $products_code,
-                    'type' => $type,
-                    'summery_id' => $order_summery_id
-                              );
-                      $this->cart->insert($data);
-
-                    }
-
- 
-                }
-                else {
-                        $this->cart->destroy();
-                     if($items['qty'] <= $choosen_quantity){
-
-                        $data = array(
-                    'id'      => $product_id,
-                    'qty'     => $return_quantity_val,
-                    'price'   => $price,
-                    'name'    => $product_name,
-                    'availablequantity' => 1,
-                    'product_code' => $products_code,
-                    'type' => $type,
-                    'summery_id' => $order_summery_id
-                              );
-                      $this->cart->insert($data);
-
-                    }
-
-
-                }
-
-
-                #end of if for type
-
-
-
-
-
-            } #endof foreach
-
-        } #end of else
 
         echo json_encode($this->cart->contents());
 
@@ -4179,13 +4116,22 @@ public function select_postponed(){
         $refundedamount = $this->security->xss_clean($_POST['refundedamount']); 
         $ordered_dateforreturn = $this->security->xss_clean($_POST['ordered_dateforreturn']); 
 
+        $todaydate = $this->security->xss_clean($_POST['todaydate']); 
 
+        $paymentmethodforreturn = $this->security->xss_clean($_POST['paymentmethodforreturn']); 
         $this->main_model->saverefundamountforregisterdetails($refundedamount,$ordered_dateforreturn,$this->session->outlet_id); 
 
          $outletid = (int)$this->session->userdata('outlet_id');
+
+         $priceamount = 0.00; 
+         $quantityamount = 0.00; 
+      
+
+         $chosen_summeryid = $this->security->xss_clean($_POST['chosen_summeryid']); 
+
         if(count($this->cart->contents())!=0){
             foreach($this->cart->contents() as $items){
-                $oldqtysection = (int)$items['qty'];
+                $oldqtysection = $items['qty'];
                 $currentquanttiy = 0;
                 $answersectionforquantity = 0;
 
@@ -4212,6 +4158,11 @@ public function select_postponed(){
                 }
 
 
+                $answer = ($items['qty'] * $items['price']); 
+                if($paymentmethodforreturn=='Credit'){
+                    $this->main_model->getpaymentresultsection($todaydate, $answer, $this->session->outlet_id,$chosen_summeryid); 
+                }
+                
 
 
                 $resultupdateqty = $this->main_model->resultupdateqtysectionforoutlet($answersectionforquantity,$outletid,$items['id']);
@@ -4231,6 +4182,8 @@ public function select_postponed(){
 
                 echo 'Result reduce '. $resultofreduce;
             }
+
+          
         }
         else {
 

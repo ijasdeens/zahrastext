@@ -1337,6 +1337,7 @@
                                         <tr>
                                         <th>Invoice NO</th>
                                         <th>Customer name</th>
+                                        <th>Payment method</th>
                                         <th>Mobile</th>
                                         <th>Product list</th>
                                         <th>Date</th>
@@ -1359,6 +1360,11 @@
                                         </div>
                                         
                                     </div>
+                                    <div class="row">
+                                        <div class="col">
+                                           <input type="search" name="search" id="searcchbybarcodeinreturn" placeholder="Barcode here......" class="form-control">
+                                        </div>
+                                    </div>
                                     <div class="row my-2 d-none">
                                         <div class="col">
                                             <span class="total_sub_total badge badge-info">Sum of sub total : </span>&nbsp; <span id='sumofsubtotaltotal_amount_section'>Rs.0.00</span>
@@ -1370,6 +1376,7 @@
                                         <thead>
                                             <tr>
                                                 <th>Product name</th>
+                                                <th>Barcode</th>
                                                 <th>Quantity</th>
                                                 <th>Price</th>
                                                 <th>Sub total</th>

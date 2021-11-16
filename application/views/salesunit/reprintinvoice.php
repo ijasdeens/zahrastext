@@ -131,6 +131,7 @@
     <div id="mid">
       <div class="info">
         <h2>Contact Info</h2>
+       <center> <h1>REPRINTED</h1></center>
         <p style="font-weight:bold">
             Address :    <?= $this->session->address?><br/>
               Phone   : <?php echo $this->session->outlet_mobile?> <br/>

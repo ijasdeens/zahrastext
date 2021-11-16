@@ -252,8 +252,8 @@
     </script>
 
     <script>
-$(document).ready(function(){
-                            $.ajax({
+ $(document).ready(function(){
+                             $.ajax({
                         url: $('#base_url').val() + 'Controllerunit/deletesessionforcarts',
                         method: 'POST',
                         success: function (data) {
@@ -264,7 +264,9 @@ $(document).ready(function(){
                         }
                     });
 
-});
+                    
+
+}); 
 </script>
 
     <script>

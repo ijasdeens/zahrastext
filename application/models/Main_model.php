@@ -1928,13 +1928,47 @@ class Main_model extends CI_Model {
 
     }
 
+    public function getpaymentresultsection($date, $answer, $outletid,$chosensummeryid){
+
+        $elcustomerid = 0; 
+
+        $this->db->select('customer_id'); 
+        $this->db->from('order_summery'); 
+        $this->db->where('order_summery_id',$chosensummeryid);
+        $elresult = $this->db->get(); 
+        if($elresult->num_rows() > 0) {
+            foreach($elresult->result() as $row){
+                $elcustomerid = $row->customer_id; 
+            }
+        } 
+
+        $answer = floatval($answer); 
+        $this->db->select('sales_credit_amount'); 
+        $this->db->from('sales_credit_details'); 
+        $this->db->where('summery_id_fk',$chosensummeryid); 
+        $this->db->where('outlet_id',$outletid); 
+        $result = $this->db->get(); 
+
+        $priceanswer =0.00; 
+
+        if($result->num_rows() > 0) {
+            foreach($result->result() as $row){
+                $priceanswer = floatval($row->sales_credit_amount); 
+            }
+               $this->db->query("update customer set customer_credit=(customer_credit - ".$answer.") where customer_id=".$elcustomerid.""); 
+               
+        return $this->db->query("update sales_credit_details set sales_credit_amount=(sales_credit_amount - ".$answer." ) where summery_id_fk=".$chosensummeryid." and outlet_id=".$outletid." "); 
+
+        }
+    }
+
 
     public function deleteproductsforoutlet($id){
         return $this->db->where('product_id',$id)->delete('products_for_outlet');
     }
     
     public function searchinvoicebasedpurchase($fromdate,$todate,$outletid){
-        $this->db->select('customer.customer_name,customer.customer_mobile,order_summery.invoice_no,order_summery.ordered_date,order_summery.order_summery_id');
+        $this->db->select('order_summery.payment_method,customer.customer_name,customer.customer_mobile,order_summery.invoice_no,order_summery.ordered_date,order_summery.order_summery_id');
         $this->db->from('order_summery');
         $this->db->join('customer','customer.customer_id=order_summery.customer_id','left');
        $this->db->where('SUBSTRING(order_summery.ordered_date,1,10)>=',$fromdate);
@@ -1954,7 +1988,7 @@ class Main_model extends CI_Model {
 
 
     public function getproductdetails($order_summery_id){
-        $this->db->select('order_summery.discount,order_summery.discounted_amount,order_summery.total_amount as fulltotalamount,products_section.products_id as product_id,products_section.product_name,products_section.product_price,order_details.choosen_quantity,products_section.products_id,products_section.products_code,order_details.choosen_quantity,order_details.sub_total');
+        $this->db->select('order_summery.discount,order_summery.discounted_amount,order_summery.total_amount as fulltotalamount,products_section.products_id as product_id,products_section.product_name,products_section.product_price,order_details.choosen_quantity,products_section.products_id,products_section.products_code,order_details.choosen_quantity,order_details.sub_total,order_details.product_code_no');
         $this->db->from('order_details');
         $this->db->join('products_section','products_section.products_id=order_details.product_id','left');
         $this->db->join('order_summery','order_summery.order_summery_id=order_details.summery_id','left');
@@ -3130,6 +3164,7 @@ class Main_model extends CI_Model {
         $this->db->from('order_summery'); 
         $this->db->join('customer','customer.customer_id=order_summery.customer_id','left'); 
         $this->db->join('sales_credit_details','sales_credit_details.summery_id_fk=order_summery.order_summery_id','left');
+
         if($fromdate!=''){
             $this->db->where('SUBSTRING(ordered_date,1,10)>=',$fromdate);
 
@@ -3207,10 +3242,8 @@ class Main_model extends CI_Model {
     }
 
     public function detectcreditdetailsbycash($recamount, $ordereddate, $summeryid,$balanceamount){
-        
        
-      
-            $recamount = floatval($recamount);
+        $recamount = floatval($recamount);
             $this->db->select('sales_credti_id'); 
             $this->db->from('sales_credit_details'); 
             $this->db->where('summery_id_fk',$summeryid);

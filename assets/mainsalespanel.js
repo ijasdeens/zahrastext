@@ -5,6 +5,12 @@ $(document).ready(function () {
 
 	sessionStorage.setItem('checklinessid','asd'); 
 
+
+	
+	const returnedproductarray = []; 
+	const returnedproductqty = []; 
+
+
 		const setdatesforsumemry = (fromdate='', todate='') => {
 		$.ajax({
 			url: base_url + "Controllerunit/setdatesforsumemry",
@@ -2320,10 +2326,7 @@ getloanpaymentmentcheckmethod();
 		let additional_information = $('#additional_information').val(); 
 
 	 
-
-	 
-
-	 
+ 
 
 		if (sales_invoice_id == null) {
 		}
@@ -2801,8 +2804,9 @@ getloanpaymentmentcheckmethod();
 						html = `<tr>
 <td>${d.invoice_no}</td>
 <td>${d.customer_name == null ? "Walkin customer" : d.customer_name}</td>
+<td>${d.payment_method}</td>
 <td>${d.customer_mobile == null ? "Walkin Customer" : d.customer_mobile}</td>
-<td><button class='btn btn-link btn-sm  show_products_details_btn' ordered_date = '${
+<td><button class='btn btn-link btn-sm  show_products_details_btn' payment_method="${d.payment_method}" ordered_date = '${
 							d.ordered_date
 						}' order_summery_id='${
 							d.order_summery_id
@@ -2834,6 +2838,10 @@ ${d.ordered_date}
 
 		let sumoftotalvalue = 0.00; 
 
+		let payment_method = $(this).attr('payment_method'); 
+
+
+
 		$.ajax({
 			url: base_url + "Controllerunit/getproductdetails",
 			method: "POST",
@@ -2851,21 +2859,25 @@ ${d.ordered_date}
 					$('#total_amount_section').html('Rs.'+parseFloat(0).toFixed(2));
 					return false;
 				} else {
+					sessionStorage.setItem('ordersummeryidfromreturn',order_summery_id); 
+					sessionStorage.setItem('ordereddateid',ordered_date); 
+					sessionStorage.setItem('paymentmethodforreturn',payment_method); 
+					
 					$("#product_name_section_display").html("");
-
-
-					getData.map((d) => {
+ 					getData.map((d) => {
 						$('#total_amount_section').html('Rs.'+parseFloat(d.fulltotalamount).toFixed(2));
 						sessionStorage.setItem('fulltotalamount',d.fulltotalamount); 
 						let subtotal = parseFloat(d.sub_total * d.choosen_quantity);
 						sumoftotalvalue = parseFloat(d.sub_total * d.choosen_quantity); 
 						html += `<tr>
 <td>${d.product_name}</td>
+<td>${d.product_code_no}</td>
 <td class='choosen_quantity_column'>${d.choosen_quantity}</td>
 <td class="sub_total_amount_for_total">${parseFloat(d.sub_total).toFixed(2)}</td>
 <td>
 ${subtotal.toFixed(2)}
 </td>
+
 <td class='text-center'>
 <input type='tel' class='form-control return_quantity_value text-center' value='${d.choosen_quantity}'/>
 ${
@@ -2920,12 +2932,27 @@ ${
 
 		$('.sub_total_amount_for_total').each(function(e){
 			totalrefundableamount+=parseFloat($(this).html()); 
-		})
+		}); 
 
-		let refundedamount = prompt("Refunded amount",parseFloat(sessionStorage.getItem('fulltotalamount')).toFixed(2));
+		let totalpricesection = 0.00; 
+		let totalqtysection = 0.00; 
+	 
+		returnedproductarray.map(pr => {
+			totalpricesection+=parseFloat(pr);
+		}); 
+		returnedproductqty.map(br => {
+			totalqtysection+=parseFloat(br); 
+		}); 
 
-		let ordered_dateforreturn = sessionStorage.getItem("ordered_dateforreturn");
+	 
 
+		let refundedamount = prompt("Refunded amount",parseFloat(totalpricesection).toFixed(2));
+
+	 
+
+		let chosen_summeryid = sessionStorage.getItem('ordersummeryidfromreturn'); 
+		let chosendate = sessionStorage.getItem('ordereddateid'); 
+		let paymentmethodforreturn= sessionStorage.getItem('paymentmethodforreturn'); 
 		 
 		if (refundedamount != null) {
 			refundedamount = parseFloat(refundedamount).toFixed(2); 
@@ -2938,7 +2965,11 @@ ${
 					method: "POST",
 					data: {
 						refundedamount: refundedamount,
-						ordered_dateforreturn: ordered_dateforreturn,
+						ordered_dateforreturn: sessionStorage.getItem('ordered_dateforreturn'),
+						chosen_summeryid:chosen_summeryid,
+						chosendate:chosendate, 
+						paymentmethodforreturn:paymentmethodforreturn, 
+						todaydate : getfulldate()
 					},
 					success: function (data) {
 						window.open(
@@ -2968,6 +2999,7 @@ ${
 	//whileback
 
 	generaldatasection = 0; 
+
 
 	$("body").delegate(".return_product_to_sale", "click", function () {
 		let choosen_quantity_html = parseInt(
@@ -3006,16 +3038,24 @@ ${
 		let discount = $(this).attr("discount");
 		let discounted_amount = $(this).attr("discounted_amount");
 		let total_amount = $(this).attr("total_amount");
-
 		let products_code = $(this).attr("products_code");
 		let choosen_quantity = $(this).attr("choosen_quantity");
 
+
+		let tempprice = parseFloat(price); 
+		let tempquantity = parseFloat(return_quantity_val); 
+		let answer = (tempprice * tempquantity); 
+
+		returnedproductarray.push(answer); 
+		returnedproductqty.push(return_quantity_val); 
+	
 		toastr.info(
 			`${return_quantity_val} ${product_name} ${
 				return_quantity_val > 1 ? "have been" : "has been "
 			} added for return report`
 		);
 
+		$(this).attr('disabled',true); 
  
 		$.ajax({
 			url: base_url + "Controllerunit/addproductsforreturn",
@@ -3062,6 +3102,17 @@ ${
 			$(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
 		});
 	});
+
+	$("#searcchbybarcodeinreturn").on("keyup", function () {
+		var value = $(this).val().toLowerCase();
+		$("#product_name_section_display tr").filter(function () {
+			$(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+		});
+	});
+
+
+
+
 
 	function saveexpensedetailsforregister(amount,date){
 		$.ajax({
@@ -3217,8 +3268,6 @@ ${
 
 		let html = '';
 		let count = 0;
-
-		console.log("date", mydate);
 
 		let totalamountsection = 0;
 
